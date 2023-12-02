@@ -18,7 +18,7 @@
     "make:seeder": "knex seed:make --knexfile=knexfile.ts -x ts --env development",
     "make:migration": "knex migrate:make --knexfile=knexfile.ts -x ts --env development",
     "deploy:prod": "npm run build && pm2 start ecosystem.config.js --only prod",
-    "deploy:dev": "deploy.bat dev"
+    "deploy:dev": "npm run build && pm2 start ecosystem.config.js --only dev"
   },
   "keywords": [],
   "author": "",
@@ -74,6 +74,7 @@
     "objection": "^3.1.1",
     "parse-duration": "^1.1.0",
     "pg": "^8.11.3",
+    "pm2": "^5.3.0",
     "puppeteer": "^21.5.1",
     "puppeteer-cluster": "^0.23.0",
     "puppeteer-extra": "^3.3.6",
