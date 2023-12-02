@@ -1,49 +1,30 @@
 @echo off
 SETLOCAL EnableDelayedExpansion
 
-:: Vérifiez si l'argument est fourni
-IF "%1"=="" (
-    echo Usage: %0 [dev|prod]
-    exit /b 1
-)
-
-:: Déterminez la branche de déploiement en fonction de l'argument
-IF "%1"=="dev" (
-    SET "deploy_branch=dev"
-) ELSE IF "%1"=="prod" (
-    SET "deploy_branch=prod"
-) ELSE (
-    echo Argument invalide. Utilisez 'dev' ou 'prod'.
-    exit /b 1
-)
-
-:: Sauvegardez la branche actuelle
-FOR /F "tokens=*" %%i IN ('git rev-parse --abbrev-ref HEAD') DO SET "current_branch=%%i"
-
-:: Assurez-vous que vous êtes sur la branche main
-git checkout main
-
-:: Exécutez npm run build
+:: Construire le projet
 call npm run build
 IF NOT %ERRORLEVEL% == 0 (
-    echo La commande a échoué: npm run build
+    echo La construction du projet a échoué.
     exit /b 1
 )
+:: Sauvegarder la branche actuelle
+FOR /F "tokens=*" %%i IN ('git rev-parse --abbrev-ref HEAD') DO SET "current_branch=%%i"
 
-:: Ajouter le dossier build
-git add dist --force
-git add package.json
+:: Créer une nouvelle branche temporaire
+git checkout -b temp-deploy
 
-:: Demander le message de commit
-echo Entrez le message de commit :
-SET /P commit_message=
-git commit -m "%commit_message%"
+:: Ajouter et committer le dossier dist
+git add dist -f
+git commit -m "Déploiement du dossier dist"
 
-:: Pousser la branche main sur la branche spécifiée sur le dépôt distant deploy
-git push deploy main:%deploy_branch%
+:: Pousser sur la branche dev du dépôt deploy
+git push deploy temp-deploy:dev
 
-:: Nettoyage
+:: Revenir à la branche originale
 git checkout %current_branch%
 
-echo Deploiement sur la branche << %deploy_branch% >> termine avec succes.
+:: Supprimer la branche temporaire
+git branch -d temp-deploy
+
+echo Déploiement réussi sur la branche dev.
 ENDLOCAL
