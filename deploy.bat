@@ -21,7 +21,7 @@ IF "%1"=="dev" (
 FOR /F "tokens=*" %%i IN ('git rev-parse --abbrev-ref HEAD') DO SET "current_branch=%%i"
 
 :: Assurez-vous que vous êtes sur la branche main
-git checkout main
+git checkout back
 
 :: Exécutez npm run build
 call npm run build
@@ -35,7 +35,8 @@ git fetch deploy %deploy_branch%
 git checkout -b temp-branch deploy/%deploy_branch%
 
 :: Ajouter le dossier build
-git add chemin/vers/le/dossier/build
+git add dist --force
+git add package.json
 
 :: Demander le message de commit
 echo Entrez le message de commit :
