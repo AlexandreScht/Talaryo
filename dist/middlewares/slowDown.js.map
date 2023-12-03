@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/middlewares/slowDown.ts"],"sourcesContent":["const slowDown =\n  (ms: number) =>\n  ({ next }) =>\n    setTimeout(() => next(), ms);\n\nexport default slowDown;\n"],"names":["slowDown","ms","next","setTimeout"],"mappings":";;;;+BAKA;;;eAAA;;;AALA,MAAMA,WACJ,CAACC,KACD,CAAC,EAAEC,IAAI,EAAE,GACPC,WAAW,IAAMD,QAAQD;MAE7B,WAAeD"}
