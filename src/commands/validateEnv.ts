@@ -1,14 +1,10 @@
-import { bool, cleanEnv, port, str } from 'envalid';
+const { cleanEnv, str, port, bool } = require('envalid');
 
-export const ValidateDefaultEnv = () => {
+require('dotenv').config();
+
+try {
   cleanEnv(process.env, {
     NODE_ENV: str({ choices: ['development', 'production'], default: 'development' }),
-    PORT: port(),
-  });
-};
-
-export const ValidateEnv = () => {
-  cleanEnv(process.env, {
     PORT: port(),
     FRONT_URL: str(),
     DB_USER: str(),
@@ -36,4 +32,6 @@ export const ValidateEnv = () => {
     STRIPE_SECRET_WEBHOOK: str(),
     LINKEDIN: str(),
   });
-};
+} catch (error: unknown) {
+  process.exit(1);
+}

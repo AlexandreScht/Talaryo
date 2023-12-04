@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node dist/server.js",
-    "dev": "cross-env NODE_ENV=development nodemon",
+     "env": "ts-node src/commands/validateEnv.ts",
+    "start": "npm run env && cross-env NODE_ENV=production node dist/server.js",
+    "dev": "npm run env && cross-env NODE_ENV=development nodemon",
     "reset": "ts-node src/commands/resetProd.ts",
     "code": "tsc --noEmit --skipLibCheck --incremental false && tsc-alias",
     "build": "swc src -d dist --source-maps --copy-files",

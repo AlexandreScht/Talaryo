@@ -1,9 +1,5 @@
-import { config as dotConfig } from 'dotenv';
-import { ValidateEnv } from '../commands/validateEnv';
-
-dotConfig({ path: `.env.${process.env.NODE_ENV || 'development'}.local` });
-
-ValidateEnv();
+import dotenv from 'dotenv';
+dotenv.config();
 
 const config = {
   FRONT_URL: process.env.FRONT_URL,
