@@ -5,7 +5,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.bigIncrements('id').unsigned().primary();
     table.string('email', 125).notNullable();
     table.text('password').nullable();
-    table.enu('role', ['admin', 'business', 'advanced', 'pro']).nullable().defaultTo(null);
+    table.enu('role', ['admin', 'business', 'advanced', 'pro', 'test']).nullable().defaultTo(null);
     table.string('firstName', 125).nullable();
     table.string('lastName', 125).nullable();
     table.timestamp('freeTrials').nullable();

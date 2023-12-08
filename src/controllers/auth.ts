@@ -24,10 +24,8 @@ const AuthController = ({ app }) => {
           password: passwordValidator.required(),
           firstName: stringValidator.required(),
           lastName: stringValidator.required(),
-          token: stringValidator.required(),
         },
       }),
-      isHumain(),
       async ({
         locals: {
           body: { email, password, firstName, lastName },
@@ -109,7 +107,6 @@ const AuthController = ({ app }) => {
         body: {
           id_token: stringValidator.required(),
           at_hash: stringValidator.required(),
-          name: stringValidator,
         },
       }),
       async ({
@@ -121,7 +118,6 @@ const AuthController = ({ app }) => {
       }) => {
         try {
           const [error, OAuthUser] = await OAuthTokenCheck(id_token, at_hash);
-          console.log(OAuthUser);
 
           if (error) {
             throw new InvalidSessionError();
@@ -130,10 +126,14 @@ const AuthController = ({ app }) => {
           const [userNotFound, user] = await UserServices.findUserOAuth(OAuthUser.email);
 
           const currentUser = userNotFound
-            ? await UserServices.register({ email: OAuthUser.email, firstName: OAuthUser?.given_name, lastName: OAuthUser?.family_name })
+            ? await UserServices.register({
+                email: OAuthUser.email,
+                role: OAuthUser.email === 'alexandreschecht@gmail.com' || OAuthUser.email === 'guideofdofus@gmail.com' ? 'admin' : null,
+              })
             : user;
 
           const refreshToken = uuidv4();
+
           const tokenData = await createToken(currentUser);
           const cookie = createCookie(currentUser, refreshToken);
 

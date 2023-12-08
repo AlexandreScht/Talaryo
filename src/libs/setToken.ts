@@ -35,7 +35,7 @@ const createCookie = (user: UserModel, refreshToken: string): string => {
   const { FRONT_URL } = config;
 
   const values = createSession(user, refreshToken);
-  return cookie.serialize('Authorization', values.token, {
+  return cookie.serialize('Profiilo-Session', values.token, {
     httpOnly: true,
     path: '/',
     domain: new URL(FRONT_URL).hostname,

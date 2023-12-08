@@ -23,6 +23,7 @@ export type DataStoredInToken = {
 
 export interface AuthRegister {
   email: string;
+  role?: role;
   password?: string;
   token?: string;
   firstName?: string;

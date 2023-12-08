@@ -49,6 +49,9 @@ const ScrappingController = ({ app }) => {
 
           sources.forEach((s: sources) => {
             const url = Object.keys(queries).reduce((acc, key) => {
+              if (!queries[key]) {
+                return acc;
+              }
               if (key === 'fn') {
                 const str = queries[key].split(',').map((v: string) => `intitle:${v.replaceAll(' ', '-')}`);
                 return (acc += ` ${str.join(' | ')}`);

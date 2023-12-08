@@ -10,7 +10,7 @@ import Container from 'typedi';
 const { security } = config;
 
 const getAuthorization = (req: Request) => {
-  const coockie = req.cookies['Authorization'];
+  const coockie = req.cookies['Profiilo-Session'];
   if (coockie) return coockie;
 
   const header = req.header('Authorization');
@@ -70,9 +70,9 @@ const mw =
     try {
       const UserServices = Container.get(UsersServiceFile);
       const Authorization = getAuthorization(req);
+
       if (Authorization) {
         const [err, user] = getUser(Authorization);
-
         if (err) {
           throw new ExpiredSessionError();
         }
