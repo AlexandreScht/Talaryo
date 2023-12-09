@@ -22,6 +22,8 @@ const OAuthTokenCheck = async (idToken: string, at_hash: string): Promise<OAuthT
     }
     return [true];
   } catch (error) {
+    console.log(error);
+
     return [true];
   }
 };

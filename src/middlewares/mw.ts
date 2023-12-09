@@ -76,6 +76,7 @@ const mw =
         if (err) {
           throw new ExpiredSessionError();
         }
+
         await UserServices.checkRefreshToken(user);
         ctx.session = user;
       }

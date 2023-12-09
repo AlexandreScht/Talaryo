@@ -38,7 +38,7 @@ const createCookie = (user: UserModel, refreshToken: string): string => {
   return cookie.serialize('Profiilo-Session', values.token, {
     httpOnly: true,
     path: '/',
-    domain: new URL(FRONT_URL).hostname,
+    domain: new URL(FRONT_URL).hostname === 'localhost' ? new URL(FRONT_URL).hostname : '.profiilo.com',
     maxAge: values.expiresIn,
     secure: process.env.NODE_ENV === 'production',
   });
