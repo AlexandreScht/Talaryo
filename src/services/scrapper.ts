@@ -76,7 +76,7 @@ export class ScrapperServiceFile extends ApiPuppeteer {
           }
         });
       }
-      const desc = $(element).find('div.VwiC3b.yXK7lf.lyLwlc.yDYNvb.W8l4ac.lEBKkf').text();
+      const desc = $(element).find('div.VwiC3b.yXK7lf').text();
       const fullName = title?.length > 0 ? title[0].toString().trim() : undefined;
       const currentJob = chip?.length > 2 ? chip[1].toString().trim() : title?.length > 1 ? title[1].toString().trim() : undefined;
       const currentCompany = title?.length > 2 ? title[2].toString().trim() : chip?.length > 1 ? chip[chip.length - 1].toString().trim() : undefined;
