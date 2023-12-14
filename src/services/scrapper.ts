@@ -3,11 +3,11 @@ import { ScrapeInfosResult, ScrappingSource, cheerioInfos, cheerioResult, puppet
 import { ApiPuppeteer } from '@utils/puppeteer';
 import { load } from 'cheerio';
 import { Service } from 'typedi';
+
 @Service()
 export class ScrapperServiceFile extends ApiPuppeteer {
   private shuffleArray(v: cheerioInfos[][]): cheerioInfos[] {
     const shuffleArr = [].concat(...v);
-
     for (let i = shuffleArr.length - 1; i > 0; i--) {
       const mixed = Math.floor(Math.random() * (i + 1));
       [shuffleArr[i], shuffleArr[mixed]] = [shuffleArr[mixed], shuffleArr[i]];
@@ -20,13 +20,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
     const functionName = {
       LinkedIn: [this.LinkedIn, 'https://www.google.com/search'],
     };
-
     return functionName[name];
   }
 
   public async scrape(data: ScrappingSource[]): Promise<ScrapeInfosResult> {
     const values: puppeteerProps[] = data.map(v => ({ ...v, props: this.getFn(v.site), retryCount: 0 }));
-
     this.check(values);
     const [error, success] = await this.open(values);
     if (error) {
@@ -60,16 +58,19 @@ export class ScrapperServiceFile extends ApiPuppeteer {
 
     const linkedIn: cheerioResult = [];
 
-    const img = $('div.N54PNb.BToiNc.cvP2Ce').find('img.XNo5Ab').attr('src');
+    const platform = $('div.N54PNb.BToiNc.cvP2Ce').find('img.XNo5Ab').attr('src');
 
-    $('div.N54PNb.BToiNc.cvP2Ce').each((_, element) => {
+    const elements = $('div.N54PNb.BToiNc.cvP2Ce');
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
+
       const link = $(element).find('a[jsname="UWckNb"]').attr('href');
       const title = $(element).find('h3.LC20lb.MBeuO.DKV0Md').text().split(' - ');
       const chip = [];
       const chipWrapper = $(element).find('div.lhLbod.gEBHYd');
       if (chipWrapper) {
-        chipWrapper.find('span').each((_, element) => {
-          const chipText = $(element).text();
+        chipWrapper.find('span').each((_, elem) => {
+          const chipText = $(elem).text();
           if (chipText !== ' · ') {
             chip.push(chipText);
           }
@@ -79,12 +80,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       const fullName = title?.length > 0 ? title[0].toString().trim() : undefined;
       const currentJob = chip?.length > 2 ? chip[1].toString().trim() : title?.length > 1 ? title[1].toString().trim() : undefined;
       const currentCompany = title?.length > 2 ? title[2].toString().trim() : chip?.length > 1 ? chip[chip.length - 1].toString().trim() : undefined;
-      linkedIn.push({ link, img, fullName, currentJob, currentCompany, desc: desc?.trim() });
-    });
+      linkedIn.push({ platform, link, img: null, fullName, currentJob, currentCompany, desc: desc?.trim() });
+    }
 
     return linkedIn;
   }
-  //? ----- linkedIn logic -----
 }
 
 export default ScrapperServiceFile;

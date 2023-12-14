@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-     "env": "ts-node src/commands/validateEnv.ts",
+    "env": "ts-node src/commands/validateEnv.ts",
     "start": "npm run env && cross-env NODE_ENV=production node dist/server.js",
     "dev": "npm run env && cross-env NODE_ENV=development nodemon",
     "reset": "ts-node src/commands/resetProd.ts",
@@ -53,6 +53,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "cheerio": "^1.0.0-rc.12",
     "commander": "^11.1.0",

@@ -28,3 +28,5 @@ export interface RequestWithAuth extends Request {
 export interface RequestWithWebhook extends Request {
   event?: Stripe.Event;
 }
+
+export type ApiRes = [Error] | [null, unknown];

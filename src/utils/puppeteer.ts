@@ -158,6 +158,10 @@ export class ApiPuppeteer {
             }
             const res: cheerioResult = props[0](responseBody);
             await page.close();
+            if (res instanceof Promise) {
+              const result = await res;
+              resolve([false, [result, this.getNumber(responseBody)]]);
+            }
             resolve([false, [res, this.getNumber(responseBody)]]);
           }
         });

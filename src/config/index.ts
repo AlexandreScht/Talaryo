@@ -53,6 +53,9 @@ const config = {
     USERNAME: process.env.PROXY_USERNAME,
     PASSWORD: process.env.PROXY_PASSWORD,
   },
+  api: {
+    PROXYCURL: process.env.PROXYCURL_KEY,
+  },
   sites: {
     LinkedIn: process.env.LINKEDIN,
   },

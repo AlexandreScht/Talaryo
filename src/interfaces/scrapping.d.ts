@@ -41,6 +41,7 @@ export interface cheerioInfos {
   desc: string;
   img: string;
   favFolderId?: string;
+  platform: string;
 }
 export type cheerioResult = cheerioInfos[];
 
