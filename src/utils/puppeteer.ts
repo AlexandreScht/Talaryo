@@ -186,12 +186,8 @@ export class ApiPuppeteer {
         const [error, res] = await this.scrapper({ page, data });
         if (error) {
           data.retryCount++;
-          if (data.retryCount < 3) {
-            logger.error(`Error on scrapping: ${data.url}`);
-            this.browser.queue(data);
-          } else {
-            result.push({ data: undefined, current: true });
-          }
+          logger.error(`Error on scrapping: ${data.url}`);
+          result.push({ data: undefined, current: true });
         } else {
           result.push({ data: res[0], number: res[1], current: data.current });
         }

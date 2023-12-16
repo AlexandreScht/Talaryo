@@ -28,7 +28,6 @@ try {
     MAILER_HOST: str(),
     ORIGIN: str(),
     CREDENTIALS: bool(),
-    PROXYCURL_KEY: str(),
     STRIPE_SECRET_KEY: str(),
     STRIPE_SECRET_WEBHOOK: str(),
     LINKEDIN: str(),
