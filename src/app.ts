@@ -20,7 +20,7 @@ export class App {
   public env: string;
   public port: string | number;
   private server: http.Server;
-
+ 
   constructor(routes: Routes) {
     this.app = express();
     this.env = config.NODE_ENV || 'development';
