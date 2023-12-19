@@ -26,7 +26,7 @@ class FavorisServiceFile {
 
   public async getFavInFolder(limit: number, page: number, favFolderId: number): Promise<{ total: number; favoris: FavoriModel[] }> {
     try {
-      const query = FavoriModel.query().where({ favFolderId, disabled: false });
+      const query = FavoriModel.query().where({ favFolderId });
       const [{ count }] = await query.clone().limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
 
@@ -36,15 +36,15 @@ class FavorisServiceFile {
       throw new ServicesError();
     }
   }
-  public async getLastFav(userId: number): Promise<FavoriModel[]> {
+  public async getLatests(userId: number): Promise<FavoriModel[]> {
     try {
-      return await FavoriModel.query().where({ userId, disabled: false }).orderBy('id', 'desc').limit(3);
+      return await FavoriModel.query().where({ userId }).orderBy('id', 'desc').limit(3);
     } catch (error) {
       throw new ServicesError();
     }
   }
 
-  public async createFav(fav: favorisData, id: number): Promise<FavoriModel | boolean> {
+  public async create(fav: favorisData, id: number): Promise<FavoriModel | boolean> {
     try {
       return await FavoriModel.query().insert({ ...fav, userId: id });
     } catch (error) {
@@ -55,7 +55,7 @@ class FavorisServiceFile {
     }
   }
 
-  public async removeFav({ favFolderId, link }: findFav): Promise<boolean> {
+  public async remove({ favFolderId, link }: findFav): Promise<boolean> {
     try {
       const deletedRows = await FavoriModel.query().delete().where({
         favFolderId,

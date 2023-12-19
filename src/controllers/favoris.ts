@@ -33,7 +33,7 @@ const FavorisController = ({ app }) => {
         next,
       }) => {
         try {
-          const success = await FavorisServices.createFav({ link, img, fullName, currentJob, currentCompany, desc, favFolderId }, sessionId);
+          const success = await FavorisServices.create({ link, img, fullName, currentJob, currentCompany, desc, favFolderId }, sessionId);
           res.send({ res: success });
         } catch (error) {
           next(error);
@@ -59,7 +59,7 @@ const FavorisController = ({ app }) => {
         next,
       }) => {
         try {
-          const success = await FavorisServices.removeFav({ link, favFolderId });
+          const success = await FavorisServices.remove({ link, favFolderId });
           res.send({ res: success });
         } catch (error) {
           next(error);
@@ -104,7 +104,7 @@ const FavorisController = ({ app }) => {
       auth(),
       async ({ session: { sessionId }, res, next }) => {
         try {
-          const favoris = await FavorisServices.getLastFav(sessionId);
+          const favoris = await FavorisServices.getLatests(sessionId);
 
           res.send({ res: favoris });
         } catch (error) {

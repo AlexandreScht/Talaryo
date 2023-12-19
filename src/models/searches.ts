@@ -5,7 +5,9 @@ export class SearchesModel extends Model implements searches {
   id: number;
   userId: number;
   searchFolderId: number;
-  search: string;
+  searchQueries: string;
+  name: string;
+  society?: string;
   count?: string;
 
   static tableName = 'searches';

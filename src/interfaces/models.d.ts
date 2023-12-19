@@ -34,7 +34,9 @@ export interface searches {
   id?: number;
   userId?: number;
   searchFolderId?: number;
-  search: string;
+  searchQueries: string;
+  name: string;
+  society?: string;
 }
 
 export interface searchFolders {

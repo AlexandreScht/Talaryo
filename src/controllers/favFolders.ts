@@ -5,7 +5,7 @@ import FavorisFolderFile from '@/services/favFolders';
 import mw from '@middlewares/mw';
 import Container from 'typedi';
 
-const FoldersController = ({ app }) => {
+const FavFoldersController = ({ app }) => {
   const FavorisFolderServices = Container.get(FavorisFolderFile);
   app.post(
     '/create-favFolders',
@@ -35,6 +35,7 @@ const FoldersController = ({ app }) => {
   app.delete(
     '/remove-favFolders',
     mw([
+      auth(),
       validator({
         query: {
           id: idValidator.required(),
@@ -48,7 +49,7 @@ const FoldersController = ({ app }) => {
         next,
       }) => {
         try {
-          const countDeleted = await FavorisFolderServices.removeFavFolder(id);
+          const countDeleted = await FavorisFolderServices.removeFolder(id);
           res.send({ res: countDeleted });
         } catch (error) {
           next(error);
@@ -76,7 +77,7 @@ const FoldersController = ({ app }) => {
         next,
       }) => {
         try {
-          const { folders, total } = await FavorisFolderServices.getFavInFolders(sessionId, { limit, page, name });
+          const { folders, total } = await FavorisFolderServices.getFolders(sessionId, { limit, page, name });
           res.send({ res: { folders, meta: { total } } });
         } catch (error) {
           next(error);
@@ -85,4 +86,4 @@ const FoldersController = ({ app }) => {
     ]),
   );
 };
-export default FoldersController;
+export default FavFoldersController;

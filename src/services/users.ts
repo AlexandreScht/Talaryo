@@ -33,8 +33,6 @@ class UsersServiceFile {
       }
       return [false, findUser];
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }
@@ -59,8 +57,6 @@ class UsersServiceFile {
       }
       return await UserModel.query().insert({ ...userData, validate: true });
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }
@@ -103,8 +99,6 @@ class UsersServiceFile {
 
       if (updatedCount) return;
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
     throw new InvalidSessionError();

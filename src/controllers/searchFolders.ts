@@ -1,88 +1,89 @@
-// import { idValidator, limitValidator, pageValidator, stringValidator } from '@/libs/validate';
-// import auth from '@/middlewares/auth';
-// import validator from '@/middlewares/validator';
-// import FavorisFolderFile from '@/services/favFolders';
-// import mw from '@middlewares/mw';
-// import Container from 'typedi';
+import { idValidator, limitValidator, pageValidator, stringValidator } from '@/libs/validate';
+import auth from '@/middlewares/auth';
+import validator from '@/middlewares/validator';
+import SearchFolderFile from '@/services/searchFolder';
+import mw from '@middlewares/mw';
+import Container from 'typedi';
 
-// const FoldersController = ({ app }) => {
-//   const FavorisFolderServices = Container.get(FavorisFolderFile);
-//   app.post(
-//     '/create-searchFolders',
-//     mw([
-//       auth(),
-//       validator({
-//         body: { name: stringValidator.required() },
-//       }),
-//       async ({
-//         locals: {
-//           body: { name },
-//         },
-//         session: { sessionId },
-//         res,
-//         next,
-//       }) => {
-//         try {
-//           const success = await FavorisFolderServices.createFolder(name, sessionId);
-
-//           res.send({ res: success });
-//         } catch (error) {
-//           next(error);
-//         }
-//       },
-//     ]),
-//   );
-//   app.delete(
-//     '/remove-searchFolders',
-//     mw([
-//       validator({
-//         query: {
-//           id: idValidator.required(),
-//         },
-//       }),
-//       async ({
-//         locals: {
-//           query: { id },
-//         },
-//         res,
-//         next,
-//       }) => {
-//         try {
-//           const countDeleted = await FavorisFolderServices.removeFavFolder(id);
-//           res.send({ res: countDeleted });
-//         } catch (error) {
-//           next(error);
-//         }
-//       },
-//     ]),
-//   );
-//   app.get(
-//     '/get-searchFolders',
-//     mw([
-//       auth(),
-//       validator({
-//         query: {
-//           limit: limitValidator.default(10),
-//           page: pageValidator.default(1),
-//           name: stringValidator,
-//         },
-//       }),
-//       async ({
-//         locals: {
-//           query: { name, page, limit },
-//         },
-//         session: { sessionId },
-//         res,
-//         next,
-//       }) => {
-//         try {
-//           const { folders, total } = await FavorisFolderServices.getFavInFolders(sessionId, { limit, page, name });
-//           res.send({ res: { folders, meta: { total } } });
-//         } catch (error) {
-//           next(error);
-//         }
-//       },
-//     ]),
-//   );
-// };
-// export default FoldersController;
+const SearchFoldersController = ({ app }) => {
+  const SearchFolderServices = Container.get(SearchFolderFile);
+  app.post(
+    '/create-searchFolders',
+    mw([
+      auth(),
+      validator({
+        body: {
+          name: stringValidator.required(),
+        },
+      }),
+      async ({
+        locals: {
+          body: { name },
+        },
+        session: { sessionId },
+        res,
+        next,
+      }) => {
+        try {
+          const success = await SearchFolderServices.createFolder(name, sessionId);
+          res.send({ res: success });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.delete(
+    '/remove-searchFolders',
+    mw([
+      auth(),
+      validator({
+        query: {
+          id: idValidator.required(),
+        },
+      }),
+      async ({
+        locals: {
+          query: { id },
+        },
+        res,
+        next,
+      }) => {
+        try {
+          const countDeleted = await SearchFolderServices.removeFolder(id);
+          res.send({ res: countDeleted });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.get(
+    '/get-searchFolders',
+    mw([
+      auth(),
+      validator({
+        query: {
+          limit: limitValidator.default(10),
+          page: pageValidator.default(1),
+        },
+      }),
+      async ({
+        locals: {
+          query: { page, limit },
+        },
+        session: { sessionId },
+        res,
+        next,
+      }) => {
+        try {
+          const { folders, total } = await SearchFolderServices.getFolders(sessionId, { limit, page });
+          res.send({ res: { folders, meta: { total } } });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+};
+export default SearchFoldersController;

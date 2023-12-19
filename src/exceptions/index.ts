@@ -3,8 +3,6 @@ export class ServerException extends Error {
   public message: string;
 
   constructor(status: number = 500, message: string | string[] = 'Something went wrong') {
-    console.log(message);
-
     super(Array.isArray(message) ? message.join(' | ') : message);
     this.status = status;
     this.message = Array.isArray(message) ? message.join(' | ') : message;

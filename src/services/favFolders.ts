@@ -22,13 +22,11 @@ class FavorisFolderFile {
     }
   }
 
-  public async removeFavFolder(id: number): Promise<number> {
+  public async removeFolder(id: number): Promise<number> {
     try {
       await FavoriModel.query().where('favFolderId', id).delete();
       return await FavFoldersModel.query().findById(id).delete();
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }
@@ -44,7 +42,7 @@ class FavorisFolderFile {
     throw new InvalidCredentialsError();
   }
 
-  public async getFavInFolders(
+  public async getFolders(
     userId: number,
     { limit, page, name }: { limit: number; page: number; name?: string },
   ): Promise<{ total: number; folders: FavFoldersModel[] }> {
@@ -62,17 +60,12 @@ class FavorisFolderFile {
         .clone()
         .select('favFolders.id', 'favFolders.name')
         .leftJoin('favoris', 'favFolders.id', 'favoris.favFolderId')
-        .andWhere(function () {
-          this.where('favoris.disabled', false).orWhereNull('favoris.disabled');
-        })
         .groupBy('favFolders.id')
         .count('favoris.id as itemsCount')
         .modify('paginate', limit, page);
 
       return { total, folders };
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }

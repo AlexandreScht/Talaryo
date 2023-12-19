@@ -35,14 +35,13 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.string('currentJob', 255).nullable();
     table.string('currentCompany', 255).nullable();
     table.text('desc').nullable();
-    table.boolean('disabled').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
     table.unique(['userId', 'link', 'favFolderId']);
   });
   await knex.schema.createTable('searchFolders', table => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
-    table.text('name').notNullable();
+    table.string('name').notNullable();
     table.timestamps(true, true, true);
     table.unique(['userId', 'name']);
   });
@@ -51,6 +50,8 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.integer('userId').notNullable().references('id').inTable('users');
     table.integer('searchFolderId').notNullable().references('id').inTable('searchFolders');
     table.text('searchQueries').notNullable();
+    table.string('name').notNullable();
+    table.string('society').nullable();
     table.timestamps(true, true, true);
     table.unique(['userId', 'searchQueries', 'searchFolderId']);
   });
