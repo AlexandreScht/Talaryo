@@ -31,10 +31,19 @@ class SearchesServiceFile {
     }
   }
 
-  public async getLatests(userId: number, { limit, page }: { limit: number; page: number }): Promise<SearchesModel[]> {
+  public async getLatests(
+    userId: number,
+    { limit, page, name }: { limit: number; page: number; name?: string },
+  ): Promise<{ total: number; searches: SearchesModel[] }> {
     try {
-      const query = SearchesModel.query().where({ userId }).orderBy('id', 'desc').select('id', 'searchQueries', 'name', 'society');
-      return await query.modify('paginate', limit, page);
+      let query = SearchesModel.query().where({ userId });
+      if (name) {
+        query = query.where('name', 'like', `${name}%`);
+      }
+      const [{ count }] = await query.clone().limit(1).offset(0).count();
+      const total = Number.parseInt(count, 10);
+      const searches = await query.orderBy('id', 'desc').select('id', 'searchQueries', 'name', 'society').modify('paginate', limit, page);
+      return { total, searches };
     } catch (error) {
       throw new ServicesError();
     }

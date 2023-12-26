@@ -34,17 +34,17 @@ const SearchFoldersController = ({ app }) => {
     ]),
   );
   app.delete(
-    '/remove-searchFolders',
+    '/remove-searchFolders/:id',
     mw([
       auth(),
       validator({
-        query: {
+        params: {
           id: idValidator.required(),
         },
       }),
       async ({
         locals: {
-          query: { id },
+          params: { id },
         },
         res,
         next,
@@ -66,18 +66,19 @@ const SearchFoldersController = ({ app }) => {
         query: {
           limit: limitValidator.default(10),
           page: pageValidator.default(1),
+          name: stringValidator,
         },
       }),
       async ({
         locals: {
-          query: { page, limit },
+          query: { page, limit, name },
         },
         session: { sessionId },
         res,
         next,
       }) => {
         try {
-          const { folders, total } = await SearchFolderServices.getFolders(sessionId, { limit, page });
+          const { folders, total } = await SearchFolderServices.getFolders(sessionId, { limit, page, name });
           res.send({ res: { folders, meta: { total } } });
         } catch (error) {
           next(error);

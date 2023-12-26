@@ -95,9 +95,9 @@ const SearchController = ({ app }) => {
         next,
       }) => {
         try {
-          const favoris = await SearchServices.getSearchInFolder(searchFolderId, { limit, page });
+          const searches = await SearchServices.getSearchInFolder(searchFolderId, { limit, page });
 
-          res.send({ res: favoris });
+          res.send({ res: searches });
         } catch (error) {
           next(error);
         }
@@ -112,19 +112,20 @@ const SearchController = ({ app }) => {
         query: {
           limit: limitValidator.default(5),
           page: pageValidator.default(1),
+          name: stringValidator,
         },
       }),
       async ({
         locals: {
-          query: { limit, page },
+          query: { limit, page, name },
         },
         session: { sessionId },
         res,
         next,
       }) => {
         try {
-          const favoris = await SearchServices.getLatests(sessionId, { limit, page });
-          res.send({ res: favoris });
+          const searches = await SearchServices.getLatests(sessionId, { limit, page, name });
+          res.send({ res: searches });
         } catch (error) {
           next(error);
         }

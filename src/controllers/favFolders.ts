@@ -33,17 +33,17 @@ const FavFoldersController = ({ app }) => {
     ]),
   );
   app.delete(
-    '/remove-favFolders',
+    '/remove-favFolders/:id',
     mw([
       auth(),
       validator({
-        query: {
+        params: {
           id: idValidator.required(),
         },
       }),
       async ({
         locals: {
-          query: { id },
+          params: { id },
         },
         res,
         next,
@@ -63,8 +63,9 @@ const FavFoldersController = ({ app }) => {
       auth(),
       validator({
         query: {
-          limit: limitValidator.default(10),
+          limit: limitValidator.default(9),
           page: pageValidator.default(1),
+          //TODO for search folder by name in front
           name: stringValidator,
         },
       }),

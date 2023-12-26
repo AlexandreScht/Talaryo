@@ -34,10 +34,14 @@ class SearchFolderFile {
 
   public async getFolders(
     userId: number,
-    { limit, page }: { limit: number; page: number },
+    { limit, page, name }: { limit: number; page: number; name?: string },
   ): Promise<{ total: number; folders: SearchFolderModel[] }> {
     try {
-      const query = SearchFolderModel.query().where('searchFolders.userId', userId);
+      let query = SearchFolderModel.query().where('searchFolders.userId', userId);
+
+      if (name) {
+        query = query.where('name', 'like', `${name}%`);
+      }
 
       const [{ count }] = await query.clone().limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
@@ -45,11 +49,11 @@ class SearchFolderFile {
       const folders = await query
         .clone()
         .select('searchFolders.id', 'searchFolders.name')
-        .modifyGraph('searches', builder => {
-          builder.select('id', 'searchQueries', 'name', 'society').orderBy('id', 'desc').limit(2);
-        })
-        .modify('paginate', limit, page)
-        .withGraphFetched('searches');
+        .leftJoin('searches', 'searchFolders.id', 'searches.searchFolderId')
+        .groupBy('searchFolders.id')
+        .count('searches.id as searchesCount')
+        .orderBy('id', 'desc')
+        .modify('paginate', limit, page);
 
       return { total, folders };
     } catch (error) {

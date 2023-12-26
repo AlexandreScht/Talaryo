@@ -53,6 +53,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.3.1",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "cheerio": "^1.0.0-rc.12",
@@ -63,6 +64,7 @@
     "envalid": "^7.3.1",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "faker": "^6.6.6",
     "google-auth-library": "^9.0.0",
     "helmet": "^7.0.0",
     "hpp": "^0.2.3",
