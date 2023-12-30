@@ -31,12 +31,17 @@ class SearchesServiceFile {
     }
   }
 
-  public async getLatests(
+  public async getSearch(
     userId: number,
-    { limit, page, name }: { limit: number; page: number; name?: string },
+    { limit, page, name, searchFolderId }: { limit: number; page: number; name?: string; searchFolderId: number },
   ): Promise<{ total: number; searches: SearchesModel[] }> {
     try {
       let query = SearchesModel.query().where({ userId });
+
+      if (searchFolderId) {
+        query = query.where({ searchFolderId });
+      }
+
       if (name) {
         query = query.where('name', 'like', `${name}%`);
       }
@@ -45,14 +50,17 @@ class SearchesServiceFile {
       const searches = await query.orderBy('id', 'desc').select('id', 'searchQueries', 'name', 'society').modify('paginate', limit, page);
       return { total, searches };
     } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }
 
-  public async getSearchInFolder(searchFolderId: number, { limit, page }: { limit: number; page: number }): Promise<SearchesModel[]> {
+  public async getTotalSearches(userId: number): Promise<number> {
     try {
-      const query = SearchesModel.query().where({ searchFolderId }).orderBy('id', 'desc').select('id', 'searchQueries', 'name', 'society');
-      return await query.modify('paginate', limit, page);
+      const [{ count }] = await SearchesModel.query().where({ userId }).limit(1).offset(0).count();
+      const total = Number.parseInt(count, 10);
+      return total;
     } catch (error) {
       throw new ServicesError();
     }

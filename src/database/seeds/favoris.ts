@@ -33,35 +33,41 @@ const generate = (iteration: number, schema: schemaType): schemaType[] => {
 };
 
 export async function seed(knex: Knex): Promise<void> {
-  await knex.schema.dropTableIfExists('searches');
-  await knex.schema.dropTableIfExists('searchFolders');
-  await knex.schema.createTable('searchFolders', table => {
+  await knex.schema.dropTableIfExists('favoris');
+  await knex.schema.dropTableIfExists('favFolders');
+  await knex.schema.createTable('favFolders', table => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
     table.string('name').notNullable();
     table.timestamps(true, true, true);
     table.unique(['userId', 'name']);
   });
-  await knex.schema.createTable('searches', table => {
+  await knex.schema.createTable('favoris', table => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
-    table.integer('searchFolderId').notNullable().references('id').inTable('searchFolders');
-    table.text('searchQueries').notNullable();
-    table.string('name').notNullable();
-    table.string('society').nullable();
+    table.integer('favFolderId').notNullable().references('id').inTable('favFolders');
+    table.text('link').notNullable();
+    table.text('img').notNullable();
+    table.string('fullName', 255).nullable();
+    table.string('currentJob', 255).nullable();
+    table.string('currentCompany', 255).nullable();
+    table.text('desc').nullable();
     table.timestamps(true, true, true);
-    table.unique(['userId', 'searchQueries', 'searchFolderId']);
+    table.unique(['userId', 'link', 'favFolderId']);
   });
 
   // Inserts seed entries
-  await knex('searchFolders').insert(generate(50, { userId: 1, name: () => faker.word.words(1) }));
-  await knex('searches').insert(
+  await knex('favFolders').insert(generate(50, { userId: 1, name: () => faker.word.words(1) }));
+  await knex('favoris').insert(
     generate(75, {
       userId: 1,
-      searchQueries: () => `platform=${faker.word.words(1)}`,
-      searchFolderId: [() => Math.floor(Math.random() * (50 - 1 + 1)) + 1],
-      name: () => faker.word.words(1),
-      society: () => faker.word.words(1),
+      link: () => faker.internet.url({ protocol: 'http', appendSlash: true }),
+      img: [() => faker.internet.avatar()],
+      favFolderId: [() => Math.floor(Math.random() * (50 - 1 + 1)) + 1],
+      fullName: [() => faker.person.fullName()],
+      currentJob: [() => faker.person.jobTitle()],
+      currentCompany: [() => faker.company.name()],
+      desc: [() => faker.person.jobDescriptor()],
     }),
   );
 }

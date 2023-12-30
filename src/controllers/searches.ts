@@ -82,22 +82,24 @@ const SearchController = ({ app }) => {
       auth(),
       validator({
         query: {
-          limit: limitValidator.default(10),
+          limit: limitValidator.default(5),
           page: pageValidator.default(1),
-          searchFolderId: idValidator.required(),
+          searchFolderId: idValidator,
+          name: stringValidator,
         },
       }),
       async ({
         locals: {
-          query: { limit, page, searchFolderId },
+          query: { limit, page, name, searchFolderId },
         },
+        session: { sessionId },
         res,
         next,
       }) => {
         try {
-          const searches = await SearchServices.getSearchInFolder(searchFolderId, { limit, page });
+          const { total, searches } = await SearchServices.getSearch(sessionId, { limit, page, name, searchFolderId });
 
-          res.send({ res: searches });
+          res.send({ res: { total, searches } });
         } catch (error) {
           next(error);
         }
@@ -105,27 +107,13 @@ const SearchController = ({ app }) => {
     ]),
   );
   app.get(
-    '/get-lastSearches',
+    '/get-totalSearches',
     mw([
       auth(),
-      validator({
-        query: {
-          limit: limitValidator.default(5),
-          page: pageValidator.default(1),
-          name: stringValidator,
-        },
-      }),
-      async ({
-        locals: {
-          query: { limit, page, name },
-        },
-        session: { sessionId },
-        res,
-        next,
-      }) => {
+      async ({ session: { sessionId }, res, next }) => {
         try {
-          const searches = await SearchServices.getLatests(sessionId, { limit, page, name });
-          res.send({ res: searches });
+          const total = await SearchServices.getTotalSearches(sessionId);
+          res.send({ res: total });
         } catch (error) {
           next(error);
         }
