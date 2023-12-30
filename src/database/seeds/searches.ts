@@ -50,7 +50,7 @@ export async function seed(knex: Knex): Promise<void> {
     table.string('name').notNullable();
     table.string('society').nullable();
     table.timestamps(true, true, true);
-    table.unique(['userId', 'searchQueries', 'searchFolderId']);
+    table.unique(['userId', 'name', 'searchFolderId']);
   });
 
   // Inserts seed entries
@@ -58,7 +58,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('searches').insert(
     generate(75, {
       userId: 1,
-      searchQueries: () => `platform=${faker.word.words(1)}`,
+      searchQueries: 'platform=LinkedIn',
       searchFolderId: [() => Math.floor(Math.random() * (50 - 1 + 1)) + 1],
       name: () => faker.word.words(1),
       society: () => faker.word.words(1),

@@ -53,7 +53,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.string('name').notNullable();
     table.string('society').nullable();
     table.timestamps(true, true, true);
-    table.unique(['userId', 'searchQueries', 'searchFolderId']);
+    table.unique(['userId', 'name', 'searchFolderId']);
   });
 };
 
