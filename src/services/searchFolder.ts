@@ -40,7 +40,7 @@ class SearchFolderFile {
       let query = SearchFolderModel.query().where('searchFolders.userId', userId);
 
       if (name) {
-        query = query.where('name', 'like', `${name}%`);
+        query = query.where('searchFolders.name', 'like', `${name}%`);
       }
 
       const [{ count }] = await query.clone().limit(1).offset(0).count();
@@ -51,12 +51,14 @@ class SearchFolderFile {
         .select('searchFolders.id', 'searchFolders.name')
         .leftJoin('searches', 'searchFolders.id', 'searches.searchFolderId')
         .groupBy('searchFolders.id')
-        .count('searches.id as searchesCount')
+        .count('searches.id as itemsCount')
         .orderBy('id', 'desc')
         .modify('paginate', limit, page);
 
       return { total, folders };
     } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }

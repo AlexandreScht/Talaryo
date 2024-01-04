@@ -50,7 +50,7 @@ class FavorisFolderFile {
       let query = FavFoldersModel.query().where('favFolders.userId', userId);
 
       if (name) {
-        query = query.where('name', 'like', `${name}%`);
+        query = query.where('favFolders.name', 'like', `${name}%`);
       }
 
       const [{ count }] = await query.clone().limit(1).offset(0).count();

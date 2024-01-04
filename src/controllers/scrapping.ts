@@ -46,8 +46,9 @@ const ScrappingController = ({ app }) => {
           const Searches: ScrappingSource[] = [];
           const queries = { fn, industry, sector, skill, key, loc, Nindustry, Nskill, Nkey };
           const sources: sources[] = platform.split(',');
+          console.log(platform);
 
-          sources.forEach((s: sources) => {
+          sources.forEach((site: sources) => {
             const url = Object.keys(queries).reduce((acc, key) => {
               if (!queries[key]) {
                 return acc;
@@ -80,11 +81,11 @@ const ScrappingController = ({ app }) => {
                 return (acc += ` ${serializeLoc(loc, zone)}`);
               }
               return acc;
-            }, sitesUri(s));
+            }, sitesUri(site));
 
             Searches.push({
               url: `https://www.google.com/search?client=opera&q=${encodeURIComponent(url)}&start=${start}&num=${index}`,
-              site: s,
+              site,
               current: time ?? false,
             });
           });

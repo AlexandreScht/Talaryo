@@ -13,18 +13,7 @@ const SearchController = ({ app }) => {
       auth(),
       validator({
         body: {
-          platform: stringValidator.required(),
-          fn: stringValidator,
-          industry: stringValidator,
-          sector: stringValidator,
-          skill: stringValidator,
-          key: stringValidator,
-          loc: stringValidator,
-          Nindustry: stringValidator,
-          Nskill: stringValidator,
-          Nkey: stringValidator,
-          time: stringValidator,
-          zone: stringValidator,
+          search: stringValidator.required(),
         },
         query: {
           searchFolderId: idValidator.required(),
@@ -34,16 +23,15 @@ const SearchController = ({ app }) => {
       }),
       async ({
         locals: {
+          body: { search },
           query: { searchFolderId, name, society },
         },
-        locals,
         session: { sessionId },
         res,
         next,
       }) => {
         try {
-          const searches = JSON.stringify(locals.body);
-          const success = await SearchServices.create({ name, society, searchQueries: searches, searchFolderId }, sessionId);
+          const success = await SearchServices.create({ name, society, searchQueries: search, searchFolderId }, sessionId);
           res.send({ res: success });
         } catch (error) {
           next(error);

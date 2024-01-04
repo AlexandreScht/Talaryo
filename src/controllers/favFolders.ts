@@ -65,7 +65,6 @@ const FavFoldersController = ({ app }) => {
         query: {
           limit: limitValidator.default(9),
           page: pageValidator.default(1),
-          //TODO for search folder by name in front
           name: stringValidator,
         },
       }),
