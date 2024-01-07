@@ -5,6 +5,8 @@ export class SearchFolderModel extends Model implements searchFolders {
   id: number;
   userId: number;
   name: string;
+  createdAt: string;
+  updatedAt: string;
   count?: string;
 
   static tableName = 'searchFolders';

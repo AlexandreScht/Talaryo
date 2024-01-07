@@ -1,6 +1,6 @@
 import config from '@/config';
 import type { ctx } from '@/interfaces/request';
-import { InvalidIdentityError, ServerException } from '@exceptions';
+import { ServerException } from '@exceptions';
 import fetch from 'node-fetch';
 type isHumainLocals = { body: { token: string } };
 
@@ -20,7 +20,7 @@ const isHumain = () => {
       const data: { success?: boolean } = await response.json();
 
       if (!data.success) {
-        throw new InvalidIdentityError();
+        throw new ServerException(401, 'Échec de la vérification Recaptcha');
       }
 
       next();

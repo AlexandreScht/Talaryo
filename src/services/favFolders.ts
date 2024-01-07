@@ -1,4 +1,4 @@
-import { InvalidCredentialsError, ServicesError } from '@/exceptions';
+import { InvalidArgumentError, ServicesError } from '@/exceptions';
 import { FavFoldersModel } from '@/models/favFolders';
 import { FavoriModel } from '@/models/favoris';
 import type { Knex } from 'knex';
@@ -25,7 +25,7 @@ class FavorisFolderFile {
   public async removeFolder(id: number): Promise<number> {
     try {
       await FavoriModel.query().where('favFolderId', id).delete();
-      return await FavFoldersModel.query().findById(id).delete();
+      return await FavFoldersModel.query().deleteById(id);
     } catch (error) {
       throw new ServicesError();
     }
@@ -39,7 +39,7 @@ class FavorisFolderFile {
     } catch (error) {
       throw new ServicesError();
     }
-    throw new InvalidCredentialsError();
+    throw new InvalidArgumentError();
   }
 
   public async getFolders(

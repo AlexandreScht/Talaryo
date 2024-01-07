@@ -6,6 +6,8 @@ export class FavFoldersModel extends Model implements favFolders {
   id: number;
   userId: number;
   name: string;
+  createdAt: string;
+  updatedAt: string;
   count?: string;
 
   static tableName = 'favFolders';

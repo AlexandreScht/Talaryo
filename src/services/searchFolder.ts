@@ -26,7 +26,7 @@ class SearchFolderFile {
   public async removeFolder(id: number): Promise<number> {
     try {
       await SearchesModel.query().where('searchFolderId', id).delete();
-      return await SearchFolderModel.query().findById(id).delete();
+      return await SearchFolderModel.query().deleteById(id);
     } catch (error) {
       throw new ServicesError();
     }

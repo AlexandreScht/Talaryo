@@ -21,6 +21,7 @@ const config = {
     session: {
       SESSION_SECRET: process.env.SESSION_SECRET,
     },
+    ACCESS_TOKEN: process.env.ACCESS_TOKEN,
     password: {
       saltlen: 512,
       keylen: 512,

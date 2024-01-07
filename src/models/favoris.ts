@@ -13,6 +13,8 @@ export class FavoriModel extends Model implements Favoris {
   currentCompany?: string;
   disabled: boolean;
   favFolderId: number;
+  createdAt: string;
+  updatedAt: string;
   count?: string;
 
   static tableName = 'favoris';

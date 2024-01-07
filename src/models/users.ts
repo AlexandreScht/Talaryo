@@ -17,6 +17,8 @@ export class UserModel extends Model implements User {
   stripeBilling?: Date;
   freeTest: boolean;
   passwordReset?: boolean;
+  createdAt: string;
+  updatedAt: string;
   count?: string;
 
   static tableName = 'users';

@@ -1,4 +1,4 @@
-import { InvalidArgumentError, InvalidSessionError, NotFoundError } from '@exceptions';
+import { InvalidSessionError, NotFoundError } from '@exceptions';
 import OAuthTokenCheck from '@libs/OAuthToken';
 import { createCookie, createToken } from '@libs/setToken';
 import { emailValidator, passwordValidator, stringValidator } from '@libs/validate';
@@ -34,10 +34,11 @@ const AuthController = ({ app }) => {
         next,
       }) => {
         try {
-          const [err] = await UserServices.findUserByEmail(email);
+          const [found] = await UserServices.findUserByEmail(email, true);
 
-          if (!err) {
-            throw new InvalidArgumentError(`this email is already used`);
+          if (found) {
+            res.status(201).send({ result: 'Un email de confirmation sera envoyé si vos données sont valides' });
+            return;
           }
 
           await transaction(UserServices.getModel, async trx => {
@@ -46,7 +47,7 @@ const AuthController = ({ app }) => {
             await trx.commit();
           });
 
-          res.status(201).send({ result: 'Confirmation email has been sent' });
+          res.status(201).send({ result: 'Un email de confirmation sera envoyé si vos données sont valides' });
         } catch (error) {
           next(error);
         }
@@ -73,14 +74,14 @@ const AuthController = ({ app }) => {
         next,
       }) => {
         try {
-          const [err, user] = await UserServices.findUserByEmail(email);
+          const [found, user] = await UserServices.findUserByEmail(email);
 
-          if (err) {
-            throw new NotFoundError(`Email or Password is incorrect`);
+          if (!found) {
+            throw new NotFoundError(`Email ou mot de passe invalide`);
           }
 
           if (!user.validate) {
-            throw new InvalidSessionError('Please validate your account by mail');
+            throw new InvalidSessionError('Veuillez valider votre compte par e-mail');
           }
 
           await UserServices.login(user, password);

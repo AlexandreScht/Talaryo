@@ -8,6 +8,8 @@ export class SearchesModel extends Model implements searches {
   searchQueries: string;
   name: string;
   society?: string;
+  createdAt: string;
+  updatedAt: string;
   count?: string;
 
   static tableName = 'searches';
