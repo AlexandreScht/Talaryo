@@ -1,7 +1,7 @@
 import { InvalidSessionError, NotFoundError } from '@exceptions';
 import OAuthTokenCheck from '@libs/OAuthToken';
 import { createCookie, createToken } from '@libs/setToken';
-import { emailValidator, passwordValidator, stringValidator } from '@libs/validate';
+import { confirmPasswordValidator, emailValidator, passwordValidator, stringValidator } from '@libs/validate';
 import isHumain from '@middlewares/isHumain';
 import mw from '@middlewares/mw';
 import slowDown from '@middlewares/slowDown';
@@ -24,8 +24,11 @@ const AuthController = ({ app }) => {
           password: passwordValidator.required(),
           firstName: stringValidator.required(),
           lastName: stringValidator.required(),
+          confirm: confirmPasswordValidator.required(),
+          token: stringValidator.required(),
         },
       }),
+      isHumain(),
       async ({
         locals: {
           body: { email, password, firstName, lastName },
