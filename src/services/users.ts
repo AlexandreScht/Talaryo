@@ -96,7 +96,8 @@ class UsersServiceFile {
 
   public async resetPassword(password: string, accessToken: string, id: number | string): Promise<number> {
     try {
-      const hashedPassword = await hash(password, 10);
+      const salt = await genSalt(10);
+      const hashedPassword = await hash(password, salt);
       return await UserModel.query()
         .findById(id)
         .where({ accessToken, passwordReset: true })
