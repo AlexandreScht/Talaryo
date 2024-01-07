@@ -2,12 +2,11 @@ import { setKeyToken } from '@/utils/keyToken';
 import { ExpiredSessionError, InvalidCredentialsError, InvalidSessionError, ServicesError } from '@exceptions';
 import type { AuthRegister, TokenUser } from '@interfaces/auth';
 import { UserModel, UserShape } from '@models/users';
-import { hash } from 'bcrypt';
+import { genSalt, hash } from 'bcrypt';
 import type { Knex } from 'knex';
 import { Transaction } from 'objection';
 import { Service } from 'typedi';
 import { v4 as uuid } from 'uuid';
-
 @Service()
 class UsersServiceFile {
   get getModel(): Knex<any, any[]> {
@@ -53,7 +52,8 @@ class UsersServiceFile {
   public async register(userData: AuthRegister, trx?: Transaction): Promise<UserModel> {
     try {
       if (userData?.password) {
-        const hashedPassword = await hash(userData.password, 10);
+        const salt = await genSalt(10);
+        const hashedPassword = await hash(userData.password, salt);
         return await UserModel.query(trx).insert({ ...userData, password: hashedPassword, accessToken: uuid().replace(/-/g, '') });
       }
       return await UserModel.query().insert({ ...userData, validate: true });
@@ -88,6 +88,8 @@ class UsersServiceFile {
       }
       throw new InvalidCredentialsError();
     } catch (error) {
+      console.log(error);
+      
       throw new ServicesError();
     }
   }
@@ -110,6 +112,8 @@ class UsersServiceFile {
       if (updatedCount) return;
       throw new InvalidSessionError();
     } catch (error) {
+      console.log(error);
+      
       throw new ServicesError();
     }
   }
