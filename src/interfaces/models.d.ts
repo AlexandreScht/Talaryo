@@ -1,4 +1,4 @@
-export type role = 'admin' | 'business' | 'advanced' | 'pro' | undefined;
+export type role = 'admin' | 'business' | 'advanced' | 'pro' | 'free' | undefined;
 
 export interface User {
   id?: number;

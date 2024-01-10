@@ -13,6 +13,14 @@ class UsersServiceFile {
     return UserModel.knex();
   }
 
+  public async updateUser(userData: UserModel, id: number): Promise<UserModel> {
+    try {
+      return await UserModel.query().updateAndFetchById(id, { ...userData });
+    } catch (err) {
+      throw new ServicesError();
+    }
+  }
+
   public async findUserById(id: number): Promise<[boolean, UserModel?]> {
     try {
       const findUser: UserModel = await UserModel.query().findById(id);
@@ -89,7 +97,7 @@ class UsersServiceFile {
       throw new InvalidCredentialsError();
     } catch (error) {
       console.log(error);
-      
+
       throw new ServicesError();
     }
   }
@@ -114,7 +122,7 @@ class UsersServiceFile {
       throw new InvalidSessionError();
     } catch (error) {
       console.log(error);
-      
+
       throw new ServicesError();
     }
   }

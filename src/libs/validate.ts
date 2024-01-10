@@ -5,7 +5,7 @@ export const createValidator = (object: validatorsProps) => yup.object().shape(o
 
 export const stringValidator = yup.string();
 export const emailValidator = yup.string().email();
-export const roleValidator = yup.string().oneOf(['admin', 'user']);
+export const roleValidator = yup.string().oneOf(['admin', 'business', 'advanced', 'pro', 'free', undefined]);
 
 export const numberValidator = yup.number().integer();
 export const limitValidator = yup.number().integer().min(1).max(50).defined();

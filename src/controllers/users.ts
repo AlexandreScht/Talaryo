@@ -1,6 +1,8 @@
-import { InvalidArgumentError } from '@/exceptions';
+import { InvalidArgumentError, InvalidSessionError } from '@/exceptions';
+import { createToken } from '@/libs/setToken';
+import auth from '@/middlewares/auth';
 import { getKeyToken } from '@/utils/keyToken';
-import { confirmPasswordValidator, passwordValidator, stringValidator } from '@libs/validate';
+import { confirmPasswordValidator, passwordValidator, roleValidator, stringValidator } from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import MailerServiceFile from '@services/mailer';
@@ -11,6 +13,31 @@ import { Container } from 'typedi';
 const UsersController = ({ app }) => {
   const UserServices = Container.get(UsersServiceFile);
   const MailerService = Container.get(MailerServiceFile);
+  app.put(
+    '/update-user',
+    mw([
+      validator({
+        body: {
+          firstName: stringValidator,
+          lastName: stringValidator,
+          role: roleValidator,
+        },
+      }),
+      auth(),
+      async ({ locals: { body }, session: { sessionId }, res, next }) => {
+        try {
+          const userUpdate = await UserServices.updateUser(body, sessionId);
+          if (!userUpdate) {
+            throw new InvalidSessionError();
+          }
+          const { jwt } = await createToken(userUpdate);
+          res.status(201).send({ payload: jwt });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
   app.patch(
     '/validate-account',
     mw([
