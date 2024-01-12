@@ -50,3 +50,12 @@ export interface favFolders {
   userId?: number;
   name: string;
 }
+export interface scores {
+  id?: number;
+  year: number;
+  userId: number;
+  month: number;
+  day: number;
+  searches?: number;
+  profils?: number;
+}

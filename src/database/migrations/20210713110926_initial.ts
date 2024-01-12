@@ -9,7 +9,6 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.string('firstName', 125).nullable();
     table.string('lastName', 125).nullable();
     table.timestamp('freeTrials').nullable();
-    table.boolean('freeTest').notNullable().defaultTo(false);
     table.boolean('validate').notNullable().defaultTo(false);
     table.boolean('passwordReset').notNullable().defaultTo(false);
     table.string('accessToken', 125).nullable();
@@ -17,6 +16,17 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.string('stripeCustomer', 64).nullable();
     table.timestamp('stripeBilling').nullable();
     table.timestamps(true, true, true);
+  });
+  await knex.schema.createTable('scores', table => {
+    table.bigIncrements('id').unsigned().primary();
+    table.integer('userId').notNullable().references('id').inTable('users');
+    table.integer('year');
+    table.integer('month');
+    table.integer('day');
+    table.integer('searches').defaultTo(0);
+    table.integer('profils').defaultTo(0);
+    table.timestamps(true, true, true);
+    table.unique(['userId', 'year', 'month', 'day']);
   });
   await knex.schema.createTable('favFolders', table => {
     table.bigIncrements('id').unsigned().primary();
@@ -62,5 +72,6 @@ module.exports.down = async (knex: Knex): Promise<void> => {
   await knex.schema.dropTable('favFolders');
   await knex.schema.dropTable('searches');
   await knex.schema.dropTable('searchFolders');
+  await knex.schema.dropTable('scores');
   await knex.schema.dropTable('users');
 };

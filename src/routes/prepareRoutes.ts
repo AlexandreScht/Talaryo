@@ -1,6 +1,7 @@
 // apiRouter.ts
 import FavFoldersController from '@/controllers/favFolders';
 import FavorisController from '@/controllers/favoris';
+import ScoreController from '@/controllers/scores';
 import SearchFoldersController from '@/controllers/searchFolders';
 import SearchController from '@/controllers/searches';
 import StripeWebhook from '@/webhooks/stripe';
@@ -25,5 +26,6 @@ export class ApiRouter implements Routes {
     FavFoldersController({ app: this.router });
     SearchFoldersController({ app: this.router });
     SearchController({ app: this.router });
+    ScoreController({ app: this.router });
   }
 }

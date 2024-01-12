@@ -11,8 +11,11 @@ export const numberValidator = yup.number().integer();
 export const limitValidator = yup.number().integer().min(1).max(50).defined();
 export const pageValidator = yup.number().integer().min(1).defined();
 
-export const booleanValidator = yup.mixed().test('is-boolean', 'The value must be a boolean', function (value) {
-  return typeof value === 'boolean' || (typeof value === 'string' && (value === 'true' || value === 'false'));
+export const timestampValidator = yup.date().transform((value, originalValue) => {
+  if (value.toISOString() === originalValue) {
+    return new Date(originalValue);
+  }
+  return false;
 });
 
 //? favoris
