@@ -1,10 +1,11 @@
+import { role } from '@/interfaces/models';
 import { setKeyToken } from '@/utils/keyToken';
 import { ExpiredSessionError, InvalidCredentialsError, InvalidSessionError, ServicesError } from '@exceptions';
 import type { AuthRegister, TokenUser } from '@interfaces/auth';
 import { UserModel, UserShape } from '@models/users';
 import { genSalt, hash } from 'bcrypt';
 import type { Knex } from 'knex';
-import { Transaction } from 'objection';
+import { Transaction, transaction } from 'objection';
 import { Service } from 'typedi';
 import { v4 as uuid } from 'uuid';
 @Service()
@@ -13,10 +14,24 @@ class UsersServiceFile {
     return UserModel.knex();
   }
 
-  public async updateUser(userData: UserModel, id: number): Promise<UserModel> {
+  public async updateCurrentUser(userData: UserModel, id: number): Promise<UserModel> {
     try {
       return await UserModel.query().updateAndFetchById(id, { ...userData });
     } catch (err) {
+      throw new ServicesError();
+    }
+  }
+
+  public async updateUsers(userData: UserModel[]): Promise<boolean> {
+    try {
+      await transaction(UserModel.knex(), async trx => {
+        for (const user of userData) {
+          await UserModel.query(trx).updateAndFetchById(user.id, user);
+        }
+      });
+      return true;
+    } catch (err) {
+      console.error(err);
       throw new ServicesError();
     }
   }
@@ -134,6 +149,43 @@ class UsersServiceFile {
       if (user && user.refreshToken === userData.refreshToken) return;
       throw new ExpiredSessionError();
     } catch (error) {
+      throw new ServicesError();
+    }
+  }
+
+  public async getAll({
+    firstName,
+    lastName,
+    email,
+    role,
+    limit,
+    page,
+  }: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    role?: role;
+    limit: number;
+    page: number;
+  }): Promise<UserModel[]> {
+    try {
+      let query = UserModel.query().where({ validate: true }).orderBy('id', 'asc').select('id', 'email', 'role', 'firstName', 'lastName');
+      if (firstName) {
+        query = query.andWhereRaw('LOWER("firstName") LIKE LOWER(?)', [`${firstName}%`]);
+      }
+      if (lastName) {
+        query = query.andWhereRaw('LOWER("lastName") LIKE LOWER(?)', [`${lastName}%`]);
+      }
+      if (email) {
+        query = query.andWhereRaw('LOWER(email) LIKE LOWER(?)', [`${email}%`]);
+      }
+      if (role) {
+        query = query.andWhere({ role });
+      }
+      return await query.modify('paginate', limit, page);
+    } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }

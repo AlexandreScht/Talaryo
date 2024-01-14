@@ -1,4 +1,4 @@
-import { timestampValidator } from '@/libs/validate';
+import { numberValidator, timestampValidator } from '@/libs/validate';
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
 import ScoreServiceFile from '@/services/scores';
@@ -8,14 +8,26 @@ import { Container } from 'typedi';
 const ScoreController = ({ app }) => {
   const ScoreServices = Container.get(ScoreServiceFile);
   app.patch(
-    '/profils-consulted',
+    '/profils-consulted/:profils',
     mw([
       auth(),
-      async ({ session: { sessionId }, res, next }) => {
+      validator({
+        params: {
+          profils: numberValidator.required(),
+        },
+      }),
+      async ({
+        locals: {
+          params: { profils },
+        },
+        session: { sessionId },
+        res,
+        next,
+      }) => {
         try {
           const currentDate = new Date();
           await ScoreServices.improveProfilScore(
-            { year: currentDate.getFullYear(), month: currentDate.getMonth() + 1, day: currentDate.getDate(), profils: 1 },
+            { year: currentDate.getFullYear(), month: currentDate.getMonth() + 1, day: currentDate.getDate(), profils },
             sessionId,
           );
           res.status(201).send({ res: true });
@@ -28,7 +40,7 @@ const ScoreController = ({ app }) => {
   app.get(
     '/get-user-score/:dateSearch?/:rangeDate?',
     mw([
-      // auth(),
+      auth(),
       validator({
         params: {
           dateSearch: timestampValidator,

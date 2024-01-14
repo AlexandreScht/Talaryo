@@ -48,7 +48,6 @@ const ScrappingController = ({ app }) => {
           const Searches: ScrappingSource[] = [];
           const queries = { fn, industry, sector, skill, key, loc, Nindustry, Nskill, Nkey };
           const sources: sources[] = platform.split(',');
-          console.log(platform);
 
           sources.forEach((site: sources) => {
             const url = Object.keys(queries).reduce((acc, key) => {

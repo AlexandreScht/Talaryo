@@ -2,7 +2,15 @@ import { InvalidArgumentError, InvalidSessionError } from '@/exceptions';
 import { createToken } from '@/libs/setToken';
 import auth from '@/middlewares/auth';
 import { getKeyToken } from '@/utils/keyToken';
-import { confirmPasswordValidator, passwordValidator, roleValidator, stringValidator } from '@libs/validate';
+import {
+  confirmPasswordValidator,
+  limitValidator,
+  pageValidator,
+  passwordValidator,
+  roleValidator,
+  stringValidator,
+  usersValidator,
+} from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import MailerServiceFile from '@services/mailer';
@@ -14,7 +22,7 @@ const UsersController = ({ app }) => {
   const UserServices = Container.get(UsersServiceFile);
   const MailerService = Container.get(MailerServiceFile);
   app.put(
-    '/update-user',
+    '/update-current-user',
     mw([
       validator({
         body: {
@@ -26,7 +34,7 @@ const UsersController = ({ app }) => {
       auth(),
       async ({ locals: { body }, session: { sessionId }, res, next }) => {
         try {
-          const userUpdate = await UserServices.updateUser(body, sessionId);
+          const userUpdate = await UserServices.updateCurrentUser(body, sessionId);
           if (!userUpdate) {
             throw new InvalidSessionError();
           }
@@ -161,6 +169,61 @@ const UsersController = ({ app }) => {
 
           const rowEdited = await UserServices.resetPassword(password, accessToken, id);
           res.status(201).send({ res: !!rowEdited });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.get(
+    '/get-all-users',
+    mw([
+      auth('admin'),
+      validator({
+        query: {
+          limit: limitValidator.default(10),
+          page: pageValidator.default(1),
+          firstName: stringValidator,
+          lastName: stringValidator,
+          email: stringValidator,
+          role: roleValidator,
+        },
+      }),
+      async ({
+        locals: {
+          query: { limit, page, firstName, lastName, email, role },
+        },
+        res,
+        next,
+      }) => {
+        try {
+          const Users = await UserServices.getAll({ firstName, lastName, email, role, limit, page });
+          res.status(201).send({ res: Users });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.put(
+    '/update-users',
+    mw([
+      auth('admin'),
+      validator({
+        body: {
+          users: usersValidator.required(),
+        },
+      }),
+      async ({
+        locals: {
+          body: { users },
+        },
+        res,
+        next,
+      }) => {
+        try {
+          const update = await UserServices.updateUsers(users);
+          res.status(201).send({ res: !!update });
         } catch (error) {
           next(error);
         }

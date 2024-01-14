@@ -43,7 +43,7 @@ class SearchesServiceFile {
       }
 
       if (name) {
-        query = query.where('name', 'like', `${name}%`);
+        query = query.andWhereRaw('LOWER("name") LIKE LOWER(?)', [`${name}%`]);
       }
       const [{ count }] = await query.clone().limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);

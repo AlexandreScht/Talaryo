@@ -35,3 +35,14 @@ export const passwordValidator = yup
   );
 
 export const confirmPasswordValidator = yup.string().oneOf([yup.ref('password')], 'Passwords must be identical');
+
+// users
+
+const userSchema = yup.object().shape({
+  firstName: stringValidator.required(),
+  lastName: stringValidator.required(),
+  email: emailValidator.required(),
+  role: roleValidator,
+});
+
+export const usersValidator = yup.array().of(userSchema);

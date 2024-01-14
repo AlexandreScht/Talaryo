@@ -40,7 +40,7 @@ class SearchFolderFile {
       let query = SearchFolderModel.query().where('searchFolders.userId', userId);
 
       if (name) {
-        query = query.where('searchFolders.name', 'like', `${name}%`);
+        query = query.andWhereRaw('LOWER("searchFolders.name") LIKE LOWER(?)', [`${name}%`]);
       }
 
       const [{ count }] = await query.clone().limit(1).offset(0).count();

@@ -1,7 +1,8 @@
+import { role } from '@/interfaces/models';
 import { ExpiredSessionError, InvalidAccessError } from '@exceptions';
 import type { ctx } from '@interfaces/request';
 
-const auth = (role?: string | string[]) => {
+const auth = (role?: role | role[]) => {
   return async (ctx: ctx) => {
     const { next, session } = ctx;
 
