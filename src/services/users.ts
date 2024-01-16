@@ -167,9 +167,9 @@ class UsersServiceFile {
     role?: role;
     limit: number;
     page: number;
-  }): Promise<UserModel[]> {
+  }): Promise<{ total: number; users: UserModel[] }> {
     try {
-      let query = UserModel.query().where({ validate: true }).orderBy('id', 'asc').select('id', 'email', 'role', 'firstName', 'lastName');
+      let query = UserModel.query().where({ validate: true });
       if (firstName) {
         query = query.andWhereRaw('LOWER("firstName") LIKE LOWER(?)', [`${firstName}%`]);
       }
@@ -182,7 +182,10 @@ class UsersServiceFile {
       if (role) {
         query = query.andWhere({ role });
       }
-      return await query.modify('paginate', limit, page);
+      const [{ count }] = await query.clone().limit(1).offset(0).count();
+      const total = Number.parseInt(count, 10);
+      const users = await query.orderBy('id', 'asc').select('id', 'email', 'role', 'firstName', 'lastName').modify('paginate', limit, page);
+      return { total, users };
     } catch (error) {
       console.log(error);
 

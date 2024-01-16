@@ -197,8 +197,8 @@ const UsersController = ({ app }) => {
         next,
       }) => {
         try {
-          const Users = await UserServices.getAll({ firstName, lastName, email, role, limit, page });
-          res.status(201).send({ res: Users });
+          const meta = await UserServices.getAll({ firstName, lastName, email, role, limit, page });
+          res.status(201).send({ res: meta });
         } catch (error) {
           next(error);
         }
