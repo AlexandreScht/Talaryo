@@ -10,7 +10,7 @@ const FavFoldersController = ({ app }) => {
   app.post(
     '/create-favFolders',
     mw([
-      auth(),
+      auth(['pro', 'advanced', 'business', 'admin', 'free']),
       validator({
         body: { name: stringValidator.required() },
       }),

@@ -1,3 +1,5 @@
+import { role } from '@/interfaces/models';
+
 export class ServerException extends Error {
   public status: number;
   public message: string;
@@ -42,6 +44,11 @@ export class ExpiredSessionError extends ServerException {
 export class InvalidAccessError extends ServerException {
   constructor(message: string[] | string = 'Permission insuffisante') {
     super(403, message);
+  }
+}
+export class InvalidRoleAccessError extends ServerException {
+  constructor(role: role) {
+    super(403, `Cette fonctionnalité est disponible à partir de l'abonnement ${role}`);
   }
 }
 

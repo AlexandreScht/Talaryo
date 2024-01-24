@@ -40,11 +40,12 @@ class SearchFolderFile {
       let query = SearchFolderModel.query().where('searchFolders.userId', userId);
 
       if (name) {
-        query = query.andWhereRaw('LOWER("searchFolders.name") LIKE LOWER(?)', [`${name}%`]);
+        query = query.andWhereRaw('LOWER("searchFolders"."name") LIKE LOWER(?)', [`${name}%`]);
       }
 
-      const [{ count }] = await query.clone().limit(1).offset(0).count();
-      const total = Number.parseInt(count, 10);
+      const totalQuery = query.clone().count('* as count').first();
+      const totalResult = await totalQuery;
+      const total = parseInt(totalResult.count, 10);
 
       const folders = await query
         .clone()
@@ -52,7 +53,7 @@ class SearchFolderFile {
         .leftJoin('searches', 'searchFolders.id', 'searches.searchFolderId')
         .groupBy('searchFolders.id')
         .count('searches.id as itemsCount')
-        .orderBy('id', 'desc')
+        .orderBy('searchFolders.id', 'desc')
         .modify('paginate', limit, page);
 
       return { total, folders };

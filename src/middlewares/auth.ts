@@ -1,5 +1,5 @@
 import { role } from '@/interfaces/models';
-import { ExpiredSessionError, InvalidAccessError } from '@exceptions';
+import { ExpiredSessionError, InvalidRoleAccessError } from '@exceptions';
 import type { ctx } from '@interfaces/request';
 
 const auth = (role?: role | role[]) => {
@@ -10,8 +10,8 @@ const auth = (role?: role | role[]) => {
       throw new ExpiredSessionError();
     }
 
-    if (role && session.sessionRole !== role && !role.includes(session.sessionRole)) {
-      throw new InvalidAccessError();
+    if (role && session.sessionRole !== role && !role.includes(session.sessionRole) && process.env.NODE_ENV !== 'development') {
+      throw new InvalidRoleAccessError(Array.isArray(role) ? role[0] : role);
     }
 
     next();

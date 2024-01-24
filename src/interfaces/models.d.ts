@@ -13,7 +13,7 @@ export interface User {
   stripeCustomer?: string;
   freeTrials?: Date;
   stripeBilling?: Date;
-  freeTest: boolean;
+  getFreeTest: boolean;
   passwordReset?: boolean;
 }
 

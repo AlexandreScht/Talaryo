@@ -10,7 +10,7 @@ const ScoreController = ({ app }) => {
   app.patch(
     '/profils-consulted/:profils',
     mw([
-      auth(),
+      auth(['pro', 'advanced', 'business', 'admin', 'free']),
       validator({
         params: {
           profils: numberValidator.required(),

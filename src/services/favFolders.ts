@@ -50,7 +50,7 @@ class FavorisFolderFile {
       let query = FavFoldersModel.query().where('favFolders.userId', userId);
 
       if (name) {
-        query = query.andWhereRaw('LOWER("favFolders.name") LIKE LOWER(?)', [`${name}%`]);
+        query = query.andWhereRaw('LOWER("name") LIKE LOWER(?)', [`${name}%`]);
       }
 
       const [{ count }] = await query.clone().limit(1).offset(0).count();
@@ -66,6 +66,8 @@ class FavorisFolderFile {
 
       return { total, folders };
     } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }

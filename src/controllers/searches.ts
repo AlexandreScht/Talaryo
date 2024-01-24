@@ -10,7 +10,7 @@ const SearchController = ({ app }) => {
   app.post(
     '/create-search',
     mw([
-      auth(),
+      auth(['advanced', 'business', 'admin']),
       validator({
         body: {
           search: stringValidator.required(),

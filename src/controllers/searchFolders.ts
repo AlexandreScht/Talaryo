@@ -10,7 +10,7 @@ const SearchFoldersController = ({ app }) => {
   app.post(
     '/create-searchFolders',
     mw([
-      auth(),
+      auth(['advanced', 'business', 'admin']),
       validator({
         body: {
           name: stringValidator.required(),

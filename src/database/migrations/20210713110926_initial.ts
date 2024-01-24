@@ -9,6 +9,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.string('firstName', 125).nullable();
     table.string('lastName', 125).nullable();
     table.timestamp('freeTrials').nullable();
+    table.boolean('getFreeTest').notNullable().defaultTo(false);
     table.boolean('validate').notNullable().defaultTo(false);
     table.boolean('passwordReset').notNullable().defaultTo(false);
     table.string('accessToken', 125).nullable();

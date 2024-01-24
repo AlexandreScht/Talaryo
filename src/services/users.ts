@@ -14,10 +14,12 @@ class UsersServiceFile {
     return UserModel.knex();
   }
 
-  public async updateCurrentUser(userData: UserModel, id: number): Promise<UserModel> {
+  public async updateCurrentUser(userData: Partial<UserModel>, id: number): Promise<UserModel> {
     try {
       return await UserModel.query().updateAndFetchById(id, { ...userData });
     } catch (err) {
+      console.log(err);
+
       throw new ServicesError();
     }
   }

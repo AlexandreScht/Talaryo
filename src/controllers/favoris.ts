@@ -12,7 +12,7 @@ const FavorisController = ({ app }) => {
   app.post(
     '/create-fav',
     mw([
-      auth(),
+      auth(['pro', 'advanced', 'business', 'admin', 'free']),
       validator({
         body: {
           link: linkValidator.required(),

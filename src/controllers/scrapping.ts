@@ -17,7 +17,7 @@ const ScrappingController = ({ app }) => {
   app.get(
     '/scrapping',
     mw([
-      auth(),
+      auth(['pro', 'advanced', 'business', 'admin', 'free']),
       validator({
         query: {
           platform: stringValidator.required(),
