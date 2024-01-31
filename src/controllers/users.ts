@@ -29,6 +29,7 @@ const UsersController = ({ app }) => {
           firstName: stringValidator,
           lastName: stringValidator,
           role: roleValidator,
+          society: stringValidator,
         },
       }),
       auth(),

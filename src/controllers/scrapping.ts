@@ -5,7 +5,7 @@ import auth from '@/middlewares/auth';
 import FavorisServiceFile from '@/services/favoris';
 import ScoreServiceFile from '@/services/scores';
 import ScrapperServiceFile from '@/services/scrapper';
-import { numberValidator, stringValidator } from '@libs/validate';
+import { booleanValidator, numberValidator, stringValidator } from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import Container from 'typedi';
@@ -30,7 +30,7 @@ const ScrappingController = ({ app }) => {
           Nindustry: stringValidator,
           Nskill: stringValidator,
           Nkey: stringValidator,
-          time: stringValidator,
+          time: booleanValidator,
           zone: stringValidator,
           start: numberValidator,
           index: numberValidator,

@@ -25,7 +25,8 @@ export class ApiPuppeteer {
       if (!v.props || !Array.isArray(v.props)) {
         throw new InvalidArgumentError('Option "props" needs to be an array.');
       }
-      if (v.current && typeof v.url !== 'boolean') {
+
+      if (v.current && typeof v.current !== 'boolean') {
         throw new InvalidArgumentError('Option "currentCompany" needs to be a boolean.');
       }
     });

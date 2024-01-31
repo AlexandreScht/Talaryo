@@ -10,7 +10,7 @@ export const roleValidator = yup.string().oneOf(['admin', 'business', 'advanced'
 export const numberValidator = yup.number().integer();
 export const limitValidator = yup.number().integer().min(1).max(50).defined();
 export const pageValidator = yup.number().integer().min(1).defined();
-
+export const booleanValidator = yup.boolean();
 export const timestampValidator = yup.date().transform((value, originalValue) => {
   if (value.toISOString() === originalValue) {
     return new Date(originalValue);
