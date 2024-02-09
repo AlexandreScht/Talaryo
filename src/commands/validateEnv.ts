@@ -4,7 +4,7 @@ require('dotenv').config();
 
 try {
   cleanEnv(process.env, {
-    NODE_ENV: str({ choices: ['development', 'production'], default: 'development' }),
+    NODE_ENV: str({ choices: ['development', 'production'] }),
     PORT: port(),
     FRONT_URL: str(),
     DB_USER: str(),
@@ -19,7 +19,7 @@ try {
     PROXY_SERVER: str(),
     PROXY_USERNAME: str(),
     PROXY_PASSWORD: str(),
-    LOG_FORMAT: str({ choices: ['combined', 'dev'], default: 'dev' }),
+    LOG_FORMAT: str({ choices: ['combined', 'dev'] }),
     LOG_DIR: str({ default: '../logs' }),
     MAILER_DIR: str({ default: '../templates' }),
     MAILER_USER: str(),

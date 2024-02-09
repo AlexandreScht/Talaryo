@@ -32,15 +32,15 @@ const createSession = (user: UserModel, refreshToken: string): { token: string; 
 };
 
 const createCookie = (user: UserModel, refreshToken: string): string => {
-  const { FRONT_URL } = config;
+  const { FRONT_URL, NODE_ENV } = config;
 
   const values = createSession(user, refreshToken);
-  return cookie.serialize('Profiilo-Session', values.token, {
+  return cookie.serialize(new URL(FRONT_URL).hostname === 'app.talaryo.com' ? 'Talaryo-Session' : 'Talaryo-SessionBis', values.token, {
     httpOnly: true,
     path: '/',
-    domain: new URL(FRONT_URL).hostname === 'localhost' ? new URL(FRONT_URL).hostname : '.profiilo.com',
+    domain: new URL(FRONT_URL).hostname === 'localhost' ? 'localhost' : '.talaryo.com',
     maxAge: values.expiresIn,
-    secure: process.env.NODE_ENV === 'production',
+    secure: NODE_ENV === 'production' && new URL(FRONT_URL).hostname !== 'localhost',
   });
 };
 

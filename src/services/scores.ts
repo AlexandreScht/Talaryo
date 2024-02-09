@@ -49,8 +49,6 @@ class ScoreServiceFile {
           profils: ScoreModel.raw('?? + ?', ['scores.profils', profils]),
         });
     } catch (err) {
-      console.log(err);
-
       throw new ServicesError();
     }
   }
@@ -59,8 +57,6 @@ class ScoreServiceFile {
     try {
       return await ScoreModel.query().where({ year, month, day, userId }).select('searches', 'profils', 'year', 'month', 'day').first();
     } catch (err) {
-      console.log(err);
-
       throw new ServicesError();
     }
   }
@@ -80,7 +76,6 @@ class ScoreServiceFile {
 
       return await query.select('searches', 'profils', 'year', 'month', 'day').orderBy('id', 'asc');
     } catch (err) {
-      console.log(err);
       throw new ServicesError();
     }
   }

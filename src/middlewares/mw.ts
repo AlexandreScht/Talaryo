@@ -7,10 +7,10 @@ import deepmerge from 'deepmerge';
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import Container from 'typedi';
-const { security } = config;
+const { security, FRONT_URL } = config;
 
 const getAuthorization = (req: Request) => {
-  const coockie = req.cookies['Profiilo-Session'];
+  const coockie = req.cookies[new URL(FRONT_URL).hostname === 'app.talaryo.com' ? 'Talaryo-Session' : 'Talaryo-SessionBis'];
   if (coockie) return coockie;
 
   const header = req.header('Authorization');

@@ -1,3 +1,4 @@
+import config from '@/config';
 import { InvalidSessionError, NotFoundError } from '@exceptions';
 import OAuthTokenCheck from '@libs/OAuthToken';
 import { createCookie, createToken } from '@libs/setToken';
@@ -37,6 +38,17 @@ const AuthController = ({ app }) => {
         next,
       }) => {
         try {
+          const { FRONT_URL, NODE_ENV } = config;
+
+          if (
+            NODE_ENV === 'production' &&
+            new URL(FRONT_URL).hostname === 'test.talaryo.com' &&
+            !['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(email)
+          ) {
+            res.status(404).send({ result: 'Seule les comptes développeur peuvent ce connecter sur ce site' });
+            return;
+          }
+
           const [found] = await UserServices.findUserByEmail(email, true);
 
           if (found) {
@@ -121,7 +133,17 @@ const AuthController = ({ app }) => {
         next,
       }) => {
         try {
+          const { FRONT_URL, NODE_ENV } = config;
           const [error, OAuthUser] = await OAuthTokenCheck(id_token, at_hash);
+
+          if (
+            NODE_ENV === 'production' &&
+            new URL(FRONT_URL).hostname === 'test.talaryo.com' &&
+            !['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(OAuthUser.email)
+          ) {
+            res.status(404).send({ result: 'Seule les comptes développeur peuvent ce connecter sur ce site' });
+            return;
+          }
 
           if (error) {
             throw new InvalidSessionError();
@@ -132,7 +154,7 @@ const AuthController = ({ app }) => {
           const currentUser = userNotFound
             ? await UserServices.register({
                 email: OAuthUser.email,
-                role: OAuthUser.email === 'alexandreschecht@gmail.com' || OAuthUser.email === 'guideofdofus@gmail.com' ? 'admin' : null,
+                role: ['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(OAuthUser.email) ? 'admin' : null,
               })
             : user;
 

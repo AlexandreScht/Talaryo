@@ -30,8 +30,6 @@ class MailerServiceFile {
 
       await sendMail(mailOptions);
     } catch (error) {
-      console.log(error);
-
       throw new MailerError();
     }
   }
@@ -54,7 +52,6 @@ class MailerServiceFile {
 
       await this.sendMailAsync(mailOptions);
     } catch (error) {
-      console.log(error);
       throw new MailerError();
     }
   }

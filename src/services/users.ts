@@ -18,8 +18,6 @@ class UsersServiceFile {
     try {
       return await UserModel.query().updateAndFetchById(id, { ...userData });
     } catch (err) {
-      console.log(err);
-
       throw new ServicesError();
     }
   }
@@ -57,7 +55,6 @@ class UsersServiceFile {
 
       return [!!findUser, findUser];
     } catch (error) {
-      console.log(error);
       throw new ServicesError();
     }
   }
@@ -97,8 +94,6 @@ class UsersServiceFile {
       });
       return token;
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }
@@ -113,8 +108,6 @@ class UsersServiceFile {
       }
       throw new InvalidCredentialsError();
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }
@@ -138,8 +131,6 @@ class UsersServiceFile {
       if (updatedCount) return;
       throw new InvalidSessionError();
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }
@@ -189,8 +180,6 @@ class UsersServiceFile {
       const users = await query.orderBy('id', 'asc').select('id', 'email', 'role', 'firstName', 'lastName').modify('paginate', limit, page);
       return { total, users };
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }

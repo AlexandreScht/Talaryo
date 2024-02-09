@@ -106,6 +106,9 @@ dist
 .temp
 .cache
 
+# deploy file
+deploy.js
+
 # Docusaurus cache and generated files
 .docusaurus
 

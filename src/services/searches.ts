@@ -50,8 +50,6 @@ class SearchesServiceFile {
       const searches = await query.orderBy('id', 'desc').select('id', 'searchQueries', 'name', 'society').modify('paginate', limit, page);
       return { total, searches };
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }

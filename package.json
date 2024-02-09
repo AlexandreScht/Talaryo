@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "env": "ts-node src/commands/validateEnv.ts",
-    "start": "npm run env && cross-env NODE_ENV=production node dist/server.js",
-    "dev": "npm run env && cross-env NODE_ENV=development nodemon",
+    "start": "cross-env NODE_ENV=production npm run env && node dist/server.js",
+    "dev": "cross-env NODE_ENV=development npm run env && nodemon",
     "reset": "ts-node src/commands/resetProd.ts",
     "code": "tsc --noEmit --skipLibCheck --incremental false && tsc-alias",
     "build": "swc src -d dist --source-maps --copy-files",
@@ -18,8 +18,8 @@
     "rollback": "knex migrate:rollback --knexfile=knexfile.ts --verbose",
     "make:seeder": "knex seed:make --knexfile=knexfile.ts -x ts --env development",
     "make:migration": "knex migrate:make --knexfile=knexfile.ts -x ts --env development",
-    "deploy:dev": "node deploy/script.js dev",
-    "deploy:prod": "node deploy/script.js prod"
+    "deploy:dev": "node deploy.js dev",
+    "deploy:prod": "node deploy.js prod"
   },
   "keywords": [],
   "author": "",
@@ -85,6 +85,8 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "reflect-metadata": "^0.1.13",
+    "ssh2": "^1.15.0",
+    "ssh2-sftp-client": "^10.0.3",
     "stripe": "^13.6.0",
     "supertest": "^6.3.3",
     "typedi": "^0.10.0",

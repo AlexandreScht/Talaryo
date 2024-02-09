@@ -58,8 +58,6 @@ class SearchFolderFile {
 
       return { total, folders };
     } catch (error) {
-      console.log(error);
-
       throw new ServicesError();
     }
   }
