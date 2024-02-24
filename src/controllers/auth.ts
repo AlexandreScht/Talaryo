@@ -2,7 +2,7 @@ import config from '@/config';
 import { InvalidSessionError, NotFoundError } from '@exceptions';
 import OAuthTokenCheck from '@libs/OAuthToken';
 import { createCookie, createToken } from '@libs/setToken';
-import { confirmPasswordValidator, emailValidator, passwordValidator, stringValidator } from '@libs/validate';
+import { confirmPasswordValidator, emailValidator, keyValidator, passwordValidator, stringValidator } from '@libs/validate';
 import isHumain from '@middlewares/isHumain';
 import mw from '@middlewares/mw';
 import slowDown from '@middlewares/slowDown';
@@ -26,7 +26,7 @@ const AuthController = ({ app }) => {
           firstName: stringValidator.required(),
           lastName: stringValidator.required(),
           confirm: confirmPasswordValidator.required(),
-          token: stringValidator.required(),
+          token: keyValidator.required(),
         },
       }),
       isHumain(),
@@ -38,11 +38,11 @@ const AuthController = ({ app }) => {
         next,
       }) => {
         try {
-          const { FRONT_URL, NODE_ENV } = config;
+          const { ORIGIN, NODE_ENV } = config;
 
           if (
             NODE_ENV === 'production' &&
-            new URL(FRONT_URL).hostname === 'test.talaryo.com' &&
+            new URL(ORIGIN).hostname === 'test.talaryo.com' &&
             !['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(email)
           ) {
             res.status(404).send({ result: 'Seule les comptes développeur peuvent ce connecter sur ce site' });
@@ -77,7 +77,7 @@ const AuthController = ({ app }) => {
         body: {
           email: emailValidator.required(),
           password: stringValidator.required(),
-          token: stringValidator.required(),
+          token: keyValidator.required(),
         },
       }),
       isHumain(),
@@ -121,8 +121,8 @@ const AuthController = ({ app }) => {
     mw([
       validator({
         body: {
-          id_token: stringValidator.required(),
-          at_hash: stringValidator.required(),
+          id_token: keyValidator.required(),
+          at_hash: keyValidator.required(),
         },
       }),
       async ({
@@ -133,12 +133,12 @@ const AuthController = ({ app }) => {
         next,
       }) => {
         try {
-          const { FRONT_URL, NODE_ENV } = config;
+          const { ORIGIN, NODE_ENV } = config;
           const [error, OAuthUser] = await OAuthTokenCheck(id_token, at_hash);
 
           if (
             NODE_ENV === 'production' &&
-            new URL(FRONT_URL).hostname === 'test.talaryo.com' &&
+            new URL(ORIGIN).hostname === 'test.talaryo.com' &&
             !['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(OAuthUser.email)
           ) {
             res.status(404).send({ result: 'Seule les comptes développeur peuvent ce connecter sur ce site' });

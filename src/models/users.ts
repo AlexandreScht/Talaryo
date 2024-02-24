@@ -10,6 +10,7 @@ export class UserModel extends Model implements User {
   firstName?: string;
   lastName?: string;
   validate: boolean;
+  society?: string;
   accessToken?: string;
   refreshToken?: string;
   stripeCustomer?: string;

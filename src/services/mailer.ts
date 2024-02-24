@@ -6,7 +6,7 @@ import { join } from 'path';
 import { Service } from 'typedi';
 import util from 'util';
 
-const { mailer, FRONT_URL } = config;
+const { mailer, ORIGIN } = config;
 
 @Service()
 class MailerServiceFile {
@@ -16,7 +16,7 @@ class MailerServiceFile {
     this.transporter = nodemailer.createTransport({
       host: mailer.HOST,
       port: parseInt(mailer.PORT),
-      // secure: true,
+      // requireTLS: true,
       auth: {
         user: mailer.USER,
         pass: mailer.PASSWORD,
@@ -30,6 +30,8 @@ class MailerServiceFile {
 
       await sendMail(mailOptions);
     } catch (error) {
+      console.log(error);
+
       throw new MailerError();
     }
   }
@@ -40,13 +42,13 @@ class MailerServiceFile {
       const confirmationEmail = fs.readFileSync(join(templateDir, 'confirmation-mail.html'), { encoding: 'utf-8' });
       const htmlMailer = confirmationEmail
         .replace('{{support_MAIL}}', mailer.USER)
-        .replace('{{url}}', FRONT_URL + `?token=${encodeURIComponent(userToken)}`)
+        .replace('{{url}}', ORIGIN + `?token=${encodeURIComponent(userToken)}`)
         .replace('{{user}}', firstName);
 
       const mailOptions = {
         from: mailer.USER,
         to: email,
-        subject: "Confirmation d'email - Profiilo",
+        subject: "Confirmation d'email - Talaryo",
         html: htmlMailer,
       };
 
@@ -62,12 +64,12 @@ class MailerServiceFile {
       const confirmationEmail = fs.readFileSync(join(templateDir, 'reset-password.html'), { encoding: 'utf-8' });
       const htmlMailer = confirmationEmail
         .replace('{{support_MAIL}}', mailer.USER)
-        .replace('{{url}}', FRONT_URL + `/reset-password/new?token=${encodeURIComponent(token)}`);
+        .replace('{{url}}', ORIGIN + `/reset-password/new?token=${encodeURIComponent(token)}`);
 
       const mailOptions = {
         from: mailer.USER,
         to: email,
-        subject: 'Lien de réinitialisation de mot de passe - Profiilo',
+        subject: 'Lien de réinitialisation de mot de passe - Talaryo',
         html: htmlMailer,
       };
 

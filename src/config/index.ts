@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config = {
-  FRONT_URL: process.env.FRONT_URL,
   CREDENTIALS: process.env.CREDENTIALS === 'true',
   db: {
     DB_USER: process.env.DB_USER,

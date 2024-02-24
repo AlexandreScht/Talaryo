@@ -8,6 +8,7 @@ export interface User {
   lastName?: string;
   password?: string;
   validate: boolean;
+  society?: string;
   accessToken?: string;
   refreshToken?: string;
   stripeCustomer?: string;

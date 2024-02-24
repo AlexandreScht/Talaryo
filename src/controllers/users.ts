@@ -4,6 +4,7 @@ import auth from '@/middlewares/auth';
 import { getKeyToken } from '@/utils/keyToken';
 import {
   confirmPasswordValidator,
+  keyValidator,
   limitValidator,
   pageValidator,
   passwordValidator,
@@ -52,7 +53,7 @@ const UsersController = ({ app }) => {
     mw([
       validator({
         body: {
-          accessToken: stringValidator.required(),
+          accessToken: keyValidator.required(),
         },
       }),
       async ({
@@ -113,7 +114,7 @@ const UsersController = ({ app }) => {
     mw([
       validator({
         params: {
-          token: stringValidator.required(),
+          token: keyValidator.required(),
         },
       }),
       async ({
@@ -155,7 +156,7 @@ const UsersController = ({ app }) => {
         body: {
           password: passwordValidator.required(),
           confirm: confirmPasswordValidator.required(),
-          token: stringValidator.required(),
+          token: keyValidator.required(),
         },
       }),
       async ({

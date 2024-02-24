@@ -7,10 +7,10 @@ import { sign, type JwtPayload } from 'jsonwebtoken';
 import parseDuration from 'parse-duration';
 
 const createToken = async (user: UserModel): Promise<TokenData> => {
-  const { email, role, firstName } = user;
+  const { email, role, firstName, lastName, society } = user;
   const { security } = config;
 
-  const dataStoredInToken: JwtPayload = { User: { role, firstName, email } };
+  const dataStoredInToken: JwtPayload = { User: { role, firstName, email, lastName, society } };
   const expiresIn = parseDuration(security.EXPRESS_IN) / 1000; // convert string in secondes
   const token = await new SignJWT(dataStoredInToken)
     .setProtectedHeader({ alg: 'HS256' })
@@ -32,15 +32,15 @@ const createSession = (user: UserModel, refreshToken: string): { token: string; 
 };
 
 const createCookie = (user: UserModel, refreshToken: string): string => {
-  const { FRONT_URL, NODE_ENV } = config;
+  const { ORIGIN, NODE_ENV } = config;
 
   const values = createSession(user, refreshToken);
-  return cookie.serialize(new URL(FRONT_URL).hostname === 'app.talaryo.com' ? 'Talaryo-Session' : 'Talaryo-SessionBis', values.token, {
+  return cookie.serialize(new URL(ORIGIN).hostname === 'app.talaryo.com' ? 'Talaryo-Session' : 'Talaryo-SessionBis', values.token, {
     httpOnly: true,
     path: '/',
-    domain: new URL(FRONT_URL).hostname === 'localhost' ? 'localhost' : '.talaryo.com',
+    domain: new URL(ORIGIN).hostname === 'localhost' ? 'localhost' : '.talaryo.com',
     maxAge: values.expiresIn,
-    secure: NODE_ENV === 'production' && new URL(FRONT_URL).hostname !== 'localhost',
+    secure: NODE_ENV === 'production' && new URL(ORIGIN).hostname !== 'localhost',
   });
 };
 
