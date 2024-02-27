@@ -35,7 +35,7 @@ const createCookie = (user: UserModel, refreshToken: string): string => {
   const { ORIGIN, NODE_ENV } = config;
 
   const values = createSession(user, refreshToken);
-  return cookie.serialize(new URL(ORIGIN).hostname === 'app.talaryo.com' ? 'Talaryo-Session' : 'Talaryo-SessionBis', values.token, {
+  return cookie.serialize(new URL(ORIGIN).hostname === 'app.talaryo.com' ? `Talaryo-Session` : `Talaryo-SessionBis`, values.token, {
     httpOnly: true,
     path: '/',
     domain: new URL(ORIGIN).hostname === 'localhost' ? 'localhost' : '.talaryo.com',

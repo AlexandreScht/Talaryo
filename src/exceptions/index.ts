@@ -53,7 +53,7 @@ export class InvalidRoleAccessError extends ServerException {
 }
 
 export class ServicesError extends ServerException {
-  constructor(message: string[] | string = 'Échec de la connexion à la base de données') {
+  constructor(message: string[] | string = 'Echec de la connexion avec la base de donnees') {
     super(505, message);
   }
 }

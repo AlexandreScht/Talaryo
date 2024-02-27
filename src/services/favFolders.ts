@@ -33,13 +33,13 @@ class FavorisFolderFile {
   public async getFolderByName(name: string, userId: number): Promise<FavFoldersModel> {
     try {
       const folder = await FavFoldersModel.query().select('id').where({ name, userId }).first();
-      if (folder) {
-        return folder;
+      if (!folder) {
+        throw new InvalidArgumentError();
       }
+      return folder;
     } catch (error) {
       throw new ServicesError();
     }
-    throw new InvalidArgumentError();
   }
 
   public async getFolders(

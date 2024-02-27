@@ -1,6 +1,6 @@
 import auth from '@/middlewares/auth';
 import SearchesServiceFile from '@/services/searches';
-import { idValidator, limitValidator, pageValidator, stringValidator } from '@libs/validate';
+import { idValidator, keyValidator, limitValidator, pageValidator, stringValidator } from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import Container from 'typedi';
@@ -13,7 +13,7 @@ const SearchController = ({ app }) => {
       auth(['advanced', 'business', 'admin']),
       validator({
         body: {
-          search: stringValidator.required(),
+          search: keyValidator.required(),
         },
         query: {
           searchFolderId: idValidator.required(),

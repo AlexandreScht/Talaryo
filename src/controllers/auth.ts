@@ -77,10 +77,10 @@ const AuthController = ({ app }) => {
         body: {
           email: emailValidator.required(),
           password: stringValidator.required(),
-          token: keyValidator.required(),
+          // token: keyValidator.required(),
         },
       }),
-      isHumain(),
+      // isHumain(),
       async ({
         locals: {
           body: { email, password },
@@ -89,7 +89,7 @@ const AuthController = ({ app }) => {
         next,
       }) => {
         try {
-          const [found, user] = await UserServices.findUserByEmail(email);
+          const [found, user] = await UserServices.findUserByEmail(email, true);
 
           if (!found) {
             throw new NotFoundError(`Email ou mot de passe invalide`);
@@ -100,16 +100,16 @@ const AuthController = ({ app }) => {
           }
 
           await UserServices.login(user, password);
+          const refreshToken = uuidv4();
 
           const tokenData = await createToken(user);
-          const refreshToken = uuidv4();
           const cookie = createCookie(user, refreshToken);
 
           await UserServices.setRefreshToken(user, refreshToken);
 
           res.setHeader('Set-Cookie', cookie);
 
-          res.status(200).send({ payload: tokenData });
+          res.status(201).send({ payload: tokenData });
         } catch (error) {
           next(error);
         }

@@ -5,7 +5,7 @@ import auth from '@/middlewares/auth';
 import FavorisServiceFile from '@/services/favoris';
 import ScoreServiceFile from '@/services/scores';
 import ScrapperServiceFile from '@/services/scrapper';
-import { booleanValidator, numberValidator, stringValidator } from '@libs/validate';
+import { booleanValidator, keyValidator, numberValidator } from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import Container from 'typedi';
@@ -20,18 +20,18 @@ const ScrappingController = ({ app }) => {
       auth(['pro', 'advanced', 'business', 'admin', 'free']),
       validator({
         query: {
-          platform: stringValidator.required(),
-          fn: stringValidator,
-          industry: stringValidator,
-          sector: stringValidator,
-          skill: stringValidator,
-          key: stringValidator,
-          loc: stringValidator,
-          Nindustry: stringValidator,
-          Nskill: stringValidator,
-          Nkey: stringValidator,
+          platform: keyValidator.required(),
+          fn: keyValidator,
+          industry: keyValidator,
+          sector: keyValidator,
+          skill: keyValidator,
+          key: keyValidator,
+          loc: keyValidator,
+          Nindustry: keyValidator,
+          Nskill: keyValidator,
+          Nkey: keyValidator,
           time: booleanValidator,
-          zone: stringValidator,
+          zone: keyValidator,
           start: numberValidator,
           index: numberValidator,
         },

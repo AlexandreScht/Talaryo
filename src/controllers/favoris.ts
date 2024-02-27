@@ -1,7 +1,7 @@
 import auth from '@/middlewares/auth';
 import FavorisFolderFile from '@/services/favFolders';
 import FavorisServiceFile from '@/services/favoris';
-import { idValidator, imgValidator, limitValidator, linkValidator, pageValidator, stringValidator } from '@libs/validate';
+import { idValidator, imgValidator, keyValidator, limitValidator, linkValidator, pageValidator, stringValidator } from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import Container from 'typedi';
@@ -17,10 +17,10 @@ const FavorisController = ({ app }) => {
         body: {
           link: linkValidator.required(),
           img: imgValidator.required(),
-          fullName: stringValidator.nonNullable(),
-          currentJob: stringValidator.nullable(),
-          currentCompany: stringValidator.nullable(),
-          desc: stringValidator.nonNullable(),
+          fullName: stringValidator.required(),
+          currentJob: stringValidator,
+          currentCompany: stringValidator,
+          desc: keyValidator.required(),
           favFolderId: idValidator.required(),
         },
       }),
