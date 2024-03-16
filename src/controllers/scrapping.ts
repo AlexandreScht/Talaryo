@@ -1,4 +1,5 @@
 import { ScrappingSource, sources } from '@/interfaces/scrapping';
+import { noIntitle, noSector } from '@/libs/scrapping';
 import serializeLoc from '@/libs/serializeLoc';
 import sitesUri from '@/libs/sites';
 import auth from '@/middlewares/auth';
@@ -55,7 +56,9 @@ const ScrappingController = ({ app }) => {
                 return acc;
               }
               if (key === 'fn') {
-                const str = queries[key].split(',').map((v: string) => `intitle:${v.replaceAll(' ', '-')}`);
+                const str = queries[key]
+                  .split(',')
+                  .map((v: string) => (noIntitle.includes(site) ? v.replaceAll(' ', '-') : `intitle:${v.replaceAll(' ', '-')}`));
                 return (acc += ` ${str.join(' | ')}`);
               }
               if (key === 'industry') {
@@ -66,7 +69,7 @@ const ScrappingController = ({ app }) => {
                 const str = queries[key].split(',').map((v: string) => v.replaceAll(' ', '-'));
                 return (acc += ` ${str.join('&')}`);
               }
-              if (key === 'sector') {
+              if (key === 'sector' && !noSector.includes(site)) {
                 const str = queries[key].split(',').map((v: string) => v.replaceAll(' ', '-'));
                 return (acc += ` ${str.join(' | ')}`);
               }
@@ -91,7 +94,8 @@ const ScrappingController = ({ app }) => {
             });
           });
 
-          const result = await ScrapperServices.scrape(Searches);
+          const result = await ScrapperServices.scrape(Searches, { fn, industry });
+
           const favMap = await FavorisServices.findAllUserFav(sessionId, result.scrape);
           const links = result.scrape.map(obj => ({
             ...obj,

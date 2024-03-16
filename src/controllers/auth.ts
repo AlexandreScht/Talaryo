@@ -1,5 +1,6 @@
 import config from '@/config';
-import { InvalidSessionError, NotFoundError } from '@exceptions';
+import { authorizeUser } from '@/config/devList';
+import { InvalidSessionError, NotFoundError, ServerException } from '@exceptions';
 import OAuthTokenCheck from '@libs/OAuthToken';
 import { createCookie, createToken } from '@libs/setToken';
 import { confirmPasswordValidator, emailValidator, keyValidator, passwordValidator, stringValidator } from '@libs/validate';
@@ -40,13 +41,8 @@ const AuthController = ({ app }) => {
         try {
           const { ORIGIN, NODE_ENV } = config;
 
-          if (
-            NODE_ENV === 'production' &&
-            new URL(ORIGIN).hostname === 'test.talaryo.com' &&
-            !['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(email)
-          ) {
-            res.status(404).send({ result: 'Seule les comptes développeur peuvent ce connecter sur ce site' });
-            return;
+          if (NODE_ENV === 'production' && new URL(ORIGIN).hostname === 'test.talaryo.com' && !authorizeUser.includes(email)) {
+            throw new ServerException(404, 'Seul les comptes développeur peuvent ce connecter sur ce site');
           }
 
           const [found] = await UserServices.findUserByEmail(email, true);
@@ -57,7 +53,10 @@ const AuthController = ({ app }) => {
           }
 
           await transaction(UserServices.getModel, async trx => {
-            const user = await UserServices.register({ email, password, firstName, lastName }, trx);
+            const user = await UserServices.register(
+              { email, password, firstName, lastName, ...(authorizeUser.includes(email) ? { role: 'admin' } : {}) },
+              trx,
+            );
             await MailerService.Confirmation(user.email, firstName, user.accessToken);
             await trx.commit();
           });
@@ -77,10 +76,10 @@ const AuthController = ({ app }) => {
         body: {
           email: emailValidator.required(),
           password: stringValidator.required(),
-          // token: keyValidator.required(),
+          token: keyValidator.required(),
         },
       }),
-      // isHumain(),
+      isHumain(),
       async ({
         locals: {
           body: { email, password },

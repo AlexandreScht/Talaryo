@@ -22,7 +22,7 @@ export class ApiPuppeteer {
         throw new InvalidArgumentError('url is a required property and must be a string.');
       }
 
-      if (!v.props || !Array.isArray(v.props)) {
+      if (!v.props || typeof v.props !== 'function') {
         throw new InvalidArgumentError('Option "props" needs to be an array.');
       }
 
@@ -112,7 +112,7 @@ export class ApiPuppeteer {
 
   private async scrapper({
     page,
-    data: { props, url },
+    data: { props, url, searchValues },
   }: {
     page: Page;
     data: puppeteerProps;
@@ -151,13 +151,13 @@ export class ApiPuppeteer {
             resolve([true]);
           }
 
-          if (response.url().startsWith(props[1]) && response.status() === 200) {
+          if (response.url().startsWith('https://www.google.com/search') && response.status() === 200) {
             const responseBody = await response.text();
             if (!responseBody) {
               await page.close();
               resolve([true]);
             }
-            const res: cheerioResult = props[0](responseBody);
+            const res: cheerioResult = props(responseBody, searchValues);
             await page.close();
             if (res instanceof Promise) {
               const result = await res;

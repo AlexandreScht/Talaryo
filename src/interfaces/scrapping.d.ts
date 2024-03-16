@@ -1,43 +1,38 @@
+export interface searchValues {
+  fn?: string;
+  industry?: string;
+}
 export interface puppeteerProps {
   current?: boolean;
   url: string;
-  props?: [(value: string) => cheerioResult, string];
+  props?: (value: string, searchValues: searchValues) => cheerioResult;
+  searchValues?: searchValues;
   retryCount: number;
 }
 export type sources =
   | 'LinkedIn'
   | 'Viadeo'
   | 'Xing'
-  | 'Skiller'
-  | 'PmeBTP'
   | 'Batiactu'
   | 'Dribble'
   | 'Behance'
   | 'Culinary agents'
-  | 'Dogfinance'
   | 'Symfony'
   | 'HEC'
   | 'Polytechnique'
   | 'Ferrandi'
-  | 'AIX & Polytech marseille'
   | 'UTC'
   | 'Centrale Supélec'
   | 'Centrale Lille'
   | 'Essec'
-  | 'Edhec'
-  | 'Neoma'
-  | 'ESTP'
-  | 'Mines Ales'
-  | 'AIVP'
-  | 'ENSG'
-  | 'ICAM'
-  | 'Skema';
+  | 'Neoma';
 
 export interface cheerioInfos {
   link: string;
   fullName: string;
-  currentJob: string;
-  currentCompany: string;
+  currentJob?: string;
+  diplome?: string;
+  currentCompany?: string;
   desc: string;
   img: string;
   favFolderId?: string;
@@ -61,3 +56,7 @@ export interface ScrappingSource {
   site: sources;
   current: boolean;
 }
+
+export type SourceFunction = {
+  [key in sources]?: (html: string, searchValues: searchValues) => cheerioResult;
+};
