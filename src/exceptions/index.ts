@@ -36,8 +36,8 @@ export class InvalidSessionError extends ServerException {
 }
 
 export class ExpiredSessionError extends ServerException {
-  constructor(message: string[] | string = 'Session expirée') {
-    super(401, message);
+  constructor(message: string[] | string = 'Session expired') {
+    super(999, message);
   }
 }
 

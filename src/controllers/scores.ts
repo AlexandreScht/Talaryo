@@ -1,3 +1,4 @@
+import { totalSearchFree, totalSearchPro } from '@/config/access';
 import { numberValidator, timestampValidator } from '@/libs/validate';
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
@@ -10,7 +11,7 @@ const ScoreController = ({ app }) => {
   app.patch(
     '/profils-consulted/:profils',
     mw([
-      auth(['pro', 'advanced', 'business', 'admin', 'free']),
+      auth(),
       validator({
         params: {
           profils: numberValidator.required(),
@@ -87,6 +88,24 @@ const ScoreController = ({ app }) => {
 
           const score = await ScoreServices.getUserScores(dateSelect, sessionId);
           res.status(201).send({ res: score ?? null });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.get(
+    '/get-amount-score',
+    mw([
+      auth(),
+      async ({ session: { sessionId, sessionRole }, res, next }) => {
+        try {
+          if (['business', 'admin'].includes(sessionRole)) {
+            return res.send({ res: true });
+          }
+          const total = await ScoreServices.getTotalMonthSearches(sessionId);
+          const totalSearches = sessionRole === 'pro' ? totalSearchPro - total : totalSearchFree - total;
+          res.status(201).send({ res: totalSearches });
         } catch (error) {
           next(error);
         }

@@ -66,6 +66,16 @@ class FavorisServiceFile {
       throw new ServicesError();
     }
   }
+
+  public async getTotalFavoris(userId: number): Promise<number> {
+    try {
+      const [{ count }] = await FavoriModel.query().where({ userId }).limit(1).offset(0).count();
+      const total = Number.parseInt(count, 10);
+      return total;
+    } catch (error) {
+      throw new ServicesError();
+    }
+  }
 }
 
 export default FavorisServiceFile;

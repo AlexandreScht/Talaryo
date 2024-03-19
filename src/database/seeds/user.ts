@@ -32,13 +32,9 @@ const generate = (iteration: number, schema: schemaType): schemaType[] => {
   });
 };
 
-const roles = ['business', 'advanced', 'pro', 'test'];
+const roles = ['business', 'advanced', 'pro', 'free'];
 
 export async function seed(knex: Knex): Promise<void> {
-  // Inserts seed entries
-  // await knex('users').insert([
-  //   { id: 1, email: 'test@mail.com', password: null, role: 'admin', firstName: 'test', lastName: 'account', freeTrials: null, validate: true },
-  // ]);
   await knex('users').insert(
     generate(15, {
       email: [() => faker.internet.email()],
@@ -46,7 +42,6 @@ export async function seed(knex: Knex): Promise<void> {
       role: [() => roles[Math.floor(Math.random() * roles.length)]],
       firstName: [() => faker.person.firstName()],
       lastName: [() => faker.person.lastName()],
-      freeTrials: null,
       validate: true,
     }),
   );

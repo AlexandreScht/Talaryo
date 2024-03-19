@@ -1,3 +1,5 @@
+import { sourcesBusiness, sourcesPro } from '@/config/access';
+import { InvalidRoleAccessError } from '@/exceptions';
 import { ScrappingSource, sources } from '@/interfaces/scrapping';
 import { noIntitle, noSector } from '@/libs/scrapping';
 import serializeLoc from '@/libs/serializeLoc';
@@ -18,7 +20,7 @@ const ScrappingController = ({ app }) => {
   app.get(
     '/scrapping',
     mw([
-      auth(['pro', 'advanced', 'business', 'admin', 'free']),
+      auth(),
       validator({
         query: {
           platform: keyValidator.required(),
@@ -41,7 +43,7 @@ const ScrappingController = ({ app }) => {
         locals: {
           query: { platform, fn, industry, sector, skill, key, loc, Nindustry, Nskill, Nkey, time, zone, index = 50, start = 0 },
         },
-        session: { sessionId },
+        session: { sessionId, sessionRole },
         res,
         next,
       }) => {
@@ -49,6 +51,21 @@ const ScrappingController = ({ app }) => {
           const Searches: ScrappingSource[] = [];
           const queries = { fn, industry, sector, skill, key, loc, Nindustry, Nskill, Nkey };
           const sources: sources[] = platform.split(',');
+          if (!['business', 'admin'].includes(sessionRole)) {
+            if (sources.some(s => sourcesPro.includes(s)) && sessionRole !== 'pro') {
+              throw new InvalidRoleAccessError('pro');
+            }
+            if (sources.some(s => sourcesBusiness.includes(s))) {
+              throw new InvalidRoleAccessError('business');
+            }
+            const total = await ScoreServices.getTotalMonthSearches(sessionId);
+            if (total >= 10 && sessionRole !== 'pro') {
+              throw new InvalidRoleAccessError('pro');
+            }
+            if (total >= 100) {
+              throw new InvalidRoleAccessError('business');
+            }
+          }
 
           sources.forEach((site: sources) => {
             const url = Object.keys(queries).reduce((acc, key) => {

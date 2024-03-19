@@ -1,3 +1,4 @@
+import { InvalidRoleAccessError } from '@/exceptions';
 import auth from '@/middlewares/auth';
 import FavorisFolderFile from '@/services/favFolders';
 import FavorisServiceFile from '@/services/favoris';
@@ -12,7 +13,7 @@ const FavorisController = ({ app }) => {
   app.post(
     '/create-fav',
     mw([
-      auth(['pro', 'advanced', 'business', 'admin', 'free']),
+      auth(),
       validator({
         body: {
           link: linkValidator.required(),
@@ -28,11 +29,20 @@ const FavorisController = ({ app }) => {
         locals: {
           body: { link, img, fullName, currentJob, currentCompany, desc, favFolderId },
         },
-        session: { sessionId },
+        session: { sessionId, sessionRole },
         res,
         next,
       }) => {
         try {
+          if (!['business', 'admin'].includes(sessionRole)) {
+            const limit = await FavorisServices.getTotalFavoris(sessionId);
+            if (limit >= 10 && sessionRole !== 'pro') {
+              throw new InvalidRoleAccessError('pro');
+            }
+            if (limit >= 100) {
+              throw new InvalidRoleAccessError('business');
+            }
+          }
           const success = await FavorisServices.create({ link, img, fullName, currentJob, currentCompany, desc, favFolderId }, sessionId);
           res.send({ res: success });
         } catch (error) {

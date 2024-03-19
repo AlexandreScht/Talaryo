@@ -16,7 +16,7 @@ export const stringValidator = yup.string().test('is-safe-string', 'Cette chaîn
 export const keyValidator = yup.string();
 
 export const emailValidator = yup.string().email();
-export const roleValidator = yup.string().oneOf(['admin', 'business', 'advanced', 'pro', 'free', undefined]);
+export const roleValidator = yup.string().oneOf(['admin', 'business', 'pro', 'free']);
 
 export const numberValidator = yup.number().integer();
 export const limitValidator = yup.number().integer().min(1).max(50).defined();

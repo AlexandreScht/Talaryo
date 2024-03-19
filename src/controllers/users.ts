@@ -1,4 +1,4 @@
-import { InvalidArgumentError, InvalidSessionError, ServerException } from '@/exceptions';
+import { InvalidArgumentError, InvalidSessionError } from '@/exceptions';
 import { createToken } from '@/libs/setToken';
 import auth from '@/middlewares/auth';
 import { getKeyToken } from '@/utils/keyToken';
@@ -225,33 +225,6 @@ const UsersController = ({ app }) => {
       }) => {
         try {
           const update = await UserServices.updateUsers(users);
-          res.status(201).send({ res: !!update });
-        } catch (error) {
-          next(error);
-        }
-      },
-    ]),
-  );
-  app.patch(
-    '/free-trials',
-    mw([
-      auth(),
-      async ({ session: { sessionId }, res, next }) => {
-        try {
-          const [find, user] = await UserServices.findUserById(sessionId);
-          if (!find) {
-            throw new InvalidSessionError();
-          }
-          if (user.freeTrials) {
-            throw new ServerException(403, "Votre compte est actuellement en période d'essai");
-          }
-          if (user.getFreeTest) {
-            throw new ServerException(422, "Votre compte a déjà bénéficié d'un essai gratuit");
-          }
-          const currentDate = new Date();
-          currentDate.setDate(currentDate.getDate() + 5);
-
-          const update = await UserServices.updateCurrentUser({ freeTrials: currentDate, getFreeTest: true }, sessionId);
           res.status(201).send({ res: !!update });
         } catch (error) {
           next(error);

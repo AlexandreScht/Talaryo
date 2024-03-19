@@ -1,3 +1,4 @@
+import { InvalidRoleAccessError } from '@/exceptions';
 import auth from '@/middlewares/auth';
 import SearchesServiceFile from '@/services/searches';
 import { idValidator, keyValidator, limitValidator, pageValidator, stringValidator } from '@libs/validate';
@@ -10,7 +11,7 @@ const SearchController = ({ app }) => {
   app.post(
     '/create-search',
     mw([
-      auth(['advanced', 'business', 'admin']),
+      auth(),
       validator({
         body: {
           search: keyValidator.required(),
@@ -26,11 +27,20 @@ const SearchController = ({ app }) => {
           body: { search },
           query: { searchFolderId, name, society },
         },
-        session: { sessionId },
+        session: { sessionId, sessionRole },
         res,
         next,
       }) => {
         try {
+          if (!['business', 'admin'].includes(sessionRole)) {
+            const limit = await SearchServices.getTotalSearches(sessionId);
+            if (limit >= 3 && sessionRole !== 'pro') {
+              throw new InvalidRoleAccessError('pro');
+            }
+            if (limit >= 10) {
+              throw new InvalidRoleAccessError('business');
+            }
+          }
           const success = await SearchServices.create({ name, society, searchQueries: search, searchFolderId }, sessionId);
           res.send({ res: success });
         } catch (error) {

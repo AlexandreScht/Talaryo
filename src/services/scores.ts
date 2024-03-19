@@ -60,6 +60,29 @@ class ScoreServiceFile {
       throw new ServicesError();
     }
   }
+
+  public async getTotalMonthSearches(userId: number): Promise<number> {
+    try {
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      const formatDate = (date: Date): string => {
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+      };
+      const startDate = formatDate(firstDayOfMonth);
+      const endDate = formatDate(lastDayOfMonth);
+
+      const [{ totalSearches }] = await ScoreModel.query()
+        .where({ userId })
+        .whereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') >= ?`, [startDate])
+        .andWhereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') <= ?`, [endDate])
+        .sum('searches as totalSearches');
+      return totalSearches;
+    } catch (err) {
+      throw new ServicesError(err.message || 'Error calculating total searches.');
+    }
+  }
+
   public async getUserRangeScores(
     { year, month, day }: { year: number; month: number; day: number },
     { RgYear, RgMonth, RgDay }: { RgYear: number; RgMonth: number; RgDay: number },

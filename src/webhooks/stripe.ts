@@ -12,17 +12,40 @@ const stripe = new Stripe(stripeENV.KEY, {
 
 const StripeWebhook = ({ app }) => {
   app.post(
-    '/webhook',
+    '/stripe_webhook',
     stripeHost(async (req: RequestWithWebhook, res, next) => {
       try {
         const { event } = req;
         switch (event.type) {
-          case 'payment_intent.succeeded':
-            const stripeObject: Stripe.PaymentIntent = event.data.object as Stripe.PaymentIntent;
-            logger.info(`💰 PaymentIntent status: ${stripeObject.status}`);
+          case 'checkout.session.completed':
+            logger.info(`checkout.session.completed =>`);
+            const session: Stripe.Checkout.Session = event.data.object;
+            console.log(`userId: ${session.client_reference_id}`);
+            console.log(`pr_status: ${session.status}`);
+            console.log(`customer: ${session.customer}`);
+
             break;
-          default:
-            logger.info(`Unhandled event type ${event.type}`);
+          case 'customer.subscription.deleted':
+            logger.info(`customer.subscription.deleted =>`);
+            const subscriptionDeleted: Stripe.Subscription = event.data.object;
+            console.log(`customer id end: ${subscriptionDeleted.customer}`);
+            break;
+          case 'customer.subscription.updated':
+            logger.info(`customer.subscription.updated =>`);
+            const subscriptionUpdate: Stripe.Subscription = event.data.object;
+            console.log(`customer id update: ${subscriptionUpdate.customer}`);
+            console.log(`customer subscription end: ${subscriptionUpdate.ended_at}`);
+            console.log(`items: ${subscriptionUpdate.items}`);
+            const items = subscriptionUpdate.items.data;
+            items.forEach(item => {
+              console.log(item);
+              console.log(item.plan);
+              const newRole: string = item.plan.metadata?.subscribeRole;
+              console.log(newRole);
+            });
+            console.log(`metadata: ${subscriptionUpdate.metadata}`);
+            break;
+          // logger.info(`Unhandled event type ${event.type}`);
         }
         res.json({ received: true });
       } catch (error) {

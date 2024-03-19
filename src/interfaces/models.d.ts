@@ -1,4 +1,4 @@
-export type role = 'admin' | 'business' | 'advanced' | 'pro' | 'free' | undefined;
+export type role = 'admin' | 'business' | 'pro' | 'free';
 
 export interface User {
   id?: number;
@@ -12,9 +12,7 @@ export interface User {
   accessToken?: string;
   refreshToken?: string;
   stripeCustomer?: string;
-  freeTrials?: Date;
   stripeBilling?: Date;
-  getFreeTest: boolean;
   passwordReset?: boolean;
 }
 

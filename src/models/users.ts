@@ -14,9 +14,7 @@ export class UserModel extends Model implements User {
   accessToken?: string;
   refreshToken?: string;
   stripeCustomer?: string;
-  freeTrials?: Date;
   stripeBilling?: Date;
-  getFreeTest: boolean;
   passwordReset?: boolean;
   createdAt: string;
   updatedAt: string;
