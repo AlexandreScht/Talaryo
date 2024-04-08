@@ -2,16 +2,16 @@ import config from '@/config';
 import type { ctx } from '@/interfaces/request';
 import { ServerException } from '@exceptions';
 import fetch from 'node-fetch';
-type isHumainLocals = { body: { token: string } };
+type isHumanLocals = { body: { token: string } };
 
-const isHumain = () => {
+const isHuman = () => {
   return async (ctx: ctx) => {
     const { next, locals } = ctx;
 
     try {
       const {
         body: { token },
-      } = locals as isHumainLocals;
+      } = locals as isHumanLocals;
 
       const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${config.reCaptcha}&response=${token}`, {
         method: 'POST',
@@ -30,4 +30,4 @@ const isHumain = () => {
   };
 };
 
-export default isHumain;
+export default isHuman;

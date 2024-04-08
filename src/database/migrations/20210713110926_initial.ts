@@ -14,15 +14,17 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.string('accessToken', 125).nullable();
     table.string('refreshToken', 125).nullable();
     table.string('stripeCustomer', 64).nullable();
-    table.timestamp('stripeBilling').nullable();
+    table.enu('subscribe_status', ['active', 'waiting', 'pending', 'disable']).defaultTo('disable');
+    table.timestamp('subscribe_start').nullable();
+    table.timestamp('subscribe_end').nullable();
     table.timestamps(true, true, true);
   });
   await knex.schema.createTable('scores', table => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
-    table.integer('year');
-    table.integer('month');
-    table.integer('day');
+    table.tinyint('year');
+    table.tinyint('month');
+    table.tinyint('day');
     table.integer('searches').defaultTo(0);
     table.integer('profils').defaultTo(0);
     table.timestamps(true, true, true);
@@ -48,6 +50,14 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.timestamps(true, true, true);
     table.unique(['userId', 'link', 'favFolderId']);
   });
+  await knex.schema.createTable('event', table => {
+    table.bigInteger('index').notNullable();
+    table.integer('userId').notNullable().references('id').inTable('users');
+    table.string('eventName').notNullable();
+    table.text('value').notNullable();
+    table.timestamps(true, true, true);
+    table.unique(['userId', 'eventName']);
+  });
   await knex.schema.createTable('searchFolders', table => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
@@ -68,6 +78,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
 };
 
 module.exports.down = async (knex: Knex): Promise<void> => {
+  await knex.schema.dropTable('event');
   await knex.schema.dropTable('favoris');
   await knex.schema.dropTable('favFolders');
   await knex.schema.dropTable('searches');

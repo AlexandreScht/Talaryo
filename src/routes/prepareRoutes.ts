@@ -4,6 +4,7 @@ import FavorisController from '@/controllers/favoris';
 import ScoreController from '@/controllers/scores';
 import SearchFoldersController from '@/controllers/searchFolders';
 import SearchController from '@/controllers/searches';
+import SubscriptionController from '@/controllers/subscribe';
 import StripeWebhook from '@/webhooks/stripe';
 import AuthController from '@controllers/auth';
 import ScrappingController from '@controllers/scrapping';
@@ -27,5 +28,6 @@ export class ApiRouter implements Routes {
     SearchFoldersController({ app: this.router });
     SearchController({ app: this.router });
     ScoreController({ app: this.router });
+    SubscriptionController({ app: this.router });
   }
 }

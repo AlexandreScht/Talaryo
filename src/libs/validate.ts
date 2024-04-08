@@ -2,8 +2,8 @@ import { validatorsProps } from '@interfaces/request';
 import * as yup from 'yup';
 
 const stringRule = [
-  /<script>|<\/script>|'|"|;|--|<\?php/i,
-  /(--|\/\*|\*\/|'|";|';|INSERT INTO|SELECT|DELETE|UPDATE|DROP TABLE|DROP DATABASE|CREATE TABLE|CREATE DATABASE|ALTER TABLE|EXEC|EXECUTE)/i,
+  /<script>|<\/script>|;|--|<\?php/i,
+  /(--|\/\*|\*\/|";|';|INSERT INTO|SELECT|DELETE|UPDATE|DROP TABLE|DROP DATABASE|CREATE TABLE|CREATE DATABASE|ALTER TABLE|EXEC|EXECUTE)/i,
   /--/,
   /";/,
 ];
@@ -57,3 +57,8 @@ const userSchema = yup.object().shape({
 });
 
 export const usersValidator = yup.array().of(userSchema);
+
+export const cancelOptionSubValidator = yup.object().shape({
+  feedback: yup.string(),
+  comment: yup.string(),
+});

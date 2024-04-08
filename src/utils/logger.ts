@@ -38,6 +38,15 @@ const logger = winston.createLogger({
       json: false,
       zippedArchive: true,
     }),
+    new winstonDaily({
+      level: 'warn',
+      datePattern: 'YYYY-MM-DD',
+      dirname: logDir + '/warn', // dir log file -> /logs/debug/*.log
+      filename: `%DATE%.log`,
+      maxFiles: 90, // 90 Days saved
+      json: false,
+      zippedArchive: true,
+    }),
     // error log setting
     new winstonDaily({
       level: 'error',
@@ -67,7 +76,9 @@ const logger = winston.createLogger({
 
 const stream = {
   write: (message: string) => {
-    logger.info(message.substring(0, message.lastIndexOf('\n')));
+    if (!/POST \/api\/stripe_webhook/.test(message)) {
+      logger.info(message.substring(0, message.lastIndexOf('\n')));
+    }
   },
 };
 

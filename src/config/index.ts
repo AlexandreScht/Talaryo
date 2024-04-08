@@ -12,8 +12,11 @@ const config = {
   },
   PORT: process.env.PORT,
   reCaptcha: process.env.RECAPTCHA_SECRET_KEY,
+  apiKey: {
+    emailKey: process.env.EMAIL_KEY,
+  },
   security: {
-    EXPRESS_IN: '30d', // 4 heures
+    EXPRESS_IN: '30d',
     jwt: {
       JWT_SECRET: process.env.JWT_SECRET,
     },
@@ -72,6 +75,7 @@ const config = {
     Neoma: process.env.NEOMA,
   },
   ORIGIN: process.env.ORIGIN,
+  ONLY_HTTPS: process.env.ONLY_HTTPS,
   COOKIE_NAME: process.env.COOKIE_NAME,
   NODE_ENV: process.env.NODE_ENV,
 };

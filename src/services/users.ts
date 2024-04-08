@@ -6,6 +6,7 @@ import { UserModel, UserShape } from '@models/users';
 import { genSalt, hash } from 'bcrypt';
 import type { Knex } from 'knex';
 import { Transaction, transaction } from 'objection';
+import type Stripe from 'stripe';
 import { Service } from 'typedi';
 import { v4 as uuid } from 'uuid';
 @Service()
@@ -31,7 +32,33 @@ class UsersServiceFile {
       });
       return true;
     } catch (err) {
-      console.error(err);
+      throw new ServicesError();
+    }
+  }
+
+  public async getStripeUser(customer: string | Stripe.Customer | Stripe.DeletedCustomer): Promise<UserModel> {
+    try {
+      return await UserModel.query().select('firstName', 'email', 'role').where({ stripeCustomer: customer }).first();
+    } catch (err) {
+      throw new ServicesError();
+    }
+  }
+
+  public async subscribeUser(
+    user: { customer: string | Stripe.Customer | Stripe.DeletedCustomer } | { userId: number },
+    data: Partial<UserModel>,
+  ): Promise<UserModel> {
+    try {
+      if ('customer' in user) {
+        const userModel = await UserModel.query().where({ stripeCustomer: user.customer }).first();
+
+        if (!userModel) {
+          throw new ServicesError('Utilisateur introuvable');
+        }
+        return await userModel.$query().updateAndFetch(data);
+      }
+      return await UserModel.query().updateAndFetchById(user.userId, { ...data });
+    } catch (err) {
       throw new ServicesError();
     }
   }

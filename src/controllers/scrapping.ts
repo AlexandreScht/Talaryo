@@ -5,10 +5,11 @@ import { noIntitle, noSector } from '@/libs/scrapping';
 import serializeLoc from '@/libs/serializeLoc';
 import sitesUri from '@/libs/sites';
 import auth from '@/middlewares/auth';
+import ApiServiceFile from '@/services/api';
 import FavorisServiceFile from '@/services/favoris';
 import ScoreServiceFile from '@/services/scores';
 import ScrapperServiceFile from '@/services/scrapper';
-import { booleanValidator, keyValidator, numberValidator } from '@libs/validate';
+import { booleanValidator, keyValidator, numberValidator, stringValidator } from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import Container from 'typedi';
@@ -128,6 +129,50 @@ const ScrappingController = ({ app }) => {
           }
 
           res.send({ res: links, data: { start, index, number: result.number } });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.get(
+    '/mailer-scrape',
+    mw([
+      auth(['admin', 'business', 'pro']),
+      validator({
+        query: {
+          firstName: stringValidator.required(),
+          lastName: stringValidator.required(),
+          industry: stringValidator.required(),
+        },
+      }),
+      async ({
+        locals: {
+          query: { firstName, lastName, industry },
+        },
+        res,
+        next,
+      }) => {
+        try {
+          const apiService = Container.get(ApiServiceFile);
+          const requestId = await apiService.FetchMailRequestId({
+            first_name: firstName,
+            last_name: lastName.toLocaleUpperCase(),
+            company: industry,
+          });
+
+          const ITERABLE = 5;
+          for (let i = 0; i < ITERABLE; i++) {
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            const [find, email] = await apiService.FetchMailData(requestId);
+
+            if (find && !!email[0]?.email) {
+              return res.send({ res: email[0].email });
+            }
+            if (i === ITERABLE - 1) {
+              return res.send({ res: null });
+            }
+          }
         } catch (error) {
           next(error);
         }

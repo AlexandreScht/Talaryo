@@ -35,6 +35,6 @@
       "@utils/*": ["utils/*"]
     }
   },
-  "include": ["./src/**/*.ts", "./src/**/*.json", ".env", "src/utils/regionLoc.js"],
+  "include": ["./src/**/*.ts", "./src/**/*.json", ".env", "src/utils/regionLoc.ts"],
   "exclude": ["node_modules", "src/logs"]
 }

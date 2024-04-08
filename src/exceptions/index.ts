@@ -42,7 +42,7 @@ export class ExpiredSessionError extends ServerException {
 }
 
 export class InvalidAccessError extends ServerException {
-  constructor(message: string[] | string = 'Permission insuffisante') {
+  constructor(message: string[] | string = 'Accès refusé') {
     super(403, message);
   }
 }

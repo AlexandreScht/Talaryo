@@ -1,13 +1,13 @@
-import { ExpiredSessionError } from '@/exceptions';
+import { ExpiredSessionError, InvalidAccessError } from '@/exceptions';
+import { decryptUserToken } from '@/libs/token';
 import config from '@config';
-import type { DataStoredInToken, TokenUser } from '@interfaces/auth';
+import type { TokenUser } from '@interfaces/auth';
 import type { RequestWithAuth, ctx } from '@interfaces/request';
 import UsersServiceFile from '@services/users';
 import deepmerge from 'deepmerge';
 import { NextFunction, Request, Response } from 'express';
-import { verify } from 'jsonwebtoken';
 import Container from 'typedi';
-const { security, COOKIE_NAME } = config;
+const { COOKIE_NAME, ONLY_HTTPS } = config;
 
 const getAuthorization = (req: Request) => {
   const coockie = req.cookies[COOKIE_NAME];
@@ -17,19 +17,6 @@ const getAuthorization = (req: Request) => {
   if (header) return header.split('Bearer ')[1];
 
   return null;
-};
-
-const getUser = (Authorization: string): [boolean | Error, TokenUser?] => {
-  try {
-    const data = verify(Authorization, security.session.SESSION_SECRET) as DataStoredInToken;
-    const user = {
-      ...data.user,
-      sessionId: Number.parseInt(data.user.sessionId),
-    };
-    return [false, user];
-  } catch (error) {
-    return [error];
-  }
 };
 
 const mw =
@@ -68,11 +55,14 @@ const mw =
       },
     };
     try {
+      // if (ONLY_HTTPS && !req.secure) {
+      //   throw new InvalidAccessError();
+      // }
       const UserServices = Container.get(UsersServiceFile);
       const Authorization = getAuthorization(req);
 
       if (Authorization) {
-        const [err, user] = getUser(Authorization);
+        const [err, user] = decryptUserToken(Authorization);
         if (err) {
           throw new ExpiredSessionError();
         }

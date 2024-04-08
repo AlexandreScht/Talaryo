@@ -1,10 +1,10 @@
 import config from '@/config';
 import { authorizeUser } from '@/config/devList';
+import { createCookie, createToken } from '@/libs/token';
 import { InvalidSessionError, NotFoundError, ServerException } from '@exceptions';
 import OAuthTokenCheck from '@libs/OAuthToken';
-import { createCookie, createToken } from '@libs/setToken';
 import { confirmPasswordValidator, emailValidator, keyValidator, passwordValidator, stringValidator } from '@libs/validate';
-import isHumain from '@middlewares/isHumain';
+import isHuman from '@middlewares/isHuman';
 import mw from '@middlewares/mw';
 import slowDown from '@middlewares/slowDown';
 import validator from '@middlewares/validator';
@@ -30,7 +30,7 @@ const AuthController = ({ app }) => {
           token: keyValidator.required(),
         },
       }),
-      isHumain(),
+      isHuman(),
       async ({
         locals: {
           body: { email, password, firstName, lastName },
@@ -79,7 +79,7 @@ const AuthController = ({ app }) => {
           token: keyValidator.required(),
         },
       }),
-      isHumain(),
+      isHuman(),
       async ({
         locals: {
           body: { email, password },

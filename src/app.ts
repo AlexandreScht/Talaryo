@@ -13,22 +13,26 @@ import hpp from 'hpp';
 import http from 'http';
 import morgan from 'morgan';
 import 'reflect-metadata';
-
+import { Server } from 'socket.io';
+import initializeSocket from './utils/socketManager';
 const { log } = config;
 export class App {
   public app: express.Application;
   public env: string;
   public port: string | number;
   private server: http.Server;
+  private io: Server;
 
   constructor(routes: Routes) {
     this.app = express();
     this.env = config.NODE_ENV || 'development';
     this.port = config.PORT || 3005;
     this.server = http.createServer(this.app);
+    this.io = new Server(this.server);
 
     this.connectToDatabase();
     this.initializeMiddlewares();
+    this.initializeSocket();
     this.initializeRoutes(routes);
     this.initializeErrorHandling();
     this.defaultError();
@@ -69,6 +73,10 @@ export class App {
         express.json()(req, res, next);
       }
     });
+  }
+
+  private initializeSocket() {
+    initializeSocket(this.io);
   }
 
   private initializeRoutes(routes: Routes) {

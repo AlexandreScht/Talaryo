@@ -1,5 +1,5 @@
 import { InvalidArgumentError, InvalidSessionError } from '@/exceptions';
-import { createToken } from '@/libs/setToken';
+import { createToken, refreshCookie } from '@/libs/token';
 import auth from '@/middlewares/auth';
 import { getKeyToken } from '@/utils/keyToken';
 import {
@@ -39,6 +39,10 @@ const UsersController = ({ app }) => {
           const userUpdate = await UserServices.updateCurrentUser(body, sessionId);
           if (!userUpdate) {
             throw new InvalidSessionError();
+          }
+          if (body.role) {
+            const cookie = refreshCookie(userUpdate);
+            res.setHeader('set-cookie', cookie);
           }
           const { jwt } = await createToken(userUpdate);
           res.status(201).send({ payload: jwt });

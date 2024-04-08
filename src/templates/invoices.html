@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <title>Réinitialisation de votre mot de passe</title>
+    <title>Votre facture Talaryo.com</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -11,33 +11,30 @@
         .footer {font-size: 12px; color: #999; text-align: center; margin-top: 20px;}
         .link {background: #185be0; color: white !important; font-weight: 600; text-align: center; padding: 0.6em 2.8em; border-radius: 0.5em; text-decoration: none;}
         b {font-weight: bold;}
-        .support{
-            color: #0242c4 !important; background-color: transparent !important; font-weight: 600; text-decoration: underline;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Réinitialisation de votre mot de passe</h2>
-        <p>Une demande de réinitialisation de votre mot de passe a été faite.</p>
-        <p>Si vous avez effectué cette demande, veuillez cliquer sur le bouton ci-dessous pour procéder à la réinitialisation de votre mot de passe.</p>
-        <br/>
+        <div class="content">
+            <p>Bonjour {{user}},</p>
+            <p>Nous vous informons que votre facture du <b>{{invoice_date}}</b> d'un montant de <b>{{invoice_amount}} euros TTC</b> est disponible.</p>
+            <p>Retrouvez toutes les informations de votre facture en <b>cliquant sur le lien ci-dessous :</b></p>
+            <br/>
             <table align="center" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                     <td align="center">
                         <a class="link" href="{{invoice_link}}">
-                            Réinitialiser votre mot de passe
+                            Ma facture Talaryo
                         </a>
                     </td>
                 </tr>
             </table>
-        <br/>
-        <p>Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet e-mail ou nous contacter à : 
-            <a class="support">{{support_MAIL}}</a>
-        </p>
-        <br/>
-        <p>Cordialement,</p>
-        <p>L'équipe Talaryo</p>
+            <br/>
+            <p>Nous vous remercions de votre confiance et de votre fidélité.</p>
+            <br/>
+            <p>Cordialement,</p>
+            <p>L'équipe Talaryo</p>
+        </div>
         <div class="footer">
             <p>Talaryo © 2023</p>
         </div>

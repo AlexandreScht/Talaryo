@@ -1,5 +1,5 @@
 export type role = 'admin' | 'business' | 'pro' | 'free';
-
+import type Stripe from 'stripe';
 export interface User {
   id?: number;
   email: string;
@@ -11,8 +11,10 @@ export interface User {
   society?: string;
   accessToken?: string;
   refreshToken?: string;
-  stripeCustomer?: string;
-  stripeBilling?: Date;
+  stripeCustomer?: string | Stripe.Customer | Stripe.DeletedCustomer;
+  subscribe_status: 'active' | 'pending' | 'disable' | 'waiting';
+  subscribe_start?: Date;
+  subscribe_end?: Date;
   passwordReset?: boolean;
 }
 
@@ -57,4 +59,10 @@ export interface scores {
   day: number;
   searches?: number;
   profils?: number;
+}
+export interface event {
+  index: number;
+  userId: number;
+  eventName: string;
+  value: string;
 }
