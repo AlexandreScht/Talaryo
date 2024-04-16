@@ -1,5 +1,6 @@
 import { role } from '@/interfaces/models';
 import { setKeyToken } from '@/utils/keyToken';
+import PatchLimit from '@/utils/patchingLimit';
 import { ExpiredSessionError, InvalidCredentialsError, InvalidSessionError, ServicesError } from '@exceptions';
 import type { AuthRegister, TokenUser } from '@interfaces/auth';
 import { UserModel, UserShape } from '@models/users';
@@ -27,6 +28,9 @@ class UsersServiceFile {
     try {
       await transaction(UserModel.knex(), async trx => {
         for (const user of userData) {
+          if ('role' in user) {
+            new PatchLimit(user);
+          }
           await UserModel.query(trx).updateAndFetchById(user.id, user);
         }
       });

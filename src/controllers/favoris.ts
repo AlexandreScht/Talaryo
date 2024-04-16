@@ -1,3 +1,4 @@
+import { totalFavorisSave } from '@/config/access';
 import { InvalidRoleAccessError } from '@/exceptions';
 import auth from '@/middlewares/auth';
 import FavorisFolderFile from '@/services/favFolders';
@@ -34,13 +35,16 @@ const FavorisController = ({ app }) => {
         next,
       }) => {
         try {
-          if (!['business', 'admin'].includes(sessionRole)) {
+          if (sessionRole !== 'admin') {
             const limit = await FavorisServices.getTotalFavoris(sessionId);
-            if (limit >= 10 && sessionRole !== 'pro') {
-              throw new InvalidRoleAccessError('pro');
+            if (sessionRole === 'free' && limit >= totalFavorisSave.free) {
+              throw new InvalidRoleAccessError('Limite de favoris enregistrer atteinte avec votre abonnement FREE.');
             }
-            if (limit >= 100) {
-              throw new InvalidRoleAccessError('business');
+            if (sessionRole === 'pro' && limit >= totalFavorisSave.pro) {
+              throw new InvalidRoleAccessError('Limite de favoris enregistrer atteinte avec votre abonnement PRO.');
+            }
+            if (sessionRole === 'business' && limit >= totalFavorisSave.business) {
+              throw new InvalidRoleAccessError('Limite maximale de favoris enregistrer atteinte.');
             }
           }
           const success = await FavorisServices.create({ link, img, fullName, currentJob, currentCompany, desc, favFolderId }, sessionId);
@@ -83,7 +87,7 @@ const FavorisController = ({ app }) => {
       auth(),
       validator({
         query: {
-          limit: limitValidator.default(10),
+          limit: limitValidator.default(2),
           page: pageValidator.default(1),
           favFolderName: stringValidator.required(),
         },

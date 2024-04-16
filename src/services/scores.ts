@@ -31,6 +31,30 @@ class ScoreServiceFile {
     }
   }
 
+  public async improveMailScore(
+    { year, month, day, mails }: { year: number; month: number; day: number; mails: number },
+    userId: number,
+  ): Promise<ScoreModel> {
+    try {
+      return await ScoreModel.query()
+        .insert({
+          userId,
+          year,
+          month,
+          day,
+          mails,
+        })
+        .onConflict(['userId', 'year', 'month', 'day'])
+        .merge({
+          mails: ScoreModel.raw('?? + ?', ['scores.mails', mails]),
+        });
+    } catch (err) {
+      console.log(err);
+
+      throw new ServicesError();
+    }
+  }
+
   public async improveProfilScore(
     { year, month, day, profils }: { year: number; month: number; day: number; profils: number },
     userId: number,
@@ -80,6 +104,28 @@ class ScoreServiceFile {
       return totalSearches;
     } catch (err) {
       throw new ServicesError(err.message || 'Error calculating total searches.');
+    }
+  }
+
+  public async getTotalMonthMail(userId: number): Promise<number> {
+    try {
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      const formatDate = (date: Date): string => {
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+      };
+      const startDate = formatDate(firstDayOfMonth);
+      const endDate = formatDate(lastDayOfMonth);
+
+      const [{ totalMails }] = await ScoreModel.query()
+        .where({ userId })
+        .whereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') >= ?`, [startDate])
+        .andWhereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') <= ?`, [endDate])
+        .sum('mails as totalMails');
+      return totalMails;
+    } catch (err) {
+      throw new ServicesError(err.message || 'Error calculating total mails.');
     }
   }
 

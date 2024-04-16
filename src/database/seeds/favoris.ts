@@ -48,6 +48,7 @@ export async function seed(knex: Knex): Promise<void> {
     table.integer('favFolderId').notNullable().references('id').inTable('favFolders');
     table.text('link').notNullable();
     table.text('img').notNullable();
+    table.boolean('locked').notNullable().defaultTo(false);
     table.string('fullName', 255).nullable();
     table.string('currentJob', 255).nullable();
     table.string('currentCompany', 255).nullable();

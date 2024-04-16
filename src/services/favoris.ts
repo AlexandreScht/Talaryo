@@ -26,7 +26,7 @@ class FavorisServiceFile {
 
   public async getFavInFolder(limit: number, page: number, favFolderId: number): Promise<{ total: number; favoris: FavoriModel[] }> {
     try {
-      const query = FavoriModel.query().where({ favFolderId });
+      const query = FavoriModel.query().where({ favFolderId, locked: false });
       const [{ count }] = await query.clone().limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
 
@@ -49,6 +49,14 @@ class FavorisServiceFile {
       return await FavoriModel.query().insert({ ...fav, userId: id });
     } catch (error) {
       if (error instanceof ConstraintViolationError) {
+        const { link, favFolderId } = fav;
+        const existingFav = await FavoriModel.query().where({ userId: id, link, favFolderId }).first();
+        if (existingFav && existingFav.locked === true) {
+          const update = await FavoriModel.query()
+            .update({ ...fav, locked: false })
+            .where({ id: existingFav.id });
+          return !!update;
+        }
         return false;
       }
       throw new ServicesError();
@@ -69,9 +77,28 @@ class FavorisServiceFile {
 
   public async getTotalFavoris(userId: number): Promise<number> {
     try {
-      const [{ count }] = await FavoriModel.query().where({ userId }).limit(1).offset(0).count();
+      const [{ count }] = await FavoriModel.query().where({ userId, locked: false }).limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
       return total;
+    } catch (error) {
+      throw new ServicesError();
+    }
+  }
+
+  public async lockFavoris(userId: number, n: number): Promise<void> {
+    try {
+      if (n === Infinity) {
+        await FavoriModel.query().where({ userId, locked: true }).patch({ locked: false });
+        return;
+      }
+      const unlockFavoris = await FavoriModel.query().select('id').where({ userId, locked: true }).orderBy('id', 'asc').limit(n);
+      const unlockIds = unlockFavoris.map(favori => favori.id);
+
+      const lockFavoris = await FavoriModel.query().select('id').where({ userId }).orderBy('id', 'asc').offset(n);
+      const lockIds = lockFavoris.map(favori => favori.id);
+
+      await FavoriModel.query().whereIn('id', unlockIds).patch({ locked: false });
+      await FavoriModel.query().whereIn('id', lockIds).patch({ locked: true });
     } catch (error) {
       throw new ServicesError();
     }

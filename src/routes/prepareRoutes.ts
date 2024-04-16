@@ -1,4 +1,5 @@
 // apiRouter.ts
+import EventController from '@/controllers/events';
 import FavFoldersController from '@/controllers/favFolders';
 import FavorisController from '@/controllers/favoris';
 import ScoreController from '@/controllers/scores';
@@ -22,12 +23,13 @@ export class ApiRouter implements Routes {
     AuthController({ app: this.router });
     UsersController({ app: this.router });
     ScrappingController({ app: this.router });
-    StripeWebhook({ app: this.router });
     FavorisController({ app: this.router });
     FavFoldersController({ app: this.router });
     SearchFoldersController({ app: this.router });
     SearchController({ app: this.router });
     ScoreController({ app: this.router });
     SubscriptionController({ app: this.router });
+    EventController({ app: this.router });
+    StripeWebhook({ app: this.router });
   }
 }

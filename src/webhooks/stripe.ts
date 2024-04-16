@@ -3,6 +3,8 @@ import stripe from '@/libs/stipeInstance';
 import { createToken, refreshCookie } from '@/libs/token';
 import MailerServiceFile from '@/services/mailer';
 import UsersServiceFile from '@/services/users';
+import PatchLimit from '@/utils/patchingLimit';
+import serialize_recurring from '@/utils/serialize_recurring';
 import { StoredSocket } from '@/utils/socketManager';
 import type { RequestWithWebhook, payment, subscribeStripe } from '@interfaces/request';
 import stripeHost from '@middlewares/stripe';
@@ -31,24 +33,6 @@ const get_payment_props = (payment: Stripe.Charge.PaymentMethodDetails): payment
       brand: payment.card.brand,
     };
   }
-};
-
-const serialize_recurring = (recurring: Stripe.Price.Recurring, name: boolean) => {
-  if (!name) {
-    if (recurring.interval === 'month') {
-      return `${recurring.interval_count > 1 ? recurring.interval_count + ' mois' : 'mois'}`;
-    }
-    if (recurring.interval === 'year') {
-      return 'ans';
-    }
-  }
-  if (recurring.interval === 'month') {
-    if (recurring.interval_count === 3) {
-      return 'Trimestriel';
-    }
-    return 'Mensuel';
-  }
-  return 'Annuel';
 };
 
 const StripeWebhook = ({ app }) => {
@@ -172,7 +156,7 @@ const StripeWebhook = ({ app }) => {
             const MailerService = Container.get(MailerServiceFile);
             MailerService.Failed_subscription({
               email: email,
-              name_plan: role,
+              name_plan: role?.toLocaleUpperCase() as role,
               payment_data: subStore.payment,
               invoice_link: hosted_invoice_url,
               purchase_end: purchase_end.toLocaleDateString('fr-FR').toString(),
@@ -215,7 +199,9 @@ const StripeWebhook = ({ app }) => {
           });
           const token = await createToken(userUpdate);
           StoredSocket.socketIo.ioSendTo({ userId: userUpdate.id.toString() }, 'delete_subscribe', {
-            res: { cookie: refreshCookie(userUpdate), token },
+            value: { cookie: refreshCookie(userUpdate), token },
+            text: 'Votre abonnement a pris fin',
+            date: new Date().toLocaleDateString('fr-FR').toString(),
           });
         }
         // >>>>>>>>>> checkout.subscription.updated
@@ -240,7 +226,7 @@ const StripeWebhook = ({ app }) => {
 
           if (cancel_at_period_end) {
             const UserService = Container.get(UsersServiceFile);
-            const { email, firstName } = await UserService.subscribeUser(
+            const { email, firstName, id } = await UserService.subscribeUser(
               { customer },
               {
                 subscribe_status: 'pending',
@@ -250,12 +236,17 @@ const StripeWebhook = ({ app }) => {
               return;
             }
             const MailerService = Container.get(MailerServiceFile);
+            const endData = new Date(cancel_at * 1000).toLocaleDateString('fr-FR').toString();
             MailerService.Cancel_request({
               email: email,
-              plan: sub_id as role,
+              plan: sub_id?.toLocaleUpperCase() as role,
               invoice_amount: `${(unit_amount / 100).toFixed(2).replace('.', ',')}€`,
-              cancel_date: new Date(cancel_at * 1000).toLocaleDateString('fr-FR').toString(),
+              cancel_date: endData,
               user: firstName.toLowerCase().charAt(0).toUpperCase() + firstName.toLowerCase().slice(1),
+            });
+            StoredSocket.socketIo.ioSendTo({ userId: id.toString() }, 'cancel_subscribe', {
+              text: `Vous avez annulé votre abonnement, celui-ci prendra fin le ${endData}`,
+              date: new Date().toLocaleDateString('fr-FR').toString(),
             });
             return;
           }
@@ -293,7 +284,7 @@ const StripeWebhook = ({ app }) => {
           const UserService = Container.get(UsersServiceFile);
           if (billing_reason === 'subscription_cycle' && data.length) {
             const [{ price: newSub, period: newPeriod }] = data;
-            const { email, firstName } = await UserService.subscribeUser(
+            const { email, firstName, id } = await UserService.subscribeUser(
               { customer },
               {
                 role: newSub.metadata?.sub_id as role,
@@ -314,10 +305,14 @@ const StripeWebhook = ({ app }) => {
               invoice_date: effective_at * 1000,
               user: firstName.toLowerCase().charAt(0).toUpperCase() + firstName.toLowerCase().slice(1),
             });
+            StoredSocket.socketIo.ioSendTo({ userId: id.toString() }, 'subscription_cycle', {
+              text: "Votre facture de renouvellement d'abonnement vous a été envoyée par mail",
+              date: new Date().toLocaleDateString('fr-FR').toString(),
+            });
             return;
           }
           if (billing_reason === 'subscription_update' && data.length === 2) {
-            const [{ price: oldSub, period: newPeriod }, { price: newSub }] = data;
+            const [{ price: oldSub }, { price: newSub, period: newPeriod }] = data;
 
             const userUpdate = await UserService.subscribeUser(
               { customer },
@@ -333,13 +328,14 @@ const StripeWebhook = ({ app }) => {
                 Invoice Id => ${id}
               `);
             }
+            new PatchLimit(userUpdate);
 
             MailerService.Update_subscription({
               email: userUpdate.email,
-              old_name_plan: oldSub.metadata?.sub_id as role,
+              old_name_plan: oldSub.metadata?.sub_id?.toLocaleUpperCase() as role,
               old_price_plan: `${(oldSub.unit_amount / 100).toFixed(2).replace('.', ',')}€`,
               old_period_plan: serialize_recurring(oldSub.recurring, false),
-              new_name_plan: newSub.metadata?.sub_id as role,
+              new_name_plan: newSub.metadata?.sub_id?.toLocaleUpperCase() as role,
               new_price_plan: `${(newSub.unit_amount / 100).toFixed(2).replace('.', ',')}€`,
               new_period_plan: serialize_recurring(newSub.recurring, true),
               next_invoice_date: new Date(newPeriod.end * 1000).toLocaleDateString('fr-FR'),
@@ -349,7 +345,9 @@ const StripeWebhook = ({ app }) => {
 
             const token = await createToken(userUpdate);
             StoredSocket.socketIo.ioSendTo({ userId: userUpdate.id.toString() }, 'payment_success', {
-              res: { cookie: refreshCookie(userUpdate), token },
+              value: { cookie: refreshCookie(userUpdate), token },
+              text: `Vous avez changer d'abonnement, afin de passer au plan ${newSub.metadata?.sub_id?.toLocaleUpperCase()}`,
+              date: new Date().toLocaleDateString('fr-FR').toString(),
             });
           }
         }
@@ -384,6 +382,7 @@ const StripeWebhook = ({ app }) => {
             logger.error('The user could not be updated in the session.checkout part.');
             return;
           }
+          new PatchLimit(userUpdate);
           const MailerService = Container.get(MailerServiceFile);
           MailerService.New_invoice({
             email: userUpdate.email,
@@ -396,7 +395,9 @@ const StripeWebhook = ({ app }) => {
           });
           const token = await createToken(userUpdate);
           StoredSocket.socketIo.ioSendTo({ userId: userUpdate.id.toString() }, 'payment_success', {
-            res: { cookie: refreshCookie(userUpdate), token },
+            value: { cookie: refreshCookie(userUpdate), token },
+            text: `Vous avez souscris au plan d'abonnement ${role.toLocaleUpperCase()}`,
+            date: new Date().toLocaleDateString('fr-FR').toString(),
           });
         }
         res.json({ received: true });

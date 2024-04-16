@@ -1,4 +1,4 @@
-import { totalSearchFree, totalSearchPro } from '@/config/access';
+import { totalSearch } from '@/config/access';
 import { numberValidator, timestampValidator } from '@/libs/validate';
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
@@ -100,12 +100,20 @@ const ScoreController = ({ app }) => {
       auth(),
       async ({ session: { sessionId, sessionRole }, res, next }) => {
         try {
-          if (['business', 'admin'].includes(sessionRole)) {
-            return res.send({ res: true });
+          if (sessionRole === 'admin') {
+            return res.send({ res: 'Infinity' });
           }
           const total = await ScoreServices.getTotalMonthSearches(sessionId);
-          const totalSearches = sessionRole === 'pro' ? totalSearchPro - total : totalSearchFree - total;
-          res.status(201).send({ res: totalSearches });
+          if (sessionRole === 'business') {
+            return res.status(201).send({ res: String(totalSearch.business - total) });
+          }
+          if (sessionRole === 'pro') {
+            return res.status(201).send({ res: String(totalSearch.pro - total) });
+          }
+          if (sessionRole === 'free') {
+            return res.status(201).send({ res: String(totalSearch.free - total) });
+          }
+          res.status(201).send({ res: undefined });
         } catch (error) {
           next(error);
         }

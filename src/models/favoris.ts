@@ -15,6 +15,7 @@ export class FavoriModel extends Model implements Favoris {
   favFolderId: number;
   createdAt: string;
   updatedAt: string;
+  locked: boolean;
   count?: string;
 
   static tableName = 'favoris';

@@ -9,6 +9,8 @@ export class FavFoldersModel extends Model implements favFolders {
   createdAt: string;
   updatedAt: string;
   count?: string;
+  itemsCount?: string;
+  lock?: number | true;
 
   static tableName = 'favFolders';
   static idColumn = 'id';

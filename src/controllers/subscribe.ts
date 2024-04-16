@@ -4,13 +4,15 @@ import stripe from '@/libs/stipeInstance';
 import { cancelOptionSubValidator, stringValidator } from '@/libs/validate';
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
+import serialize_recurring from '@/utils/serialize_recurring';
 import mw from '@middlewares/mw';
 import UsersServiceFile from '@services/users';
+import type Stripe from 'stripe';
 import { Container } from 'typedi';
 
 const SubscriptionController = ({ app }) => {
   const UserServices = Container.get(UsersServiceFile);
-  app.get(
+  app.post(
     '/cancel-subscription',
     mw([
       auth(),
@@ -39,6 +41,8 @@ const SubscriptionController = ({ app }) => {
           });
           res.send({ res: true });
         } catch (error) {
+          console.log(error);
+
           next(error);
         }
       },
@@ -50,7 +54,7 @@ const SubscriptionController = ({ app }) => {
       auth(),
       async ({ session: { sessionId }, res, next }) => {
         try {
-          const [found, { stripeCustomer }] = await UserServices.findUserById(sessionId);
+          const [found, { stripeCustomer, subscribe_status }] = await UserServices.findUserById(sessionId);
 
           if (!found) {
             throw new InvalidSessionError();
@@ -72,6 +76,7 @@ const SubscriptionController = ({ app }) => {
           const [
             {
               id: subId,
+              current_period_end: ended_at,
               items: {
                 data: [
                   {
@@ -88,6 +93,8 @@ const SubscriptionController = ({ app }) => {
               subId,
               priceId,
               itemSub,
+              subscribe_status,
+              ended_at: new Date(ended_at * 1000).toLocaleDateString('fr-FR'),
             },
           });
         } catch (error) {
@@ -193,6 +200,60 @@ const SubscriptionController = ({ app }) => {
             cancel_url: `${config.ORIGIN}/billing`,
           });
           res.send({ res: url });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.get(
+    '/get-Invoices',
+    mw([
+      auth(),
+      async ({ session: { sessionId }, res, next }) => {
+        try {
+          const [found, { stripeCustomer }] = await UserServices.findUserById(sessionId);
+
+          if (!found) {
+            throw new InvalidSessionError();
+          }
+          const { data } = await stripe.invoices.list({
+            customer: stripeCustomer as string,
+          });
+
+          const billing_reason = {
+            subscription_cycle: 'Renouvellement',
+            subscription_create: 'Souscription',
+            subscription_update: 'Changement',
+          };
+
+          const recupCurrentPlan = (data: Stripe.InvoiceLineItem[]) => {
+            if (data.length > 1) {
+              const [{}, { price, period }] = data;
+              return {
+                plan: price.metadata?.sub_id.toLocaleUpperCase(),
+                start: new Date(period.end * 1000).toLocaleDateString('fr-FR'),
+                recurring: serialize_recurring(price.recurring, false),
+              };
+            }
+            const [{ price, period }] = data;
+            return {
+              plan: price.metadata?.sub_id.toLocaleUpperCase(),
+              start: new Date(period.start * 1000).toLocaleDateString('fr-FR'),
+              recurring: serialize_recurring(price.recurring, false),
+            };
+          };
+
+          const invoices = (data || []).map(i => ({
+            price: i.amount_due / 100,
+            billing: billing_reason[i.billing_reason],
+            pdf: i.invoice_pdf,
+            url: i.hosted_invoice_url,
+            paid: i.status === 'paid',
+            ...recupCurrentPlan(i.lines.data),
+          }));
+
+          res.send({ res: invoices });
         } catch (error) {
           next(error);
         }

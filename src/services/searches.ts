@@ -16,6 +16,14 @@ class SearchesServiceFile {
       return await SearchesModel.query().insert({ ...searches, userId: id });
     } catch (error) {
       if (error instanceof ConstraintViolationError) {
+        const { name, searchQueries } = searches;
+        const existingSearch = await SearchesModel.query().where({ userId: id, name, searchQueries }).first();
+        if (existingSearch && existingSearch.locked === true) {
+          const update = await SearchesModel.query()
+            .update({ ...searches, locked: false })
+            .where({ id: existingSearch.id });
+          return !!update;
+        }
         return false;
       }
       throw new ServicesError();
@@ -36,7 +44,7 @@ class SearchesServiceFile {
     { limit, page, name, searchFolderId }: { limit: number; page: number; name?: string; searchFolderId: number },
   ): Promise<{ total: number; searches: SearchesModel[] }> {
     try {
-      let query = SearchesModel.query().where({ userId });
+      let query = SearchesModel.query().where({ userId, locked: false });
 
       if (searchFolderId) {
         query = query.where({ searchFolderId });
@@ -56,9 +64,28 @@ class SearchesServiceFile {
 
   public async getTotalSearches(userId: number): Promise<number> {
     try {
-      const [{ count }] = await SearchesModel.query().where({ userId }).limit(1).offset(0).count();
+      const [{ count }] = await SearchesModel.query().where({ userId, locked: false }).limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
       return total;
+    } catch (error) {
+      throw new ServicesError();
+    }
+  }
+
+  public async lockSearches(userId: number, n: number): Promise<void> {
+    try {
+      if (n === Infinity) {
+        await SearchesModel.query().where({ userId, locked: true }).patch({ locked: false });
+        return;
+      }
+      const unlockSearches = await SearchesModel.query().select('id').where({ userId, locked: true }).orderBy('id', 'asc').limit(n);
+      const unlockIds = unlockSearches.map(search => search.id);
+
+      const lockSearches = await SearchesModel.query().select('id').where({ userId }).orderBy('id', 'asc').offset(n);
+      const lockIds = lockSearches.map(search => search.id);
+
+      await SearchesModel.query().whereIn('id', unlockIds).patch({ locked: false });
+      await SearchesModel.query().whereIn('id', lockIds).patch({ locked: true });
     } catch (error) {
       throw new ServicesError();
     }

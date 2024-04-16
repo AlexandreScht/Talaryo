@@ -1,5 +1,5 @@
 import { ServicesError } from '@/exceptions';
-import { eventsMap } from '@/interfaces/user';
+import { eventList, eventsMap } from '@/interfaces/user';
 import { EventModel } from '@/models/event';
 import type { Knex } from 'knex';
 import { ConstraintViolationError } from 'objection';
@@ -11,31 +11,9 @@ class EventServiceFile {
     return EventModel.knex();
   }
 
-  public async createMissingEvent({
-    userId,
-    eventName,
-    value,
-    eventId,
-  }: {
-    userId: number;
-    eventName: string;
-    value: string;
-    eventId: number;
-  }): Promise<boolean> {
+  public async createMissingEvent(eventData: eventList, eventId: string): Promise<boolean> {
     try {
-      const insert = await EventModel.query().insert({ userId, eventName, index: eventId, value });
-      return !!insert;
-    } catch (error) {
-      if (error instanceof ConstraintViolationError) {
-        return false;
-      }
-      throw new ServicesError();
-    }
-  }
-
-  public async updateMissingEvent(eventId: number, value: string): Promise<boolean> {
-    try {
-      const insert = await EventModel.query().findById(eventId).patch({ value });
+      const insert = await EventModel.query().insert({ ...eventData, eventId });
       return !!insert;
     } catch (error) {
       if (error instanceof ConstraintViolationError) {
@@ -47,11 +25,13 @@ class EventServiceFile {
 
   public async getMissingEvent(): Promise<eventsMap> {
     try {
-      const events = await EventModel.query().select('*').orderBy('index', 'asc');
+      const events = await EventModel.query().select('userId', 'eventName', 'value', 'text', 'date', 'eventId').where({ send: false });
+
       return new Map(
         events.map(event => {
-          const key = `${event.userId}.${event.eventName}`;
-          return [key, { userId: event.userId, eventName: event.eventName, value: JSON.parse(event.value), eventId: event.index }];
+          const { userId, eventId, eventName, date, text } = event;
+          const key = `${userId}.${eventId}`;
+          return [key, { userId, eventName, value: JSON.parse(event.value), date, text }];
         }),
       );
     } catch (error) {
@@ -60,9 +40,19 @@ class EventServiceFile {
     }
   }
 
-  public async delMissingEvent(userId: number) {
+  public async getUserEvent(userId: number): Promise<EventModel[]> {
     try {
-      await EventModel.query().where({ userId }).del();
+      const events = await EventModel.query().select('date', 'text').where({ userId });
+      return events || [];
+    } catch (error) {
+      console.log(error);
+      throw new ServicesError();
+    }
+  }
+
+  public async setEventSendToUser(userId: number) {
+    try {
+      await EventModel.query().where({ userId }).patch({ send: true });
     } catch (error) {
       throw new ServicesError();
     }

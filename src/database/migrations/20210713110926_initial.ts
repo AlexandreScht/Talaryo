@@ -25,8 +25,9 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.tinyint('year');
     table.tinyint('month');
     table.tinyint('day');
-    table.integer('searches').defaultTo(0);
-    table.integer('profils').defaultTo(0);
+    table.integer('searches').notNullable().defaultTo(0);
+    table.integer('profils').notNullable().defaultTo(0);
+    table.integer('mails').notNullable().defaultTo(0);
     table.timestamps(true, true, true);
     table.unique(['userId', 'year', 'month', 'day']);
   });
@@ -43,6 +44,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.integer('favFolderId').notNullable().references('id').inTable('favFolders');
     table.text('link').notNullable();
     table.text('img').notNullable();
+    table.boolean('locked').notNullable().defaultTo(false);
     table.string('fullName', 255).nullable();
     table.string('currentJob', 255).nullable();
     table.string('currentCompany', 255).nullable();
@@ -51,12 +53,16 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.unique(['userId', 'link', 'favFolderId']);
   });
   await knex.schema.createTable('event', table => {
-    table.bigInteger('index').notNullable();
+    table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
-    table.string('eventName').notNullable();
-    table.text('value').notNullable();
+    table.string('eventName', 255).notNullable();
+    table.text('value').nullable();
+    table.string('text', 255).nullable();
+    table.string('date', 255).notNullable();
+    table.string('eventId', 255).notNullable();
+    table.boolean('send').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
-    table.unique(['userId', 'eventName']);
+    table.unique(['userId', 'eventName', 'date']);
   });
   await knex.schema.createTable('searchFolders', table => {
     table.bigIncrements('id').unsigned().primary();
@@ -71,6 +77,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.integer('searchFolderId').notNullable().references('id').inTable('searchFolders');
     table.text('searchQueries').notNullable();
     table.string('name').notNullable();
+    table.boolean('locked').notNullable().defaultTo(false);
     table.string('society').nullable();
     table.timestamps(true, true, true);
     table.unique(['userId', 'name', 'searchFolderId']);
@@ -78,11 +85,12 @@ module.exports.up = async (knex: Knex): Promise<void> => {
 };
 
 module.exports.down = async (knex: Knex): Promise<void> => {
-  await knex.schema.dropTable('event');
-  await knex.schema.dropTable('favoris');
-  await knex.schema.dropTable('favFolders');
-  await knex.schema.dropTable('searches');
-  await knex.schema.dropTable('searchFolders');
-  await knex.schema.dropTable('scores');
-  await knex.schema.dropTable('users');
+  const tables = ['event', 'favoris', 'favFolders', 'searches', 'searchFolders', 'scores', 'users'];
+
+  for (const table of tables) {
+    const exists = await knex.schema.hasTable(table);
+    if (exists) {
+      await knex.schema.dropTable(table);
+    }
+  }
 };

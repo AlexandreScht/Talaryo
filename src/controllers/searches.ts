@@ -1,3 +1,4 @@
+import { totalSearchSave } from '@/config/access';
 import { InvalidRoleAccessError } from '@/exceptions';
 import auth from '@/middlewares/auth';
 import SearchesServiceFile from '@/services/searches';
@@ -32,13 +33,16 @@ const SearchController = ({ app }) => {
         next,
       }) => {
         try {
-          if (!['business', 'admin'].includes(sessionRole)) {
+          if (sessionRole !== 'admin') {
             const limit = await SearchServices.getTotalSearches(sessionId);
-            if (limit >= 3 && sessionRole !== 'pro') {
-              throw new InvalidRoleAccessError('pro');
+            if (sessionRole === 'free' && limit >= totalSearchSave.free) {
+              throw new InvalidRoleAccessError('Limite de recherche enregistrer atteinte avec votre abonnement FREE.');
             }
-            if (limit >= 10) {
-              throw new InvalidRoleAccessError('business');
+            if (sessionRole === 'pro' && limit >= totalSearchSave.pro) {
+              throw new InvalidRoleAccessError('Limite de recherche enregistrer atteinte avec votre abonnement PRO.');
+            }
+            if (sessionRole === 'business' && limit >= totalSearchSave.business) {
+              throw new InvalidRoleAccessError('Limite maximale de recherche enregistrer atteinte.');
             }
           }
           const success = await SearchServices.create({ name, society, searchQueries: search, searchFolderId }, sessionId);

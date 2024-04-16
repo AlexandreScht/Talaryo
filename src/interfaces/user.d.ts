@@ -8,10 +8,15 @@ export type userList = {
 interface eventList {
   userId: number;
   eventName: string;
-  value: {
-    res: any;
-  };
-  eventId: number;
+  value?: any;
+  text?: string;
+  date: string;
+}
+
+interface eventData {
+  value?: any;
+  text?: string;
+  date: string;
 }
 
 export type eventsMap = Map<string, eventList>;

@@ -1,4 +1,4 @@
-import { sourcesBusiness, sourcesPro } from '@/config/access';
+import { sourcesBusiness, sourcesPro, totalMailFind, totalSearch } from '@/config/access';
 import { InvalidRoleAccessError } from '@/exceptions';
 import { ScrappingSource, sources } from '@/interfaces/scrapping';
 import { noIntitle, noSector } from '@/libs/scrapping';
@@ -52,19 +52,26 @@ const ScrappingController = ({ app }) => {
           const Searches: ScrappingSource[] = [];
           const queries = { fn, industry, sector, skill, key, loc, Nindustry, Nskill, Nkey };
           const sources: sources[] = platform.split(',');
-          if (!['business', 'admin'].includes(sessionRole)) {
-            if (sources.some(s => sourcesPro.includes(s)) && sessionRole !== 'pro') {
-              throw new InvalidRoleAccessError('pro');
+          if (sessionRole !== 'admin') {
+            if (sources.some(s => sourcesPro.includes(s)) && sessionRole === 'free') {
+              const notAllowedSite = sources.find(s => sourcesPro.includes(s));
+              throw new InvalidRoleAccessError(`Veuillez souscrire à un plan supérieur pour accéder à : ${notAllowedSite}.`);
             }
-            if (sources.some(s => sourcesBusiness.includes(s))) {
-              throw new InvalidRoleAccessError('business');
+            if (sources.some(s => sourcesBusiness.includes(s)) && ['free', 'pro'].includes(sessionRole)) {
+              const notAllowedSite = sources.find(s => sourcesPro.includes(s));
+              throw new InvalidRoleAccessError(`Veuillez souscrire au plan business pour accéder à : ${notAllowedSite}.`);
             }
             const total = await ScoreServices.getTotalMonthSearches(sessionId);
-            if (total >= 10 && sessionRole !== 'pro') {
-              throw new InvalidRoleAccessError('pro');
+            console.log(total);
+
+            if (sessionRole === 'free' && total >= totalSearch.free) {
+              throw new InvalidRoleAccessError('Limite de recherche mensuelle atteinte avec votre abonnement FREE.');
             }
-            if (total >= 100) {
-              throw new InvalidRoleAccessError('business');
+            if (sessionRole === 'pro' && total >= totalSearch.pro) {
+              throw new InvalidRoleAccessError('Limite de recherche mensuelle atteinte avec votre abonnement PRO.');
+            }
+            if (sessionRole === 'business' && total >= totalSearch.business) {
+              throw new InvalidRoleAccessError('Limite de recherche mensuelle atteinte.');
             }
           }
 
@@ -138,7 +145,7 @@ const ScrappingController = ({ app }) => {
   app.get(
     '/mailer-scrape',
     mw([
-      auth(['admin', 'business', 'pro']),
+      auth(),
       validator({
         query: {
           firstName: stringValidator.required(),
@@ -150,10 +157,26 @@ const ScrappingController = ({ app }) => {
         locals: {
           query: { firstName, lastName, industry },
         },
+        session: { sessionId, sessionRole },
         res,
         next,
       }) => {
         try {
+          const canFetchMail = async () => {
+            const total = await ScoreServices.getTotalMonthMail(sessionId);
+            if (sessionRole !== 'admin') {
+              if (sessionRole === 'free' && total >= totalMailFind.free) {
+                throw new InvalidRoleAccessError("Limite mensuelle de recherche d'emails atteinte avec votre abonnement FREE.");
+              }
+              if (sessionRole === 'pro' && total >= totalMailFind.pro) {
+                throw new InvalidRoleAccessError("Limite mensuelle de recherche d'emails atteinte avec votre abonnement PRO.");
+              }
+              if (sessionRole === 'business' && total >= totalMailFind.business) {
+                throw new InvalidRoleAccessError('Limite mensuelle maximale de recherche de mails atteinte.');
+              }
+            }
+          };
+          await canFetchMail();
           const apiService = Container.get(ApiServiceFile);
           const requestId = await apiService.FetchMailRequestId({
             first_name: firstName,
@@ -161,15 +184,21 @@ const ScrappingController = ({ app }) => {
             company: industry,
           });
 
-          const ITERABLE = 5;
-          for (let i = 0; i < ITERABLE; i++) {
+          const MAX_TRY = 5;
+          for (let i = 0; i < MAX_TRY; i++) {
             await new Promise(resolve => setTimeout(resolve, 10000));
             const [find, email] = await apiService.FetchMailData(requestId);
 
             if (find && !!email[0]?.email) {
+              await canFetchMail();
+              const currentDate = new Date();
+              await ScoreServices.improveMailScore(
+                { year: currentDate.getFullYear(), month: currentDate.getMonth() + 1, day: currentDate.getDate(), mails: 1 },
+                sessionId,
+              );
               return res.send({ res: email[0].email });
             }
-            if (i === ITERABLE - 1) {
+            if (i === MAX_TRY - 1) {
               return res.send({ res: null });
             }
           }

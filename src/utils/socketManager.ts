@@ -1,11 +1,12 @@
 // socketManager.ts
 
 import { ServerException } from '@/exceptions';
-import { eventsMap, userList } from '@/interfaces/user';
+import { eventData, eventsMap, userList } from '@/interfaces/user';
 import socketIoMiddleware from '@/middlewares/socket';
 import EventServiceFile from '@/services/event';
 import { Server, Socket } from 'socket.io';
 import Container from 'typedi';
+import { v4 as uuidv4 } from 'uuid';
 import { logger } from './logger';
 
 class SocketManager {
@@ -28,7 +29,7 @@ class SocketManager {
             if (user) {
               const sessionDouble = this.userList.find(u => u.userId === user.sessionId);
               if (sessionDouble && sessionDouble.refreshToken !== user.refreshToken) {
-                this.ioSendTo({ socketId: sessionDouble.socketId }, 'session_double', { res: true });
+                this.ioSendTo({ socketId: sessionDouble.socketId }, 'session_double', undefined);
                 return;
               }
               this.userList.push({ refreshToken: user.refreshToken, socketId: socket.id, userId: user.sessionId, secret_key });
@@ -51,25 +52,16 @@ class SocketManager {
     });
   }
 
-  private setUserListEvent(userId: number, eventName: string, eventData: Record<'res', any>): void {
-    const eventKey = `${userId}.${eventName}`;
+  private setUserListEvent(userId: number, eventName: string, eventData: eventData): void {
+    const eventId = `${userId}.${uuidv4()}`;
     const EventServices = Container.get(EventServiceFile);
-    if (this.eventMap.has(eventKey)) {
-      const existingEvent = this.eventMap.get(eventKey);
-      if (existingEvent) {
-        existingEvent.value = eventData;
-        EventServices.updateMissingEvent(existingEvent.eventId, JSON.stringify(existingEvent.value));
-        return;
-      }
-    }
     const newEvent = {
       userId,
       eventName,
-      value: eventData,
-      eventId: this.eventMap.size + 1,
+      ...eventData,
     };
-    this.eventMap.set(eventKey, newEvent);
-    EventServices.createMissingEvent({ ...newEvent, value: JSON.stringify(newEvent.value) });
+    this.eventMap.set(eventId, newEvent);
+    EventServices.createMissingEvent({ ...newEvent, value: JSON.stringify(newEvent.value) }, eventId);
   }
 
   private sendUserListEvent(userId: number) {
@@ -77,17 +69,18 @@ class SocketManager {
     this.eventMap.forEach((event, key) => {
       if (Number.parseInt(key.split('.')[0]) === userId) {
         this.eventMap.delete(key);
-        this.ioSendTo({ userId: userId.toString() }, event.eventName, event.value);
+        const { text, date, value } = event;
+        this.ioSendTo({ userId: userId.toString() }, event.eventName, { text, date, value });
         evt.found = true;
       }
     });
     if (evt.found) {
       const EventServices = Container.get(EventServiceFile);
-      EventServices.delMissingEvent(userId);
+      EventServices.setEventSendToUser(userId);
     }
   }
 
-  public ioSendTo(target: { socketId: string } | { userId: string }, eventName: string, eventData: Record<'res', any>) {
+  public ioSendTo(target: { socketId: string } | { userId: string }, eventName: string, eventData: eventData) {
     if ('socketId' in target) {
       const sender = this.userList.find(u => u.socketId === target.socketId);
       if (!sender) {

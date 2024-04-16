@@ -48,11 +48,11 @@ export async function seed(knex: Knex): Promise<void> {
     table.integer('searchFolderId').notNullable().references('id').inTable('searchFolders');
     table.text('searchQueries').notNullable();
     table.string('name').notNullable();
+    table.boolean('locked').notNullable().defaultTo(false);
     table.string('society').nullable();
     table.timestamps(true, true, true);
     table.unique(['userId', 'name', 'searchFolderId']);
   });
-
   // Inserts seed entries
   await knex('searchFolders').insert(generate(50, { userId: 1, name: () => faker.word.words(1) }));
   await knex('searches').insert(

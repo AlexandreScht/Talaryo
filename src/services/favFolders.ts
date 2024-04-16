@@ -59,13 +59,18 @@ class FavorisFolderFile {
       const folders = await query
         .clone()
         .select('favFolders.id', 'favFolders.name')
-        .leftJoin('favoris', 'favFolders.id', 'favoris.favFolderId')
+        .leftJoin('favoris', function () {
+          this.on('favFolders.id', '=', 'favoris.favFolderId').onVal('favoris.locked', false);
+        })
         .groupBy('favFolders.id')
+        .orderBy('favFolders.id', 'asc')
         .count('favoris.id as itemsCount')
         .modify('paginate', limit, page);
 
       return { total, folders };
     } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }

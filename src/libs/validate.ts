@@ -2,7 +2,7 @@ import { validatorsProps } from '@interfaces/request';
 import * as yup from 'yup';
 
 const stringRule = [
-  /<script>|<\/script>|;|--|<\?php/i,
+  /<script>|<\/script>|"|;|--|<\?php/i,
   /(--|\/\*|\*\/|";|';|INSERT INTO|SELECT|DELETE|UPDATE|DROP TABLE|DROP DATABASE|CREATE TABLE|CREATE DATABASE|ALTER TABLE|EXEC|EXECUTE)/i,
   /--/,
   /";/,

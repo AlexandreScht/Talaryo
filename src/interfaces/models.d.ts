@@ -27,7 +27,7 @@ export interface Favoris {
   fullName: string;
   currentJob?: string;
   currentCompany?: string;
-  disabled: boolean;
+  locked: boolean;
   favFolderId: number;
 }
 
@@ -37,6 +37,7 @@ export interface searches {
   searchFolderId?: number;
   searchQueries: string;
   name: string;
+  locked?: boolean;
   society?: string;
 }
 
@@ -59,10 +60,15 @@ export interface scores {
   day: number;
   searches?: number;
   profils?: number;
+  mails?: number;
 }
 export interface event {
-  index: number;
+  id: number;
   userId: number;
   eventName: string;
-  value: string;
+  value?: string;
+  send?: boolean;
+  text?: string;
+  eventId: string;
+  date: string;
 }

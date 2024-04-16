@@ -1,4 +1,4 @@
-import { ExpiredSessionError, InvalidAccessError } from '@/exceptions';
+import { ExpiredSessionError } from '@/exceptions';
 import { decryptUserToken } from '@/libs/token';
 import config from '@config';
 import type { TokenUser } from '@interfaces/auth';
@@ -7,7 +7,7 @@ import UsersServiceFile from '@services/users';
 import deepmerge from 'deepmerge';
 import { NextFunction, Request, Response } from 'express';
 import Container from 'typedi';
-const { COOKIE_NAME, ONLY_HTTPS } = config;
+const { COOKIE_NAME } = config;
 
 const getAuthorization = (req: Request) => {
   const coockie = req.cookies[COOKIE_NAME];
@@ -55,9 +55,6 @@ const mw =
       },
     };
     try {
-      // if (ONLY_HTTPS && !req.secure) {
-      //   throw new InvalidAccessError();
-      // }
       const UserServices = Container.get(UsersServiceFile);
       const Authorization = getAuthorization(req);
 

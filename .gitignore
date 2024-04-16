@@ -109,6 +109,9 @@ dist
 # deploy file
 deploy.js
 
+# migration file
+database.js
+
 # Docusaurus cache and generated files
 .docusaurus
 

@@ -1,5 +1,3 @@
-import { role } from '@/interfaces/models';
-
 export class ServerException extends Error {
   public status: number;
   public message: string;
@@ -47,8 +45,8 @@ export class InvalidAccessError extends ServerException {
   }
 }
 export class InvalidRoleAccessError extends ServerException {
-  constructor(role: role) {
-    super(403, `Cette fonctionnalité est disponible à partir de l'abonnement ${role}`);
+  constructor(message: string[] | string = 'Veuillez mettre à jour votre abonnement') {
+    super(605, message);
   }
 }
 

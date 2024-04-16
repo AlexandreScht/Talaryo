@@ -258,7 +258,7 @@ class MailerServiceFile {
       };
       const htmlMailer = confirmationEmail
         .replace('{{user}}', user)
-        .replace('{{name_plan}}', name_plan.toLocaleUpperCase())
+        .replace('{{name_plan}}', name_plan)
         .replace('{{platform_value}}', mail_payment.platform_value)
         .replace('{{info}}', mail_payment.info)
         .replace('{{info_value}}', mail_payment.info_value)
@@ -300,7 +300,7 @@ class MailerServiceFile {
       const templateDir: string = join(__dirname, mailer.DIR);
       const confirmationEmail = fs.readFileSync(join(templateDir, 'cancel_subscription.html'), { encoding: 'utf-8' });
       const htmlMailer = confirmationEmail
-        .replace('{{plan}}', plan.toLocaleUpperCase())
+        .replace('{{name_plan}}', plan)
         .replace('{{user}}', user)
         .replace('{{cancel_date}}', cancel_date)
         .replace('{{invoice_price}}', invoice_amount)

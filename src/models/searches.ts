@@ -10,6 +10,7 @@ export class SearchesModel extends Model implements searches {
   society?: string;
   createdAt: string;
   updatedAt: string;
+  locked?: boolean;
   count?: string;
 
   static tableName = 'searches';

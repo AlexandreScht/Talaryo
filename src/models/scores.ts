@@ -7,9 +7,11 @@ export class ScoreModel extends Model implements scores {
   year: number;
   month: number;
   day: number;
-  searches?: number;
-  profils?: number;
+  searches: number;
+  profils: number;
+  mails: number;
   totalSearches?: number;
+  totalMails?: number;
 
   static tableName = 'scores';
   static idColumn = 'id';

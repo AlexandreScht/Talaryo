@@ -4,6 +4,26 @@ export const sourcesPro: sources[] = ['Viadeo', 'Xing', 'Batiactu', 'Dribble', '
 
 export const sourcesBusiness: sources[] = ['HEC', 'Polytechnique', 'Ferrandi', 'UTC', 'Centrale Supélec', 'Centrale Lille', 'Essec', 'Neoma'];
 
-export const totalSearchPro = 100;
+export const totalSearch = {
+  free: 10,
+  pro: 100,
+  business: Infinity,
+};
 
-export const totalSearchFree = 10;
+export const totalMailFind = {
+  free: 10,
+  pro: 200,
+  business: 500,
+};
+
+export const totalFavorisSave = {
+  free: 10,
+  pro: 100,
+  business: Infinity,
+};
+
+export const totalSearchSave = {
+  free: 3,
+  pro: 10,
+  business: Infinity,
+};
