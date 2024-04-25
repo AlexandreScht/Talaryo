@@ -135,11 +135,7 @@ const AuthController = ({ app }) => {
           const { ORIGIN, NODE_ENV } = config;
           const [error, OAuthUser] = await OAuthTokenCheck(id_token, at_hash);
 
-          if (
-            NODE_ENV === 'production' &&
-            new URL(ORIGIN).hostname === 'test.talaryo.com' &&
-            !['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(OAuthUser.email)
-          ) {
+          if (NODE_ENV === 'production' && new URL(ORIGIN).hostname === 'test.talaryo.com' && !authorizeUser.includes(OAuthUser.email)) {
             res.status(404).send({ result: 'Seule les comptes développeur peuvent ce connecter sur ce site' });
             return;
           }
@@ -153,7 +149,6 @@ const AuthController = ({ app }) => {
           const currentUser = userNotFound
             ? await UserServices.register({
                 email: OAuthUser.email,
-                role: ['alexandreschecht@gmail.com', 'guideofdofus@gmail.com'].includes(OAuthUser.email) ? 'admin' : null,
               })
             : user;
 

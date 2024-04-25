@@ -1,4 +1,7 @@
+import { boys, girls } from '@/utils/genderProfile';
 import { Cheerio, CheerioAPI, Element } from 'cheerio';
+import { getGender } from 'gender-detection-from-name';
+import gender from 'gender-detection-ts';
 
 export const noIntitle = ['Viadeo', 'Skiller', 'Dribble', 'Behance', 'Culinary agents', 'Dogfinance', 'Symfony'];
 
@@ -27,6 +30,24 @@ export function GetChips(data: CheerioAPI, element: Element): string[] | [] {
       });
   }
   return chip;
+}
+
+export function GetProfileGenders(fullname: string) {
+  try {
+    const firstname = gender.getFirstName(fullname);
+    if (!firstname) {
+      return undefined;
+    }
+    const Gender1 = gender.detect(firstname, {
+      useCount: true,
+    });
+
+    const Gender = Gender1 !== 'unknown' ? Gender1 : getGender(firstname);
+
+    return Gender === 'female' ? girls[Math.floor(Math.random() * girls.length)] : boys[Math.floor(Math.random() * boys.length)];
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export function GetGoogleInfos(data: CheerioAPI, element: Element) {

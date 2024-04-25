@@ -7,10 +7,10 @@ import { sign, verify, type JwtPayload } from 'jsonwebtoken';
 import parseDuration from 'parse-duration';
 
 export const createToken = async (user: UserModel): Promise<TokenData> => {
-  const { email, role, firstName, lastName, society } = user;
+  const { email, role, firstName, lastName, society, createdAt } = user;
   const { security } = config;
 
-  const dataStoredInToken: JwtPayload = { User: { role, firstName, email, lastName, society } };
+  const dataStoredInToken: JwtPayload = { User: { role, firstName, email, lastName, society, createdAt } };
   const expiresIn = parseDuration(security.EXPRESS_IN) / 1000; // convert string in secondes
   const token = await new SignJWT(dataStoredInToken)
     .setProtectedHeader({ alg: 'HS256' })

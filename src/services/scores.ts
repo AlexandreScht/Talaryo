@@ -77,14 +77,6 @@ class ScoreServiceFile {
     }
   }
 
-  public async getUserScores({ year, month, day }: { year: number; month: number; day: number }, userId: number): Promise<ScoreModel> {
-    try {
-      return await ScoreModel.query().where({ year, month, day, userId }).select('searches', 'profils', 'year', 'month', 'day').first();
-    } catch (err) {
-      throw new ServicesError();
-    }
-  }
-
   public async getTotalMonthSearches(userId: number): Promise<number> {
     try {
       const today = new Date();
@@ -129,9 +121,29 @@ class ScoreServiceFile {
     }
   }
 
+  public async getUserCurrentScores(
+    { year, month }: { year: number; month: number },
+    userId: number,
+  ): Promise<{ currentScore: ScoreModel[]; lastScores: ScoreModel }> {
+    try {
+      const currentScore = await ScoreModel.query()
+        .where({ year, month, userId })
+        .select('searches', 'profils', 'year', 'month', 'day')
+        .orderBy('id', 'asc');
+      const lastScores = await ScoreModel.query()
+        .where({ year, month: month - 1, userId })
+        .sum('searches as totalSearches')
+        .sum('profils as totalProfiles')
+        .first();
+      return { currentScore, lastScores };
+    } catch (err) {
+      throw new ServicesError();
+    }
+  }
+
   public async getUserRangeScores(
     { year, month, day }: { year: number; month: number; day: number },
-    { RgYear, RgMonth, RgDay }: { RgYear: number; RgMonth: number; RgDay: number },
+    { year: RgYear, month: RgMonth, day: RgDay }: { year: number; month: number; day: number },
     userId: number,
   ): Promise<ScoreModel[]> {
     try {
@@ -145,6 +157,7 @@ class ScoreServiceFile {
 
       return await query.select('searches', 'profils', 'year', 'month', 'day').orderBy('id', 'asc');
     } catch (err) {
+      console.log(err);
       throw new ServicesError();
     }
   }

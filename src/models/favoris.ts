@@ -10,6 +10,7 @@ export class FavoriModel extends Model implements Favoris {
   img: string;
   fullName: string;
   currentJob?: string;
+  email?: string;
   currentCompany?: string;
   disabled: boolean;
   favFolderId: number;

@@ -3,7 +3,16 @@ import { InvalidRoleAccessError } from '@/exceptions';
 import auth from '@/middlewares/auth';
 import FavorisFolderFile from '@/services/favFolders';
 import FavorisServiceFile from '@/services/favoris';
-import { idValidator, imgValidator, keyValidator, limitValidator, linkValidator, pageValidator, stringValidator } from '@libs/validate';
+import {
+  emailOrBooleanValidator,
+  idValidator,
+  imgValidator,
+  keyValidator,
+  limitValidator,
+  linkValidator,
+  pageValidator,
+  stringValidator,
+} from '@libs/validate';
 import mw from '@middlewares/mw';
 import validator from '@middlewares/validator';
 import Container from 'typedi';
@@ -19,6 +28,7 @@ const FavorisController = ({ app }) => {
         body: {
           link: linkValidator.required(),
           img: imgValidator.required(),
+          email: emailOrBooleanValidator,
           fullName: stringValidator.required(),
           currentJob: stringValidator,
           currentCompany: stringValidator,
@@ -28,7 +38,7 @@ const FavorisController = ({ app }) => {
       }),
       async ({
         locals: {
-          body: { link, img, fullName, currentJob, currentCompany, desc, favFolderId },
+          body: { link, img, fullName, email, currentJob, currentCompany, desc, favFolderId },
         },
         session: { sessionId, sessionRole },
         res,
@@ -47,7 +57,7 @@ const FavorisController = ({ app }) => {
               throw new InvalidRoleAccessError('Limite maximale de favoris enregistrer atteinte.');
             }
           }
-          const success = await FavorisServices.create({ link, img, fullName, currentJob, currentCompany, desc, favFolderId }, sessionId);
+          const success = await FavorisServices.create({ link, img, fullName, email, currentJob, currentCompany, desc, favFolderId }, sessionId);
           res.send({ res: success });
         } catch (error) {
           next(error);
@@ -81,13 +91,40 @@ const FavorisController = ({ app }) => {
       },
     ]),
   );
+  app.put(
+    '/update-fav',
+    mw([
+      auth(),
+      validator({
+        body: {
+          link: linkValidator,
+          img: imgValidator,
+          email: emailOrBooleanValidator,
+          fullName: stringValidator,
+          currentJob: stringValidator,
+          currentCompany: stringValidator,
+          desc: keyValidator,
+          favFolderId: idValidator,
+          id: idValidator.required(),
+        },
+      }),
+      async ({ locals: { body }, res, next }) => {
+        try {
+          const success = await FavorisServices.update(body, body.id);
+          res.send({ res: success });
+        } catch (error) {
+          next(error);
+        }
+      },
+    ]),
+  );
   app.get(
     '/get-favoris',
     mw([
       auth(),
       validator({
         query: {
-          limit: limitValidator.default(2),
+          limit: limitValidator.default(10),
           page: pageValidator.default(1),
           favFolderName: stringValidator.required(),
         },

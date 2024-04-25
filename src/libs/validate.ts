@@ -33,7 +33,7 @@ export const timestampValidator = yup.date().transform((value, originalValue) =>
 export const linkValidator = yup.string().url();
 export const imgValidator = yup
   .string()
-  .matches(/^data:image\/(jpeg|jpg|png);base64,/, 'Le champ "img" doit être une URL base64 d\'une image valide');
+  .matches(/^https:\/\/lh3\.googleusercontent\.com\//, 'Le champ "img" doit être une URL valide ou une URL base64 d\'une image valide');
 
 export const idValidator = yup.number().min(1);
 
@@ -43,6 +43,14 @@ export const passwordValidator = yup
   .matches(
     /^(?=.*[\p{Ll}])(?=.*[\p{Lu}])(?=.*[0-9])(?=.*[^0-9\p{Lu}\p{Ll}]).*$/gu,
     'Password must contain at least 1 upper & 1 lower case letters, 1 digit, 1 spe. character',
+  );
+
+export const emailOrBooleanValidator = yup
+  .mixed()
+  .test(
+    'email-or-boolean',
+    'La valeur doit être un e-mail valide ou un booléen',
+    value => typeof value === 'undefined' || typeof value === 'boolean' || (!!value && yup.string().email().isValidSync(value)),
   );
 
 export const confirmPasswordValidator = yup.string().oneOf([yup.ref('password')], 'Passwords must be identical');

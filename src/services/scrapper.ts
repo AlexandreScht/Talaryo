@@ -9,7 +9,7 @@ import {
   searchValues,
 } from '@/interfaces/scrapping';
 import { cvFinder, dateFinder } from '@/libs/regrex';
-import { GetChips, GetElements, GetGoogleInfos, GetPlatform } from '@/libs/scrapping';
+import { GetChips, GetElements, GetGoogleInfos, GetPlatform, GetProfileGenders } from '@/libs/scrapping';
 import { normalizeString } from '@/utils/serializeString';
 import { ApiPuppeteer } from '@utils/puppeteer';
 import { load } from 'cheerio';
@@ -113,10 +113,12 @@ export class ScrapperServiceFile extends ApiPuppeteer {
           ? chip[chip.length - 1].toString().trim()
           : searchValues?.industry;
 
+      const img = GetProfileGenders(fullName);
+
       linkedIn.push({
         platform,
         link,
-        img: null,
+        img,
         fullName,
         currentJob,
         currentCompany,
@@ -183,8 +185,8 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
 
       const { currentJob, currentCompany } = filterTitleCompany(title) ? filterTitleCompanyA(title) : filterTitleCompanyB(title);
-
-      Viadeo.push({ platform, link, img: null, fullName, currentJob, currentCompany, desc: desc?.trim() });
+      const img = GetProfileGenders(fullName);
+      Viadeo.push({ platform, link, img, fullName, currentJob, currentCompany, desc: desc?.trim() });
     }
     return Viadeo;
   }
@@ -211,8 +213,8 @@ export class ScrapperServiceFile extends ApiPuppeteer {
         return { currentJob: data[1]?.trim(), currentCompany: searchValues?.industry };
       };
       const { currentJob, currentCompany } = extractInfos(splitTitle);
-
-      Xing.push({ platform, link, img: null, fullName, currentJob, currentCompany, desc: desc?.trim() });
+      const img = GetProfileGenders(fullName);
+      Xing.push({ platform, link, img, fullName, currentJob, currentCompany, desc: desc?.trim() });
     }
     return Xing;
   }
@@ -235,7 +237,8 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       const currentCompany = splitTitle[1]?.trim();
       const remainingText = title.split(splitTitle[0]);
       const fullName = remainingText[0]?.trim() || undefined;
-      Batiactu.push({ platform, link, img: null, fullName, currentJob: searchValues?.fn, currentCompany, desc: desc?.trim() });
+      const img = GetProfileGenders(fullName);
+      Batiactu.push({ platform, link, img, fullName, currentJob: searchValues?.fn, currentCompany, desc: desc?.trim() });
     }
     return Batiactu;
   }
@@ -251,11 +254,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       const element = elements[i];
 
       const { link, title, desc } = GetGoogleInfos($, element);
-
+      const img = GetProfileGenders(title);
       Dribble.push({
         platform,
         link,
-        img: null,
+        img,
         fullName: title || undefined,
         currentJob: searchValues?.fn,
         currentCompany: searchValues?.industry,
@@ -278,7 +281,8 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       const { link, title, desc } = GetGoogleInfos($, element);
       const splitTitle = title.split(' on Behance');
       const fullName = splitTitle[0]?.trim() || undefined;
-      Behance.push({ platform, link, img: null, fullName, currentJob: searchValues?.fn, currentCompany: searchValues?.industry, desc: desc?.trim() });
+      const img = GetProfileGenders(fullName);
+      Behance.push({ platform, link, img, fullName, currentJob: searchValues?.fn, currentCompany: searchValues?.industry, desc: desc?.trim() });
     }
     return Behance;
   }
@@ -296,10 +300,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       const { link, title, desc } = GetGoogleInfos($, element);
       const splitTitle = title.split("'s professional profile");
       const fullName = splitTitle[0]?.trim() || undefined;
+      const img = GetProfileGenders(fullName);
       CulinaryAgents.push({
         platform,
         link,
-        img: null,
+        img,
         fullName,
         currentJob: searchValues?.fn,
         currentCompany: searchValues?.industry,
@@ -322,7 +327,8 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       const { link, title, desc } = GetGoogleInfos($, element);
       const matchTitle = title.match(/^(.*)\s+a\.k\.a\./);
       const fullName = matchTitle && matchTitle[1] ? matchTitle[1]?.trim() : title?.trim() || undefined;
-      Symfony.push({ platform, link, img: null, fullName, currentJob: searchValues?.fn, currentCompany: searchValues?.industry, desc: desc?.trim() });
+      const img = GetProfileGenders(fullName);
+      Symfony.push({ platform, link, img, fullName, currentJob: searchValues?.fn, currentCompany: searchValues?.industry, desc: desc?.trim() });
     }
     return Symfony;
   }
@@ -389,7 +395,8 @@ export class ScrapperServiceFile extends ApiPuppeteer {
 
       const { fullName, diplome, currentCompany } = extractInfos(title);
       if (fullName) {
-        HEC.push({ platform, link, img: null, fullName, diplome, currentCompany: currentCompany || searchValues?.industry, desc: desc?.trim() });
+        const img = GetProfileGenders(fullName);
+        HEC.push({ platform, link, img, fullName, diplome, currentCompany: currentCompany || searchValues?.industry, desc: desc?.trim() });
       }
     }
     return HEC;
@@ -422,10 +429,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
       const { fullName, diplome, currentJob } = extractInfos(title);
       if (fullName) {
+        const img = GetProfileGenders(fullName);
         Polytechnique.push({
           platform,
           link,
-          img: null,
+          img,
           fullName,
           diplome,
           currentJob: currentJob || searchValues?.fn,
@@ -453,10 +461,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
       const { fullName, diplome, currentJob } = extractInfos(title);
       if (fullName) {
+        const img = GetProfileGenders(fullName);
         Ferrandi.push({
           platform,
           link,
-          img: null,
+          img,
           fullName,
           diplome,
           currentJob: currentJob || searchValues?.fn,
@@ -544,7 +553,8 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
       const { fullName, diplome, currentJob } = extractInfos(title);
       if (fullName) {
-        UTC.push({ platform, link, img: null, fullName, diplome, currentJob, currentCompany: searchValues?.industry, desc: desc?.trim() });
+        const img = GetProfileGenders(fullName);
+        UTC.push({ platform, link, img, fullName, diplome, currentJob, currentCompany: searchValues?.industry, desc: desc?.trim() });
       }
     }
     return UTC;
@@ -580,10 +590,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
       const { fullName, diplome, currentJob } = extractInfos(title);
       if (fullName) {
+        const img = GetProfileGenders(fullName);
         CentraleSupelec.push({
           platform,
           link,
-          img: null,
+          img,
           fullName,
           diplome,
           currentJob,
@@ -637,10 +648,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
       const { fullName, diplome, currentJob } = extractInfos(title);
       if (fullName) {
+        const img = GetProfileGenders(fullName);
         CentraleLille.push({
           platform,
           link,
-          img: null,
+          img,
           fullName,
           diplome,
           currentJob,
@@ -698,10 +710,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
       const { fullName, diplome, currentJob } = extractInfos(title);
       if (fullName) {
+        const img = GetProfileGenders(fullName);
         Essec.push({
           platform,
           link,
-          img: null,
+          img,
           fullName,
           diplome,
           currentJob,
@@ -770,10 +783,11 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       };
       const { fullName, diplome, currentJob } = extractInfos(title);
       if (fullName) {
+        const img = GetProfileGenders(fullName);
         Neoma.push({
           platform,
           link,
-          img: null,
+          img,
           fullName,
           diplome,
           currentJob,

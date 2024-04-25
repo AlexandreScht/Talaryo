@@ -24,6 +24,7 @@ export interface Favoris {
   link: string;
   desc: string;
   img: string;
+  email?: string | boolean;
   fullName: string;
   currentJob?: string;
   currentCompany?: string;

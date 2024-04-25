@@ -30,7 +30,16 @@ class FavorisServiceFile {
       const [{ count }] = await query.clone().limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
 
-      const favoris = await query.modify('paginate', limit, page);
+      const favorisFetched = await query.modify('paginate', limit, page);
+      const favoris = favorisFetched?.map(fav => {
+        if (fav.email === 'false') {
+          return { ...fav, email: null };
+        }
+        if (!fav.email) {
+          return { ...fav, email: undefined };
+        }
+        return fav;
+      }) as FavoriModel[];
       return { total, favoris };
     } catch (error) {
       throw new ServicesError();
@@ -46,19 +55,32 @@ class FavorisServiceFile {
 
   public async create(fav: favorisData, id: number): Promise<FavoriModel | boolean> {
     try {
-      return await FavoriModel.query().insert({ ...fav, userId: id });
+      return await FavoriModel.query().insert({ ...fav, userId: id, email: typeof fav.email === 'boolean' ? 'false' : fav.email });
     } catch (error) {
       if (error instanceof ConstraintViolationError) {
         const { link, favFolderId } = fav;
         const existingFav = await FavoriModel.query().where({ userId: id, link, favFolderId }).first();
         if (existingFav && existingFav.locked === true) {
           const update = await FavoriModel.query()
-            .update({ ...fav, locked: false })
+            .update({ ...fav, locked: false, email: typeof fav.email === 'boolean' ? 'false' : fav.email })
             .where({ id: existingFav.id });
           return !!update;
         }
         return false;
       }
+      throw new ServicesError();
+    }
+  }
+
+  public async update(fav: favorisData, id: number): Promise<FavoriModel | boolean> {
+    try {
+      const update = await FavoriModel.query()
+        .update({ ...fav, email: typeof fav.email === 'boolean' ? 'false' : fav.email })
+        .where({ id });
+      return !!update;
+    } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }

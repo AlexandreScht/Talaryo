@@ -1,4 +1,5 @@
 import { totalSearch } from '@/config/access';
+import { InvalidArgumentError } from '@/exceptions';
 import { numberValidator, timestampValidator } from '@/libs/validate';
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
@@ -39,56 +40,79 @@ const ScoreController = ({ app }) => {
     ]),
   );
   app.get(
-    '/get-user-score/:dateSearch?/:rangeDate?',
+    '/get-user-score/:firstDate?/:lastDate?',
     mw([
       auth(),
       validator({
         params: {
-          dateSearch: timestampValidator,
-          rangeDate: timestampValidator,
+          firstDate: timestampValidator,
+          lastDate: timestampValidator,
         },
       }),
       async ({
         locals: {
-          params: { dateSearch, rangeDate },
+          params: { firstDate, lastDate },
         },
         session: { sessionId },
         res,
         next,
       }) => {
         try {
-          if (!dateSearch && !rangeDate) {
-            const currentDate = new Date();
-            const dateNow = {
-              year: currentDate.getFullYear(),
-              month: currentDate.getMonth() + 1,
-              day: currentDate.getDate(),
-            };
-            const score = await ScoreServices.getUserScores(dateNow, sessionId);
-            return res.status(201).send({ res: score ?? null });
-          }
+          const sD = new Date(firstDate);
+          const eD = new Date(lastDate);
 
-          const selectDate = new Date(dateSearch);
-          const dateSelect = {
-            year: selectDate.getFullYear(),
-            month: selectDate.getMonth() + 1,
-            day: selectDate.getDate(),
+          const startDate = {
+            year: sD.getFullYear(),
+            month: sD.getMonth() + 1,
+            day: sD.getDate(),
+          };
+          const endDate = {
+            year: eD.getFullYear(),
+            month: eD.getMonth() + 1,
+            day: eD.getDate(),
           };
 
-          if (rangeDate) {
-            const rangeDateConverted = new Date(rangeDate);
-            const dateRange = {
-              RgYear: rangeDateConverted.getFullYear(),
-              RgMonth: rangeDateConverted.getMonth() + 1,
-              RgDay: rangeDateConverted.getDate(),
-            };
-            const scores = await ScoreServices.getUserRangeScores(dateSelect, dateRange, sessionId);
-            return res.status(201).send({ res: scores ?? null });
+          if (!startDate || !endDate) {
+            throw new InvalidArgumentError('dates required');
+          }
+          const cDate = new Date();
+          const currentDate = {
+            year: cDate.getFullYear(),
+            month: cDate.getMonth() + 1,
+            day: cDate.getDate(),
+          };
+          if (
+            currentDate.month === startDate.month &&
+            currentDate.month === endDate.month &&
+            currentDate.year === startDate.year &&
+            currentDate.year === endDate.year
+          ) {
+            const { lastScores, currentScore } = await ScoreServices.getUserCurrentScores(currentDate, sessionId);
+            const { totalProfiles, totalSearches } = (currentScore || []).reduce(
+              (acc, score) => {
+                acc.totalProfiles += score.profils || 0;
+                acc.totalSearches += score.searches || 0;
+                return acc;
+              },
+              { totalProfiles: 0, totalSearches: 0 },
+            );
+
+            return res.status(201).send({ res: { lastScores, fetchedScore: { scores: currentScore, meta: { totalProfiles, totalSearches } } } });
           }
 
-          const score = await ScoreServices.getUserScores(dateSelect, sessionId);
-          res.status(201).send({ res: score ?? null });
+          const scores = await ScoreServices.getUserRangeScores(startDate, endDate, sessionId);
+          const { totalProfiles, totalSearches } = (scores || []).reduce(
+            (acc, score) => {
+              acc.totalProfiles += score.profils || 0;
+              acc.totalSearches += score.searches || 0;
+              return acc;
+            },
+            { totalProfiles: 0, totalSearches: 0 },
+          );
+          return res.status(201).send({ res: { fetchedScore: { scores, meta: { totalProfiles, totalSearches } } } });
         } catch (error) {
+          console.log(error);
+
           next(error);
         }
       },
