@@ -12,7 +12,6 @@ const EventController = ({ app }) => {
       async ({ session: { sessionId }, res, next }) => {
         try {
           const events = await EventServices.getUserEvent(sessionId);
-          console.log(events);
 
           res.status(201).send({ res: events });
         } catch (error) {

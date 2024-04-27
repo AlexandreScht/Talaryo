@@ -36,12 +36,15 @@ class SocketManager {
               this.sendUserListEvent(user.sessionId);
               return;
             }
-            logger.error('Erreur de connexion :', err.message);
+            if (err) {
+              logger.error('Erreur de connexion socket-Io :', err.message);
+            }
+            logger.error("Erreur de connexion socket-Io : l'user est introuvable");
             socket.disconnect();
             return;
           });
         } catch (error) {
-          logger.error('Erreur lors de la connexion :', error);
+          logger.error('Erreur lors de la connexion socket-Io :', error);
           socket.disconnect();
         }
       });

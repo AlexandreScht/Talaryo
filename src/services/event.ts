@@ -42,7 +42,13 @@ class EventServiceFile {
 
   public async getUserEvent(userId: number): Promise<EventModel[]> {
     try {
-      const events = await EventModel.query().select('date', 'text').where({ userId });
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const events = await EventModel.query()
+        .select('date', 'text')
+        .where({ userId, send: true })
+        .andWhere('createdAt', '>', oneYearAgo.toISOString())
+        .orderBy('createdAt', 'desc');
       return events || [];
     } catch (error) {
       console.log(error);

@@ -299,6 +299,7 @@ class MailerServiceFile {
     try {
       const templateDir: string = join(__dirname, mailer.DIR);
       const confirmationEmail = fs.readFileSync(join(templateDir, 'cancel_subscription.html'), { encoding: 'utf-8' });
+
       const htmlMailer = confirmationEmail
         .replace('{{name_plan}}', plan)
         .replace('{{user}}', user)
