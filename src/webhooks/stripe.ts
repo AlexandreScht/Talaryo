@@ -134,7 +134,6 @@ const StripeWebhook = ({ app }) => {
             return;
           }
           const { customer, billing_reason, attempt_count, charge, created, subscription, hosted_invoice_url } = Invoice;
-          console.log(attempt_count);
 
           if (billing_reason === 'subscription_cycle' && [1, 3, 5, 7, 8].includes(attempt_count)) {
             logger.warn(`payement recurrant echouer => ${customer}`);

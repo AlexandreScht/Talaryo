@@ -39,6 +39,7 @@ export class ApiPuppeteer {
   private getNumber(values: string): number | undefined {
     const $ = load(values);
     const nResults = $('#result-stats').text();
+
     const match = nResults.match(/(\d+(?:[.,]\d{3})*(?:\s+\d{3})*)\s*résultats/);
 
     if (match) {

@@ -8,8 +8,3 @@ export interface favorisData {
   currentCompany?: string;
   favFolderId: number;
 }
-
-export type findFav = {
-  link: string;
-  favFolderId: number;
-};

@@ -2,11 +2,13 @@ import { idValidator, limitValidator, pageValidator, stringValidator } from '@/l
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
 import FavorisFolderFile from '@/services/favFolders';
+import FavorisServiceFile from '@/services/favoris';
 import mw from '@middlewares/mw';
 import Container from 'typedi';
 
 const FavFoldersController = ({ app }) => {
   const FavorisFolderServices = Container.get(FavorisFolderFile);
+  const FavorisServices = Container.get(FavorisServiceFile);
   app.post(
     '/create-favFolders',
     mw([
@@ -49,8 +51,9 @@ const FavFoldersController = ({ app }) => {
         next,
       }) => {
         try {
-          const countDeleted = await FavorisFolderServices.removeFolder(id);
-          res.send({ res: countDeleted });
+          await FavorisServices.removeListFolder(id);
+          const success = await FavorisFolderServices.removeFolder(id);
+          res.send({ res: success });
         } catch (error) {
           next(error);
         }

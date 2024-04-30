@@ -28,7 +28,8 @@ export interface Favoris {
   fullName: string;
   currentJob?: string;
   currentCompany?: string;
-  locked: boolean;
+  locked?: boolean;
+  deleted?: boolean;
   favFolderId: number;
 }
 
@@ -39,6 +40,7 @@ export interface searches {
   searchQueries: string;
   name: string;
   locked?: boolean;
+  deleted?: boolean;
   society?: string;
 }
 

@@ -1,6 +1,5 @@
 import { InvalidArgumentError, ServicesError } from '@/exceptions';
 import { FavFoldersModel } from '@/models/favFolders';
-import { FavoriModel } from '@/models/favoris';
 import type { Knex } from 'knex';
 import { ConstraintViolationError } from 'objection';
 import { Service } from 'typedi';
@@ -16,23 +15,30 @@ class FavorisFolderFile {
       return await FavFoldersModel.query().insert({ name, userId });
     } catch (error) {
       if (error instanceof ConstraintViolationError) {
+        const existingFavFolder = await FavFoldersModel.query().where({ name, userId, deleted: true }).first();
+        if (existingFavFolder) {
+          const update = await FavFoldersModel.query().update({ name, deleted: false }).where({ id: existingFavFolder.id });
+          return !!update;
+        }
         return false;
       }
       throw new ServicesError();
     }
   }
 
-  public async removeFolder(id: number): Promise<number> {
+  public async removeFolder(id: number): Promise<boolean> {
     try {
-      await FavoriModel.query().where('favFolderId', id).delete();
-      return await FavFoldersModel.query().deleteById(id);
+      const success = await FavFoldersModel.query().where({ id }).patch({ deleted: true });
+      return !!success;
     } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }
   public async getFolderByName(name: string, userId: number): Promise<FavFoldersModel> {
     try {
-      const folder = await FavFoldersModel.query().select('id').where({ name, userId }).first();
+      const folder = await FavFoldersModel.query().select('id').where({ name, userId, deleted: false }).first();
       if (!folder) {
         throw new InvalidArgumentError();
       }
@@ -47,7 +53,7 @@ class FavorisFolderFile {
     { limit, page, name }: { limit: number; page: number; name?: string },
   ): Promise<{ total: number; folders: FavFoldersModel[] }> {
     try {
-      let query = FavFoldersModel.query().where('favFolders.userId', userId);
+      let query = FavFoldersModel.query().where('favFolders.userId', userId).andWhere('favFolders.deleted', false);
 
       if (name) {
         query = query.andWhereRaw('LOWER("name") LIKE LOWER(?)', [`${name}%`]);
@@ -60,7 +66,7 @@ class FavorisFolderFile {
         .clone()
         .select('favFolders.id', 'favFolders.name')
         .leftJoin('favoris', function () {
-          this.on('favFolders.id', '=', 'favoris.favFolderId').onVal('favoris.locked', false);
+          this.on('favFolders.id', '=', 'favoris.favFolderId').onVal('favoris.locked', false).andOnVal('favoris.deleted', false);
         })
         .groupBy('favFolders.id')
         .orderBy('favFolders.id', 'asc')

@@ -27,6 +27,8 @@ class ScoreServiceFile {
           searches: ScoreModel.raw('?? + ?', ['scores.searches', searches]),
         });
     } catch (err) {
+      console.log(err);
+
       throw new ServicesError();
     }
   }

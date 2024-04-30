@@ -1,5 +1,5 @@
 import { ServicesError } from '@/exceptions';
-import { favorisData, findFav } from '@/interfaces/favoris';
+import { favorisData } from '@/interfaces/favoris';
 import { cheerioInfos } from '@/interfaces/scrapping';
 import { FavoriModel } from '@models/favoris';
 import type { Knex } from 'knex';
@@ -16,17 +16,19 @@ class FavorisServiceFile {
   public async findAllUserFav(id: number, objects: cheerioInfos[]): Promise<Map<string, number>> {
     try {
       const links = [...new Set(objects.map(obj => obj.link))];
-      const favorites = await FavoriModel.query().where({ userId: id }).whereIn('link', links).select('link', 'favFolderId');
+      const favorites = await FavoriModel.query().where({ userId: id, deleted: false }).whereIn('link', links).select('link', 'favFolderId');
 
       return new Map(favorites.map(fav => [fav.link, fav.favFolderId]));
     } catch (error) {
+      console.log(error);
+
       throw new ServicesError();
     }
   }
 
   public async getFavInFolder(limit: number, page: number, favFolderId: number): Promise<{ total: number; favoris: FavoriModel[] }> {
     try {
-      const query = FavoriModel.query().where({ favFolderId, locked: false });
+      const query = FavoriModel.query().where({ favFolderId, locked: false, deleted: false });
       const [{ count }] = await query.clone().limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
 
@@ -45,9 +47,10 @@ class FavorisServiceFile {
       throw new ServicesError();
     }
   }
+
   public async getLatests(userId: number): Promise<FavoriModel[]> {
     try {
-      return await FavoriModel.query().where({ userId }).orderBy('id', 'desc').limit(3);
+      return await FavoriModel.query().where({ userId, deleted: false, locked: false }).orderBy('id', 'desc').limit(3);
     } catch (error) {
       throw new ServicesError();
     }
@@ -60,11 +63,13 @@ class FavorisServiceFile {
       if (error instanceof ConstraintViolationError) {
         const { link, favFolderId } = fav;
         const existingFav = await FavoriModel.query().where({ userId: id, link, favFolderId }).first();
-        if (existingFav && existingFav.locked === true) {
-          const update = await FavoriModel.query()
-            .update({ ...fav, locked: false, email: typeof fav.email === 'boolean' ? 'false' : fav.email })
-            .where({ id: existingFav.id });
-          return !!update;
+        if (existingFav) {
+          return await existingFav.$query().updateAndFetch({
+            ...fav,
+            deleted: false,
+            locked: false,
+            email: typeof fav.email === 'boolean' ? 'false' : fav.email,
+          });
         }
         return false;
       }
@@ -72,34 +77,39 @@ class FavorisServiceFile {
     }
   }
 
-  public async update(fav: favorisData, id: number): Promise<FavoriModel | boolean> {
+  public async update(fav: favorisData, id: number): Promise<boolean> {
     try {
-      const update = await FavoriModel.query()
-        .update({ ...fav, email: typeof fav.email === 'boolean' ? 'false' : fav.email })
-        .where({ id });
+      const update = await FavoriModel.query().updateAndFetchById(id, { ...fav, email: typeof fav.email === 'boolean' ? 'false' : fav.email });
       return !!update;
     } catch (error) {
       console.log(error);
-
       throw new ServicesError();
     }
   }
 
-  public async remove({ favFolderId, link }: findFav): Promise<boolean> {
+  public async remove(id: number): Promise<boolean> {
     try {
-      const deletedRows = await FavoriModel.query().delete().where({
-        favFolderId,
-        link,
-      });
-      return !isNaN(deletedRows) && deletedRows > 0;
+      const deletedRows = await FavoriModel.query().patchAndFetchById(id, { deleted: true });
+      return !!deletedRows;
     } catch (error) {
+      console.log(error);
+      throw new ServicesError();
+    }
+  }
+
+  public async removeListFolder(id: number): Promise<boolean> {
+    try {
+      const deletedRows = await FavoriModel.query().where({ favFolderId: id }).patch({ deleted: true });
+      return !!deletedRows;
+    } catch (error) {
+      console.log(error);
       throw new ServicesError();
     }
   }
 
   public async getTotalFavoris(userId: number): Promise<number> {
     try {
-      const [{ count }] = await FavoriModel.query().where({ userId, locked: false }).limit(1).offset(0).count();
+      const [{ count }] = await FavoriModel.query().where({ userId, locked: false, deleted: false }).limit(1).offset(0).count();
       const total = Number.parseInt(count, 10);
       return total;
     } catch (error) {
@@ -110,10 +120,10 @@ class FavorisServiceFile {
   public async lockFavoris(userId: number, n: number): Promise<void> {
     try {
       if (n === Infinity) {
-        await FavoriModel.query().where({ userId, locked: true }).patch({ locked: false });
+        await FavoriModel.query().where({ userId, locked: true, deleted: false }).patch({ locked: false });
         return;
       }
-      const unlockFavoris = await FavoriModel.query().select('id').where({ userId, locked: true }).orderBy('id', 'asc').limit(n);
+      const unlockFavoris = await FavoriModel.query().select('id').where({ userId, locked: true, deleted: false }).orderBy('id', 'asc').limit(n);
       const unlockIds = unlockFavoris.map(favori => favori.id);
 
       const lockFavoris = await FavoriModel.query().select('id').where({ userId }).orderBy('id', 'asc').offset(n);

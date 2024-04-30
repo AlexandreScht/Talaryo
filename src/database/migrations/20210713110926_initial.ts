@@ -35,6 +35,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
     table.text('name').notNullable();
+    table.boolean('deleted').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
     table.unique(['userId', 'name']);
   });
@@ -46,6 +47,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.text('img').notNullable();
     table.text('email').nullable();
     table.boolean('locked').notNullable().defaultTo(false);
+    table.boolean('deleted').notNullable().defaultTo(false);
     table.string('fullName', 255).nullable();
     table.string('currentJob', 255).nullable();
     table.string('currentCompany', 255).nullable();
@@ -69,6 +71,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
     table.string('name').notNullable();
+    table.boolean('deleted').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
     table.unique(['userId', 'name']);
   });
@@ -79,6 +82,7 @@ module.exports.up = async (knex: Knex): Promise<void> => {
     table.text('searchQueries').notNullable();
     table.string('name').notNullable();
     table.boolean('locked').notNullable().defaultTo(false);
+    table.boolean('deleted').notNullable().defaultTo(false);
     table.string('society').nullable();
     table.timestamps(true, true, true);
     table.unique(['userId', 'name', 'searchFolderId']);

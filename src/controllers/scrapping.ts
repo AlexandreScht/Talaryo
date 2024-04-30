@@ -62,7 +62,6 @@ const ScrappingController = ({ app }) => {
               throw new InvalidRoleAccessError(`Veuillez souscrire au plan business pour accéder à : ${notAllowedSite}.`);
             }
             const total = await ScoreServices.getTotalMonthSearches(sessionId);
-            console.log(total);
 
             if (sessionRole === 'free' && total >= totalSearch.free) {
               throw new InvalidRoleAccessError('Limite de recherche mensuelle atteinte avec votre abonnement FREE.');

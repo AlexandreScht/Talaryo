@@ -30,8 +30,8 @@ const FavorisController = ({ app }) => {
           img: imgValidator.required(),
           email: emailOrBooleanValidator,
           fullName: stringValidator.required(),
-          currentJob: stringValidator,
-          currentCompany: stringValidator,
+          currentJob: stringValidator.nullable(),
+          currentCompany: stringValidator.nullable(),
           desc: keyValidator.required(),
           favFolderId: idValidator.required(),
         },
@@ -66,24 +66,23 @@ const FavorisController = ({ app }) => {
     ]),
   );
   app.delete(
-    '/remove-fav',
+    '/remove-fav/:id',
     mw([
       auth(),
       validator({
-        query: {
-          link: linkValidator.required(),
-          favFolderId: idValidator.required(),
+        params: {
+          id: idValidator.required(),
         },
       }),
       async ({
         locals: {
-          query: { link, favFolderId },
+          params: { id },
         },
         res,
         next,
       }) => {
         try {
-          const success = await FavorisServices.remove({ link, favFolderId });
+          const success = await FavorisServices.remove(id);
           res.send({ res: success });
         } catch (error) {
           next(error);

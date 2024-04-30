@@ -7,6 +7,7 @@ export class SearchFolderModel extends Model implements searchFolders {
   name: string;
   createdAt: string;
   updatedAt: string;
+  deleted: boolean;
   count?: string;
 
   static tableName = 'searchFolders';

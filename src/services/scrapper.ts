@@ -62,6 +62,7 @@ export class ScrapperServiceFile extends ApiPuppeteer {
     if (error) {
       throw new ServerException();
     }
+
     const number = success
       .filter(o => o.number)
       .reduce((acc, n) => {
@@ -78,10 +79,10 @@ export class ScrapperServiceFile extends ApiPuppeteer {
       });
 
     if (result.length === 1) {
-      return { scrape: result[0], number };
+      return { scrape: result[0], number: number || undefined };
     }
 
-    return { scrape: this.shuffleArray(result), number };
+    return { scrape: this.shuffleArray(result), number: number || undefined };
   }
 
   // > ----------------------------------------------------------------------------------------------------------------------------------------------

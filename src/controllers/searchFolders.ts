@@ -2,11 +2,13 @@ import { idValidator, limitValidator, pageValidator, stringValidator } from '@/l
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
 import SearchFolderFile from '@/services/searchFolder';
+import SearchesServiceFile from '@/services/searches';
 import mw from '@middlewares/mw';
 import Container from 'typedi';
 
 const SearchFoldersController = ({ app }) => {
   const SearchFolderServices = Container.get(SearchFolderFile);
+  const SearchServices = Container.get(SearchesServiceFile);
   app.post(
     '/create-searchFolders',
     mw([
@@ -50,6 +52,7 @@ const SearchFoldersController = ({ app }) => {
         next,
       }) => {
         try {
+          await SearchServices.removeListFolder(id);
           const countDeleted = await SearchFolderServices.removeFolder(id);
           res.send({ res: countDeleted });
         } catch (error) {
