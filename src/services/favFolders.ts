@@ -17,8 +17,7 @@ class FavorisFolderFile {
       if (error instanceof ConstraintViolationError) {
         const existingFavFolder = await FavFoldersModel.query().where({ name, userId, deleted: true }).first();
         if (existingFavFolder) {
-          const update = await FavFoldersModel.query().update({ name, deleted: false }).where({ id: existingFavFolder.id });
-          return !!update;
+          return await FavFoldersModel.query().patchAndFetchById(existingFavFolder.id, { deleted: false });
         }
         return false;
       }

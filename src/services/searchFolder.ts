@@ -18,8 +18,7 @@ class SearchFolderFile {
       if (error instanceof ConstraintViolationError) {
         const existingSearchFolder = await SearchFolderModel.query().where({ name, userId, deleted: true }).first();
         if (existingSearchFolder) {
-          const update = await SearchFolderModel.query().update({ name, deleted: false }).where({ id: existingSearchFolder.id });
-          return !!update;
+          return await SearchFolderModel.query().patchAndFetchById(existingSearchFolder.id, { deleted: false });
         }
         return false;
       }
