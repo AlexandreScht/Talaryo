@@ -3,6 +3,10 @@ const { cleanEnv, str, port, bool } = require('envalid');
 require('dotenv').config();
 
 try {
+  if (process.version !== 'v18.18.2') {
+    console.error('NVM version incorrect. Version 18.18.2 requise !');
+    process.exit(1);
+  }
   cleanEnv(process.env, {
     NODE_ENV: str({ choices: ['development', 'production'] }),
     PORT: port(),

@@ -1,12 +1,9 @@
-import { ExpiredSessionError } from '@/exceptions';
 import { decryptUserToken } from '@/libs/token';
 import config from '@config';
 import type { TokenUser } from '@interfaces/auth';
 import type { RequestWithAuth, ctx } from '@interfaces/request';
-import UsersServiceFile from '@services/users';
 import deepmerge from 'deepmerge';
 import { NextFunction, Request, Response } from 'express';
-import Container from 'typedi';
 const { COOKIE_NAME } = config;
 
 const getAuthorization = (req: Request) => {
@@ -55,19 +52,14 @@ const mw =
       },
     };
     try {
-      const UserServices = Container.get(UsersServiceFile);
       const Authorization = getAuthorization(req);
 
       if (Authorization) {
         const [err, user] = decryptUserToken(Authorization);
-        if (err) {
-          throw new ExpiredSessionError();
+        if (!err && user) {
+          ctx.session = user;
         }
-
-        await UserServices.checkRefreshToken(user);
-        ctx.session = user;
       }
-
       await ctx.next();
     } catch (err) {
       nextExpress(err);

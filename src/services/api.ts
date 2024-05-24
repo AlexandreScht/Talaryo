@@ -60,6 +60,20 @@ class ApiServiceFile {
       throw new ServicesError();
     }
   }
+
+  public async FetchRecaptchaIdentity(response: string) {
+    try {
+      const { data } = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+        params: {
+          secret: config.reCaptcha,
+          response,
+        },
+      });
+      return data.success && new URL(config.ORIGIN).hostname === data.hostname;
+    } catch (error) {
+      throw new ServicesError();
+    }
+  }
 }
 
 export default ApiServiceFile;

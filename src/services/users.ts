@@ -2,7 +2,7 @@ import { role } from '@/interfaces/models';
 import { setKeyToken } from '@/utils/keyToken';
 import PatchLimit from '@/utils/patchingLimit';
 import { ExpiredSessionError, InvalidCredentialsError, InvalidSessionError, ServicesError } from '@exceptions';
-import type { AuthRegister, TokenUser } from '@interfaces/auth';
+import type { AuthRegister } from '@interfaces/auth';
 import { UserModel, UserShape } from '@models/users';
 import { genSalt, hash } from 'bcrypt';
 import type { Knex } from 'knex';
@@ -130,17 +130,13 @@ class UsersServiceFile {
   }
 
   public async login(userData: UserModel, password: string): Promise<UserShape> {
-    try {
-      if (await userData.checkPassword(password)) {
-        if (userData.passwordReset) {
-          await UserModel.query().findById(userData.id).patch({ passwordReset: false });
-        }
-        return userData;
+    if (await userData.checkPassword(password)) {
+      if (userData.passwordReset) {
+        await UserModel.query().findById(userData.id).patch({ passwordReset: false });
       }
-      throw new InvalidCredentialsError();
-    } catch (error) {
-      throw new ServicesError();
+      return userData;
     }
+    throw new InvalidCredentialsError('Les identifiants fournis sont incorrects');
   }
 
   public async resetPassword(password: string, accessToken: string, id: number | string): Promise<number> {
@@ -166,15 +162,11 @@ class UsersServiceFile {
     }
   }
 
-  public async checkRefreshToken(userData: TokenUser): Promise<void> {
-    try {
-      const user = await UserModel.query().findById(userData.sessionId).select('refreshToken');
+  public async checkRefreshToken(userId: number, refreshToken: string): Promise<void> {
+    const user = await UserModel.query().findById(userId).select('refreshToken');
 
-      if (user && user.refreshToken === userData.refreshToken) return;
-      throw new ExpiredSessionError();
-    } catch (error) {
-      throw new ServicesError();
-    }
+    if (user && user.refreshToken === refreshToken) return;
+    throw new ExpiredSessionError();
   }
 
   public async getAll({
@@ -217,14 +209,19 @@ class UsersServiceFile {
 
   public async ValidateUserAccount(token: string): Promise<void> {
     try {
-      const updatedCount = await UserModel.query()
-        .where('accessToken', token)
-        .where('validate', false)
-        .patch({ validate: true, accessToken: null, updatedAt: new Date().toISOString() });
-
-      if (updatedCount) return;
-      throw new InvalidSessionError();
+      const user = await UserModel.query().where({ accessToken: token, validate: false }).first();
+      if (!user) {
+        throw new InvalidSessionError('Une erreur est survenue lors de la validation de votre compte. Veuillez réessayer plus tard.');
+      }
+      await UserModel.query().patchAndFetchById(user.id, {
+        validate: true,
+        accessToken: null,
+        updatedAt: new Date().toISOString(),
+      });
     } catch (error) {
+      if (error instanceof InvalidSessionError) {
+        throw error;
+      }
       throw new ServicesError();
     }
   }

@@ -36,9 +36,9 @@ export async function seed(knex: Knex): Promise<void> {
   await knex.schema.createTable('scores', table => {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
-    table.integer('year');
-    table.integer('month');
-    table.integer('day');
+    table.tinyint('year');
+    table.tinyint('month');
+    table.tinyint('day');
     table.integer('searches').notNullable().defaultTo(0);
     table.integer('profils').notNullable().defaultTo(0);
     table.integer('mails').notNullable().defaultTo(0);

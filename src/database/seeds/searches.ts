@@ -39,8 +39,8 @@ export async function seed(knex: Knex): Promise<void> {
     table.bigIncrements('id').unsigned().primary();
     table.integer('userId').notNullable().references('id').inTable('users');
     table.string('name').notNullable();
+    table.boolean('deleted').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
-    table.unique(['userId', 'name']);
   });
   await knex.schema.createTable('searches', table => {
     table.bigIncrements('id').unsigned().primary();
@@ -49,17 +49,17 @@ export async function seed(knex: Knex): Promise<void> {
     table.text('searchQueries').notNullable();
     table.string('name').notNullable();
     table.boolean('locked').notNullable().defaultTo(false);
+    table.boolean('deleted').notNullable().defaultTo(false);
     table.string('society').nullable();
     table.timestamps(true, true, true);
-    table.unique(['userId', 'name', 'searchFolderId']);
   });
   // Inserts seed entries
-  await knex('searchFolders').insert(generate(50, { userId: 1, name: () => faker.word.words(1) }));
+  await knex('searchFolders').insert(generate(10, { userId: 2, name: () => faker.word.words(1) }));
   await knex('searches').insert(
-    generate(75, {
-      userId: 1,
+    generate(5, {
+      userId: 2,
       searchQueries: '{"platform":["LinkedIn"],"fn":"développeur","sector":"informatique","skill":"javascript","time":true}',
-      searchFolderId: [() => Math.floor(Math.random() * (50 - 1 + 1)) + 1],
+      searchFolderId: [() => Math.floor(Math.random() * (10 - 1 + 1)) + 1],
       name: () => faker.word.words(1),
       society: () => faker.word.words(1),
     }),

@@ -394,7 +394,7 @@ const StripeWebhook = ({ app }) => {
           });
           const token = await createToken(userUpdate);
           StoredSocket.socketIo.ioSendTo({ userId: userUpdate.id.toString() }, 'payment_success', {
-            value: { cookie: refreshCookie(userUpdate), token },
+            value: { cookie: refreshCookie(userUpdate), token, plan: role.toLocaleLowerCase() },
             text: `Vous avez souscris au plan d'abonnement ${role.toLocaleUpperCase()}`,
             date: new Date().toLocaleDateString('fr-FR').toString(),
           });

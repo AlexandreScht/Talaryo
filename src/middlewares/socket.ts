@@ -8,28 +8,32 @@ import { Socket } from 'socket.io';
 
 const socketIoMiddleware = async (
   { socket, secret_key, list }: { socket: Socket; secret_key: string; list: userList[] },
-  next: (result: { err?: ServerException; user?: TokenUser; session_server?: string }) => void,
+  next: (result: { err?: ServerException; result?: { user: TokenUser; session_double?: userList } }) => void,
 ) => {
-  const { cookie, origin } = socket.handshake.headers;
-  const cookieAuth = parse(cookie)[config.COOKIE_NAME];
-
-  if (secret_key && Array.isArray(list) && cookieAuth && origin === config.ORIGIN) {
-    const [error, user] = decryptUserToken(cookieAuth);
-    if (error) {
-      return next({ err: new ServerException(500, 'Cookie non valide.') });
-    }
-    if (list.length > 0 && list.some(u => u.userId === user.sessionId)) {
-      if (list.some(u => u.socketId === socket.id && u.secret_key === secret_key)) {
-        next({ user });
-      } else {
-        next({ err: new ServerException(500, 'Request non valide') });
-      }
-    } else {
-      next({ user });
-    }
-  } else {
-    next({ err: new ServerException(500, 'Props non valide') });
+  if (!secret_key) {
+    next({ err: new ServerException(500, 'Secret_key is required') });
+    return;
   }
+  const { cookie: allCookie, origin } = socket.handshake.headers;
+  const cookieAuth = parse(allCookie)[config.COOKIE_NAME];
+
+  if (!cookieAuth || origin !== config.ORIGIN) {
+    next({ err: new ServerException(500, 'Io props incorrect') });
+    return;
+  }
+
+  const [error, user] = decryptUserToken(cookieAuth);
+
+  if (error) {
+    console.log(error);
+    next({ err: new ServerException(500, 'Cookie incorrect') });
+    return;
+  }
+
+  const withoutDoubleUser = list.filter(u => u.userId !== user.sessionId || u.refreshToken !== user.refreshToken);
+  const isDoubleLogin = withoutDoubleUser.find(u => u.userId === user.sessionId);
+
+  next({ result: { user, session_double: isDoubleLogin } });
 };
 
 export default socketIoMiddleware;

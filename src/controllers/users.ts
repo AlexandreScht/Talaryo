@@ -70,7 +70,7 @@ const UsersController = ({ app }) => {
         try {
           await UserServices.ValidateUserAccount(accessToken);
 
-          res.status(201).send({ message: 'Votre compte a été validé avec succès' });
+          res.status(201).send({ res: 'Votre compte a été validé avec succès' });
         } catch (error) {
           next(error);
         }

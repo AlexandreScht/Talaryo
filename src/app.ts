@@ -89,7 +89,10 @@ export class App {
 
   private defaultError() {
     this.app.use((req: Request, res: Response) => {
-      res.status(404).send({ error: `Cannot find or << ${req.method} >> is incorrect method at ${req.url}` });
+      res
+        .status(404)
+        .setHeader('Content-Type', 'application/json; charset=utf-8')
+        .send({ error: `Cannot find or << ${req.method} >> is incorrect method at ${req.url}` });
     });
   }
 }

@@ -152,9 +152,21 @@ const FavorisController = ({ app }) => {
     '/get-lastFavoris',
     mw([
       auth(),
-      async ({ session: { sessionId }, res, next }) => {
+      validator({
+        query: {
+          limit: limitValidator.default(3),
+        },
+      }),
+      async ({
+        locals: {
+          query: { limit },
+        },
+        session: { sessionId },
+        res,
+        next,
+      }) => {
         try {
-          const favoris = await FavorisServices.getLatests(sessionId);
+          const favoris = await FavorisServices.getLatests(limit, sessionId);
 
           res.send({ res: favoris });
         } catch (error) {

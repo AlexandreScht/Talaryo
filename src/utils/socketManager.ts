@@ -23,33 +23,24 @@ class SocketManager {
     const EventServices = Container.get(EventServiceFile);
     this.eventMap = await EventServices.getMissingEvent();
     this.io.on('connection', (socket: Socket) => {
-      socket.on('newIo', ({ secret_key }) => {
+      socket.on('ioLogged', ({ secret_key }) => {
         try {
-          socketIoMiddleware({ socket, secret_key, list: this.userList }, ({ err, user }) => {
-            if (user) {
-              const sessionDouble = this.userList.find(u => u.userId === user.sessionId);
-              if (sessionDouble && sessionDouble.refreshToken !== user.refreshToken) {
-                this.ioSendTo({ socketId: sessionDouble.socketId }, 'session_double', undefined);
-                return;
-              }
-              this.userList.push({ refreshToken: user.refreshToken, socketId: socket.id, userId: user.sessionId, secret_key });
-              this.sendUserListEvent(user.sessionId);
+          socketIoMiddleware({ socket, secret_key, list: this.userList }, async ({ err, result }) => {
+            if (err) {
+              logger.error('Erreur lors de la connexion socket-Io :', err);
               return;
             }
-            if (err) {
-              logger.error('Erreur de connexion socket-Io :', err.message);
+            const { user, session_double } = result;
+            if (session_double) {
+              this.ioSendTo({ socketId: session_double.socketId }, 'session_double', undefined);
             }
-            logger.error("Erreur de connexion socket-Io : l'user est introuvable");
-            socket.disconnect();
-            return;
+            this.userList.push({ refreshToken: user.refreshToken, socketId: socket.id, userId: user.sessionId, secret_key });
+            // this.sendUserListEvent(user.sessionId);
           });
-        } catch (error) {
-          logger.error('Erreur lors de la connexion socket-Io :', error);
-          socket.disconnect();
-        }
+        } catch (error) {}
       });
 
-      socket.on('disconnect', () => {
+      socket.on('disconnect', async () => {
         this.userList = this.userList.filter(o => o.socketId !== socket.id);
       });
     });

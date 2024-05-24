@@ -48,9 +48,9 @@ class FavorisServiceFile {
     }
   }
 
-  public async getLatests(userId: number): Promise<FavoriModel[]> {
+  public async getLatests(limit: number, userId: number): Promise<FavoriModel[]> {
     try {
-      return await FavoriModel.query().where({ userId, deleted: false, locked: false }).orderBy('id', 'desc').limit(3);
+      return await FavoriModel.query().where({ userId, deleted: false, locked: false }).orderBy('id', 'desc').limit(limit);
     } catch (error) {
       throw new ServicesError();
     }

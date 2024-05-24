@@ -1,14 +1,16 @@
-import { totalSearch } from '@/config/access';
+import { totalFavorisSave, totalMailFind, totalSearch } from '@/config/access';
 import { InvalidArgumentError } from '@/exceptions';
 import { numberValidator, timestampValidator } from '@/libs/validate';
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
+import FavorisServiceFile from '@/services/favoris';
 import ScoreServiceFile from '@/services/scores';
 import mw from '@middlewares/mw';
 import { Container } from 'typedi';
 
 const ScoreController = ({ app }) => {
   const ScoreServices = Container.get(ScoreServiceFile);
+  const FavorisServices = Container.get(FavorisServiceFile);
   app.patch(
     '/profils-consulted/:profils',
     mw([
@@ -113,6 +115,41 @@ const ScoreController = ({ app }) => {
         } catch (error) {
           console.log(error);
 
+          next(error);
+        }
+      },
+    ]),
+  );
+  app.get(
+    '/get-total-scores',
+    mw([
+      auth(),
+      async ({ session: { sessionId, sessionRole }, res, next }) => {
+        try {
+          const scoreSearches = await ScoreServices.getTotalMonthSearches(sessionId);
+          const scoreMails = await ScoreServices.getTotalMonthMail(sessionId);
+          const scoreFavoris = await FavorisServices.getTotalFavoris(sessionId);
+
+          if (sessionRole === 'admin') {
+            return res.send({
+              res: {
+                searches: { score: scoreSearches, total: Infinity },
+                favoris: { score: scoreFavoris, total: Infinity },
+                mails: { score: scoreMails, total: Infinity },
+                sessionRole,
+              },
+            });
+          }
+
+          return res.send({
+            res: {
+              searches: { score: scoreSearches, total: totalSearch[sessionRole] },
+              favoris: { score: scoreFavoris, total: totalMailFind[sessionRole] },
+              mails: { score: scoreMails, total: totalFavorisSave[sessionRole] },
+              sessionRole,
+            },
+          });
+        } catch (error) {
           next(error);
         }
       },
