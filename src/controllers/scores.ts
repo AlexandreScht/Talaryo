@@ -1,16 +1,18 @@
-import { totalFavorisSave, totalMailFind, totalSearch } from '@/config/access';
+import { totalFavorisSave, totalMailFind, totalSearch, totalSearchSave } from '@/config/access';
 import { InvalidArgumentError } from '@/exceptions';
 import { numberValidator, timestampValidator } from '@/libs/validate';
 import auth from '@/middlewares/auth';
 import validator from '@/middlewares/validator';
 import FavorisServiceFile from '@/services/favoris';
 import ScoreServiceFile from '@/services/scores';
+import SearchesServiceFile from '@/services/searches';
 import mw from '@middlewares/mw';
 import { Container } from 'typedi';
 
 const ScoreController = ({ app }) => {
   const ScoreServices = Container.get(ScoreServiceFile);
   const FavorisServices = Container.get(FavorisServiceFile);
+  const SearchesServices = Container.get(SearchesServiceFile);
   app.patch(
     '/profils-consulted/:profils',
     mw([
@@ -126,16 +128,19 @@ const ScoreController = ({ app }) => {
       auth(),
       async ({ session: { sessionId, sessionRole }, res, next }) => {
         try {
-          const scoreSearches = await ScoreServices.getTotalMonthSearches(sessionId);
+          const scoreResearches = await ScoreServices.getTotalMonthSearches(sessionId);
           const scoreMails = await ScoreServices.getTotalMonthMail(sessionId);
           const scoreFavoris = await FavorisServices.getTotalFavoris(sessionId);
-
+          const scoreSearches = await SearchesServices.getTotalSearches(sessionId);
+          console.log(scoreSearches);
+          
           if (sessionRole === 'admin') {
             return res.send({
               res: {
-                searches: { score: scoreSearches, total: Infinity },
-                favoris: { score: scoreFavoris, total: Infinity },
-                mails: { score: scoreMails, total: Infinity },
+                searches: { score: scoreSearches ?? 0, total: Infinity },
+                reSearch: { score: scoreResearches ?? 0, total: Infinity },
+                favoris: { score: scoreFavoris ?? 0, total: Infinity },
+                mails: { score: scoreMails ?? 0, total: Infinity },
                 sessionRole,
               },
             });
@@ -143,9 +148,10 @@ const ScoreController = ({ app }) => {
 
           return res.send({
             res: {
-              searches: { score: scoreSearches, total: totalSearch[sessionRole] },
-              favoris: { score: scoreFavoris, total: totalMailFind[sessionRole] },
-              mails: { score: scoreMails, total: totalFavorisSave[sessionRole] },
+              searches: { score: scoreSearches ?? 0, total: totalSearchSave[sessionRole] },
+              reSearch: { score: scoreResearches ?? 0, total: totalSearch[sessionRole] },
+              favoris: { score: scoreFavoris ?? 0, total: totalMailFind[sessionRole] },
+              mails: { score: scoreMails ?? 0, total: totalFavorisSave[sessionRole] },
               sessionRole,
             },
           });

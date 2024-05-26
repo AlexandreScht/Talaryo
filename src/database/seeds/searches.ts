@@ -54,10 +54,10 @@ export async function seed(knex: Knex): Promise<void> {
     table.timestamps(true, true, true);
   });
   // Inserts seed entries
-  await knex('searchFolders').insert(generate(10, { userId: 2, name: () => faker.word.words(1) }));
+  await knex('searchFolders').insert(generate(10, { userId: 1, name: () => faker.word.words(1) }));
   await knex('searches').insert(
     generate(5, {
-      userId: 2,
+      userId: 1,
       searchQueries: '{"platform":["LinkedIn"],"fn":"développeur","sector":"informatique","skill":"javascript","time":true}',
       searchFolderId: [() => Math.floor(Math.random() * (10 - 1 + 1)) + 1],
       name: () => faker.word.words(1),

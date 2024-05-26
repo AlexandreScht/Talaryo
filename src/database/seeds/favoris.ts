@@ -72,13 +72,13 @@ export async function seed(knex: Knex): Promise<void> {
   });
 
   // Inserts seed entries
-  await knex('favFolders').insert(generate(5, { userId: 2, name: () => faker.word.words(1) }));
+  await knex('favFolders').insert(generate(5, { userId: 1, name: () => faker.word.words(1) }));
   await knex('favoris').insert(
     generate(11, {
-      userId: 2,
+      userId: 1,
       link: () => faker.internet.url({ protocol: 'http', appendSlash: true }),
       img: [() => girls[Math.floor(Math.random() * girls.length)]],
-      favFolderId: [() => Math.floor(Math.random() * (5 - 1 + 1)) + 1],
+      favFolderId: 1,
       fullName: [() => faker.person.fullName()],
       currentJob: [() => faker.person.jobTitle()],
       currentCompany: [() => faker.company.name()],
