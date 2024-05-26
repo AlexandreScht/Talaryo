@@ -133,7 +133,7 @@ const ScoreController = ({ app }) => {
           const scoreFavoris = await FavorisServices.getTotalFavoris(sessionId);
           const scoreSearches = await SearchesServices.getTotalSearches(sessionId);
           console.log(scoreSearches);
-          
+
           if (sessionRole === 'admin') {
             return res.send({
               res: {
