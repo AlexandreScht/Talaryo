@@ -1,33 +1,27 @@
-import { cheerioResult, puppeteerProps, scrappingResult } from '@/interfaces/scrapping';
-import config from '@config';
-import { InvalidArgumentError, ServerException } from '@exceptions';
 import { logger } from '@utils/logger';
-import { load } from 'cheerio';
 import type { Page } from 'puppeteer';
 import { executablePath } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-const { proxy } = config;
+import { InvalidArgumentError, ServerException } from '../exceptions';
+import { cheerioResult, puppeteerProps, scrappingResult } from '../interfaces/scrapping';
 
 export class ApiPuppeteer {
-  private proxyServer: string = proxy.SERVER;
-  private proxyUsername: string = proxy.USERNAME;
-  private proxyPassword: string = proxy.PASSWORD;
   private browser: Cluster | null = null;
+  private values: puppeteerProps[] = [];
 
-  protected check(data: puppeteerProps[]) {
-    data.map(v => {
+  private check() {
+    this.values.map(v => {
+      if (!v.id || typeof v.id !== 'number') {
+        throw new InvalidArgumentError('id is a required property and must be a number.');
+      }
       if (!v.url || typeof v.url !== 'string') {
         throw new InvalidArgumentError('url is a required property and must be a string.');
       }
 
-      if (!v.props || typeof v.props !== 'function') {
+      if (!v.cheerio || typeof v.cheerio !== 'function') {
         throw new InvalidArgumentError('Option "props" needs to be an array.');
-      }
-
-      if (v.current && typeof v.current !== 'boolean') {
-        throw new InvalidArgumentError('Option "currentCompany" needs to be a boolean.');
       }
     });
 
@@ -36,29 +30,17 @@ export class ApiPuppeteer {
     ---------------`);
   }
 
-  private getNumber(values: string): number | undefined {
-    const $ = load(values);
-    const nResults = $('#result-stats').text();
-
-    const match = nResults.match(/(\d+(?:[.,]\d{3})*(?:\s+\d{3})*)\s*résultats/);
-
-    if (match) {
-      return Number.parseInt(match[1].replace(/\s/g, ''), 10);
-    }
-    return undefined;
-  }
-
   private async init(): Promise<void> {
+    this.check();
     try {
       puppeteer.use(StealthPlugin());
       this.browser = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_PAGE,
         maxConcurrency: 10,
         puppeteerOptions: {
-          headless: 'new',
+          headless: true,
           executablePath: executablePath(),
           args: [
-            `--proxy-server=${this.proxyServer}`,
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
@@ -111,16 +93,10 @@ export class ApiPuppeteer {
     }
   }
 
-  private async scrapper({
-    page,
-    data: { props, url, searchValues },
-  }: {
-    page: Page;
-    data: puppeteerProps;
-  }): Promise<[boolean, [cheerioResult, number | undefined]?]> {
+  private async scrapper({ page, data: { url, cheerio } }: { page: Page; data: puppeteerProps }): Promise<[boolean, cheerioResult[]?]> {
     return new Promise(async resolve => {
       try {
-        const session = await page.target().createCDPSession();
+        const session = await page.createCDPSession();
         await page.setBypassCSP(true);
         await session.send('Page.enable');
         await session.send('Page.setWebLifecycleState', {
@@ -142,44 +118,40 @@ export class ApiPuppeteer {
           }
         });
 
-        await page.authenticate({
-          username: this.proxyUsername,
-          password: this.proxyPassword,
-        });
-
         page.on('response', async response => {
           if (response.status() === 302) {
             resolve([true]);
           }
 
-          if (response.url().startsWith('https://www.google.com/search') && response.status() === 200) {
+          if (response.status() === 200) {
             const responseBody = await response.text();
             if (!responseBody) {
               await page.close();
               resolve([true]);
             }
-            const res: cheerioResult = props(responseBody, searchValues);
+            const res: cheerioResult[] = cheerio(responseBody);
             await page.close();
             if (res instanceof Promise) {
-              const result = await res;
-              resolve([false, [result, this.getNumber(responseBody)]]);
+              const result: cheerioResult[] = await res;
+              resolve([false, result]);
             }
-            resolve([false, [res, this.getNumber(responseBody)]]);
+            resolve([false, res]);
           }
         });
 
-        await page.goto(url);
+        await page.goto(url, { waitUntil: 'networkidle2' });
       } catch (err) {
         // Kill Puppeteer
         await this.close();
-        resolve([err]);
+        resolve([true]);
       }
     });
   }
 
   protected async open(values: puppeteerProps[]): Promise<[boolean, scrappingResult[]?]> {
     try {
-      if (!this.browser) {
+      if (!this.browser || !this.values) {
+        this.values = values;
         await this.init();
       }
 
@@ -187,11 +159,10 @@ export class ApiPuppeteer {
         logger.info(`scrapping: ${data.url}`);
         const [error, res] = await this.scrapper({ page, data });
         if (error) {
-          data.retryCount++;
           logger.error(`Error on scrapping: ${data.url}`);
-          result.push({ data: undefined, current: true });
+          result.push(undefined);
         } else {
-          result.push({ data: res[0], number: res[1], current: data.current });
+          result.push({ id: data.id, result: res });
         }
       });
 
@@ -201,7 +172,7 @@ export class ApiPuppeteer {
         this.browser.queue(option);
       });
       await this.close();
-      return [false, result];
+      return [false, result.filter(v => v)];
     } catch (error) {
       logger.error(`Error on open: ${error}`);
       await this.close();

@@ -1,7 +1,7 @@
-import { Routes } from '@/interfaces/routes';
 import config from '@config';
-import { dbConnection } from '@database';
-import { ErrorMiddleware } from '@middlewares/error';
+import { Routes } from '@interfaces/routes';
+// import { dbConnection } from '@database';
+// import { ErrorMiddleware } from '@middlewares/error';
 import { logger, stream } from '@utils/logger';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -13,28 +13,23 @@ import hpp from 'hpp';
 import http from 'http';
 import morgan from 'morgan';
 import 'reflect-metadata';
-import { Server } from 'socket.io';
-import initializeSocket from './utils/socketManager';
 const { log } = config;
 export class App {
   public app: express.Application;
   public env: string;
   public port: string | number;
   private server: http.Server;
-  private io: Server;
 
   constructor(routes: Routes) {
     this.app = express();
     this.env = config.NODE_ENV || 'development';
     this.port = config.PORT || 3005;
     this.server = http.createServer(this.app);
-    this.io = new Server(this.server);
 
-    this.connectToDatabase();
+    // this.connectToDatabase();
     this.initializeMiddlewares();
-    this.initializeSocket();
     this.initializeRoutes(routes);
-    this.initializeErrorHandling();
+    // this.initializeErrorHandling();
     this.defaultError();
   }
 
@@ -49,9 +44,9 @@ export class App {
     return this.app;
   }
 
-  private async connectToDatabase() {
-    await dbConnection();
-  }
+  // private async connectToDatabase() {
+  //   await dbConnection();
+  // }
 
   private initializeMiddlewares() {
     this.app.use(morgan(log.FORMAT, { stream }));
@@ -75,17 +70,13 @@ export class App {
     });
   }
 
-  private initializeSocket() {
-    initializeSocket(this.io);
-  }
-
   private initializeRoutes(routes: Routes) {
     this.app.use('/api', routes.router);
   }
 
-  private initializeErrorHandling() {
-    this.app.use(ErrorMiddleware);
-  }
+  // private initializeErrorHandling() {
+  //   this.app.use(ErrorMiddleware);
+  // }
 
   private defaultError() {
     this.app.use((req: Request, res: Response) => {
