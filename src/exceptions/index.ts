@@ -2,7 +2,7 @@ export class ServerException extends Error {
   public status: number;
   public message: string;
 
-  constructor(status: number = 500, message: string | string[] = "Une erreur s'est produite") {
+  constructor(status: number = 500, message: string | string[] = "Une erreur s'est produite, veuillez réessayer plus tard") {
     super(Array.isArray(message) ? message.join(' | ') : message);
     this.status = status;
     this.message = Array.isArray(message) ? message.join(' | ') : message;
@@ -18,6 +18,12 @@ export class NotFoundError extends ServerException {
 export class InvalidArgumentError extends ServerException {
   constructor(message: string[] | string = 'Arguments invalides') {
     super(422, message);
+  }
+}
+
+export class PuppeteerError extends ServerException {
+  constructor(message: string[] | string = 'Puppeteer error') {
+    super(500, message);
   }
 }
 

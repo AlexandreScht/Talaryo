@@ -1,14 +1,14 @@
 const graduationLevels = ['Doctorat', 'master1', 'master', 'licence', 'bachelor', 'bac', 'CAP/BEP'];
 
-const IndeedSearch = {
-  jobName: 'développeur web',
-  homeWork: undefined,
-  salary: { type: 'month', value: 1200 },
-  contract: 'apprentissage',
-  nightWork: false,
-  graduation: ['licence'],
-  loc: 'ile de france',
-};
+// const IndeedSearch = {
+//   jobName: 'développeur web',
+//   homeWork: undefined,
+//   salary: { type: 'month', value: 1200 },
+//   contract: 'apprentissage',
+//   nightWork: false,
+//   graduation: ['licence'],
+//   loc: 'ile de france',
+// };
 
 const normalizeString = str =>
   str
@@ -28,7 +28,10 @@ const alternanceJobSearchRegex = (jobSearch, offerTitle) => {
   return wordsToCheck.some(word => offerTitle.startsWith(normalizeString(word)));
 };
 
-function calculateMatchPercentage({ jobName, homeWork, salary, contract, graduation }, { jobTitle, jobPlace, jobMoney, jobContract, jobGraduation }) {
+export default function calculateMatchPercentage(
+  { jobName, homeWork, salary, contract, graduation },
+  { jobTitle, jobPlace, jobMoney, jobContract, jobGraduation },
+) {
   let score = 0,
     total = 0;
 
@@ -68,7 +71,7 @@ function calculateMatchPercentage({ jobName, homeWork, salary, contract, graduat
 
   if (salary && jobMoney) {
     total += 20;
-    const monthlySalary = salary.type === 'year' ? jobMoney / 12 : jobMoney;
+    const monthlySalary = salary.mensural ? jobMoney / 12 : jobMoney;
     score += monthlySalary >= salary.value ? 20 : 0;
   } else if (salary) total += 10;
 
@@ -83,49 +86,27 @@ function calculateMatchPercentage({ jobName, homeWork, salary, contract, graduat
       separatedWords.length === 2 && jobSearchRegex(`${secondWord} ${firstWord}`).test(jobTitleNormalized),
       jobTitleNormalized.startsWith(`${firstWord} `) ||
         ((contract === 'apprentissage' || contract === 'pro') && alternanceJobSearchRegex(firstWord, jobTitleNormalized)),
-      jobTitleNormalized.split(' ').includes(firstWord),
     ];
 
-    const scores = [80, 75, 60, 50];
+    const scores = [80, 75, 60];
+    let conditionMet = false;
 
     for (let i = 0; i < conditions.length; i++) {
       if (conditions[i]) {
         score += scores[i];
+        conditionMet = true;
         break;
       }
+    }
+
+    if (!conditionMet) {
+      separatedWords.forEach((jobWord, idx, { length }) => {
+        if (jobSearchRegex(jobWord).test(jobTitleNormalized)) {
+          score += Math.round(80 - (idx * 5) / length);
+          console.log(Math.round((80 - idx * 10) / length));
+        }
+      });
     }
   }
   return Math.round((score < 0 ? 0 : score / total) * 100);
 }
-
-// Exemple d'utilisation
-const jobOffers = [
-  {
-    jobTitle: 'Développeur Web PHP-MySql F/H bachelor',
-    jobMoney: 25000,
-    jobContract: 'CDD',
-  },
-  {
-    jobTitle: 'Développeur web Front-End Back-End H/F',
-    jobPlace: 'fullRemote',
-    jobContract: 'CDI',
-  },
-  {
-    jobTitle: 'Développeur web informatique H/F master',
-    jobPlace: 'occasionally',
-    jobMoney: 40000,
-    jobGraduation: ['master'],
-    jobContract: 'apprentissage',
-  },
-  {
-    jobTitle: 'Analyste CDI - domaine flux bancaires (H/F) licence',
-    jobPlace: 'fullRemote',
-    jobMoney: 40000,
-    jobContract: 'CDI',
-  },
-];
-
-jobOffers.forEach(jobOffer => {
-  const matchPercentage = calculateMatchPercentage(IndeedSearch, jobOffer);
-  console.log(`Offre: "${jobOffer.jobTitle}" => : ${matchPercentage}%`);
-});

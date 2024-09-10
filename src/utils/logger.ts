@@ -1,6 +1,7 @@
 import config from '@config';
 import chalk from 'chalk'; // Importez chalk pour la coloration de la console
 import { existsSync, mkdirSync } from 'fs';
+import moment from 'moment-timezone';
 import { join } from 'path';
 import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
@@ -16,6 +17,13 @@ if (!existsSync(logDir)) {
 // Define log format
 const logFormat = winston.format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`);
 
+// Custom filter for log levels
+const filterOnly = level => {
+  return winston.format(info => {
+    return info.level === level ? info : false;
+  })();
+};
+
 /*
  * Log Level
  * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
@@ -23,7 +31,7 @@ const logFormat = winston.format.printf(({ timestamp, level, message }) => `${ti
 const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss',
+      format: () => moment().tz('Europe/Paris').format('YYYY-MM-DD HH:mm:ss'), // Change 'Europe/Paris' to your timezone
     }),
     logFormat,
   ),
@@ -41,11 +49,12 @@ const logger = winston.createLogger({
     new winstonDaily({
       level: 'warn',
       datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/warn', // dir log file -> /logs/debug/*.log
+      dirname: logDir + '/warn', // dir log file -> /logs/warn/*.log
       filename: `%DATE%.log`,
       maxFiles: 90, // 90 Days saved
       json: false,
       zippedArchive: true,
+      format: winston.format.combine(filterOnly('warn')),
     }),
     // error log setting
     new winstonDaily({
@@ -57,6 +66,7 @@ const logger = winston.createLogger({
       handleExceptions: true,
       json: false,
       zippedArchive: true,
+      format: winston.format.combine(filterOnly('error')),
     }),
     // Console parts
     new winston.transports.Console({

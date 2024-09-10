@@ -8,8 +8,8 @@ interface IndeedProps {
 }
 
 @Service()
-export default class ScrapperServiceFile {
-  public Indeed(content: string): cheerioResult[] {
+export default class IndeedServiceFile {
+  public IndeedMainPage(content: string): cheerioResult[] {
     const $ = load(content);
     const data: any[] = [];
     $('li.css-5lfssm.eu4oa1w0').each((_, li) => {
@@ -48,10 +48,10 @@ export default class ScrapperServiceFile {
 
       if (link && jobName) {
         data.push({
-          link,
+          link: `https://fr.indeed.com/${link}`,
           jobName,
-          company: job_loc.find('span.css-92r8pb.eu4oa1w0')?.text()?.trim() ?? undefined,
-          domicile: desc.length === 2 ? desc[0].trim() : undefined,
+          company: job_loc.find('span[data-testid="company-name"]')?.text()?.trim(),
+          workPlace: desc.length === 2 ? desc[0].trim() : undefined,
           loc: desc.length === 2 ? desc[1].trim() : desc[0] || undefined,
           ...props,
         });
