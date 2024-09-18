@@ -9,23 +9,6 @@ interface validators {
   token?: ZodString | ZodNumber | ZodOptional<ZodString> | ZodOptional<ZodNumber>;
 }
 
-// type localsCTX =
-//   | {
-//       body: Record<string, unknown>;
-//       params: Record<string, unknown>;
-//       query: Record<string, unknown>;
-//       cookie: Record<string, unknown>;
-//     }
-//   | Record<string, any>;
-
-// interface ctx {
-//   req: Request;
-//   res: Response;
-//   locals: localsCTX;
-//   session: Partial<TokenUser> | null;
-//   next: (err?: unknown) => Promise<void>;
-// }
-
 type LocalsCTX =
   | {
       body: Record<string, unknown>;

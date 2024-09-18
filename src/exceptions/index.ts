@@ -2,7 +2,7 @@ export class ServerException extends Error {
   public status: number;
   public message: string;
 
-  constructor(status: number = 500, message: string | string[] = "Une erreur s'est produite, veuillez réessayer plus tard") {
+  constructor(status: number = 500, message: string | string[] = "Une erreur s'est produite") {
     super(Array.isArray(message) ? message.join(' | ') : message);
     this.status = status;
     this.message = Array.isArray(message) ? message.join(' | ') : message;

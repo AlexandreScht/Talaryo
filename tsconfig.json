@@ -23,7 +23,7 @@
       "@/*": ["*"],
       "@config": ["config"],
       "@controllers/*": ["controllers/*"],
-      "@database": ["database"],
+      "@database": ["database/*"],
       "@libs/*": ["libs/*"],
       "@exceptions": ["exceptions"],
       "@interfaces/*": ["interfaces/*"],

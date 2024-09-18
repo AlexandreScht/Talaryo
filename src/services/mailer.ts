@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import config from '@config';
 import { MailerError } from '@exceptions';
 import fs from 'fs';
@@ -30,7 +31,7 @@ class MailerServiceFile {
 
       await sendMail(mailOptions);
     } catch (error) {
-      console.log(error);
+      logger.error(error);
 
       throw new MailerError();
     }
@@ -51,6 +52,7 @@ class MailerServiceFile {
 
       await this.sendMailAsync(mailOptions);
     } catch (error) {
+      logger.error(error);
       throw new MailerError();
     }
   }
@@ -70,6 +72,7 @@ class MailerServiceFile {
 
       await this.sendMailAsync(mailOptions);
     } catch (error) {
+      logger.error(error);
       throw new MailerError();
     }
   }

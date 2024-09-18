@@ -1,16 +1,18 @@
 import config from './src/config';
-const { db } = config;
+const {
+  db: { pg },
+} = config;
 
 const knexfile = {
   client: 'pg',
   connection: {
     charset: 'utf8',
     timezone: 'UTC',
-    host: db.DB_HOST,
-    port: db.DB_PORT,
-    user: db.DB_USER,
-    password: db.DB_PASSWORD,
-    database: db.DB_DATABASE,
+    host: pg.DB_HOST,
+    port: pg.DB_PORT,
+    user: pg.DB_USER,
+    password: pg.DB_PASSWORD,
+    database: pg.DB_DATABASE,
   },
   migrations: {
     directory: 'src/database/migrations',

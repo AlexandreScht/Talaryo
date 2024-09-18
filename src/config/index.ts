@@ -7,11 +7,20 @@ const config = {
   BASEURL: 'http://localhost:3005/api',
   CAPTCHA_KEY: process.env.RECAPTCHA_SECRET_KEY,
   db: {
-    DB_USER: process.env.DB_USER,
-    DB_PASSWORD: process.env.DB_PASSWORD,
-    DB_HOST: process.env.DB_HOST,
-    DB_PORT: process.env.DB_PORT,
-    DB_DATABASE: process.env.DB_DATABASE,
+    mongo: {
+      DB_USER: process.env.MONGO_DB_USER,
+      DB_PASSWORD: process.env.MONGO_DB_PASSWORD,
+      DB_HOST: process.env.MONGO_DB_HOST,
+      DB_PORT: process.env.MONGO_DB_PORT,
+      DB_DATABASE: process.env.MONGO_DB_DATABASE,
+    },
+    pg: {
+      DB_USER: process.env.PG_DB_USER,
+      DB_PASSWORD: process.env.PG_DB_PASSWORD,
+      DB_HOST: process.env.PG_DB_HOST,
+      DB_PORT: process.env.PG_DB_PORT,
+      DB_DATABASE: process.env.PG_DB_DATABASE,
+    },
   },
   redis: {
     PORT: process.env.REDIS_PORT,
@@ -37,6 +46,10 @@ const config = {
       PASSWORD_PEPPER: process.env.PASSWORD_PEPPER,
     },
     TWO_FA: process.env.TWO_FACTOR_AUTHENTICATOR,
+  },
+  apiKey: {
+    EMAILKEY: process.env.EMAIL_KEY,
+    BREVOKEY: process.env.BREVOKEY,
   },
   mailer: {
     DIR: process.env.MAILER_DIR,

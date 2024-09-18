@@ -1,112 +1,189 @@
-import { InvalidArgumentError, InvalidSessionError, ServicesError } from '@/exceptions';
-import { returnUpdateCode } from '@/interfaces/service';
-import { FindUserProps, UserDocument } from '@/interfaces/users';
-import { UserModel } from '@/models/users';
-import type { DeleteResult } from 'mongodb';
-import { FilterQuery } from 'mongoose';
+import { InvalidArgumentError, ServerException, ServicesError } from '@/exceptions';
+import { QueryCriteria, returnUpdateCode, UserServiceFileType } from '@/interfaces/service';
+import { UserModel, UserShape } from '@/models/pg/users';
+import { logger } from '@/utils/logger';
+import { Knex } from 'knex';
+import { Page, QueryBuilder } from 'objection';
 import randomatic from 'randomatic';
 import { Service } from 'typedi';
 import { v7 as uuid } from 'uuid';
-
 @Service()
-export class UserServiceFile {
-  public async getUser(userData: FindUserProps, fields?: (keyof Partial<UserDocument>)[]): Promise<UserDocument | null> {
+export default class UserServiceFile implements UserServiceFileType {
+  //? for transition
+  get getModel(): Knex<any, any[]> {
+    return UserModel.knex();
+  }
+  public async getUser(userData: FindUserProps, fields?: (keyof Partial<UserShape>)[]) {
     try {
-      let query = null;
-      const selectedFields = fields.length ? fields.join(' ') : '-password';
+      let query: QueryBuilder<UserModel, UserModel> | null = null;
+      const selectedFields = fields?.length ? fields : ['email', 'id', 'firstName', 'lastName', 'role', 'society', 'subscribe_status'];
+
       if ('email' in userData) {
         const { email, oAuthAccount } = userData;
-
-        query = UserModel.findOne({
-          email,
-          ...(oAuthAccount ? { $or: [{ password: { $exists: false } }, { password: null }] } : { password: { $exists: true, $ne: null } }),
-        }).select(selectedFields);
+        query = UserModel.query()
+          .where('email', email)
+          .modify(qb => {
+            if (oAuthAccount) {
+              qb.whereNull('password');
+            } else {
+              qb.whereNotNull('password');
+            }
+          })
+          .select(selectedFields)
+          .first();
       }
       if ('id' in userData) {
         const { id } = userData;
-        query = UserModel.findById(id).select(selectedFields);
+        query = UserModel.query().select(selectedFields).findById(id);
       }
       if (!query) {
         throw new InvalidArgumentError('Search criteria must be either email or id');
       }
-      return await query.exec();
+      return await query;
     } catch (error) {
-      throw new ServicesError(error);
+      logger.error(error);
+      throw new ServicesError();
     }
   }
 
   public async updateUsers(
-    criteria: FilterQuery<Omit<UserDocument, 'password'>>,
-    values: Partial<Omit<UserDocument, '_id' | 'email' | 'password'>>,
-  ): Promise<boolean> {
+    criteria: QueryCriteria<UserShape>,
+    values: Partial<Omit<UserShape, 'id' | 'email'>>,
+    returnValues?: (keyof Partial<UserModel>)[],
+  ) {
     try {
-      const { modifiedCount } = await UserModel.updateMany(criteria, { $set: values }).exec();
+      const query = UserModel.query()
+        .modify(qb => {
+          Object.entries(criteria).forEach(([key, value]) => {
+            if (typeof value === 'object' && value !== null) {
+              Object.entries(value).forEach(([operator, val]) => {
+                switch (operator) {
+                  case 'not':
+                    Array.isArray(val) ? qb.whereNotIn(key, val) : qb.whereNot({ [key]: val });
+                    break;
+                  case 'are':
+                    Array.isArray(val) ? qb.whereIn(key, val) : qb.andWhere({ [key]: val });
+                    break;
+                  default:
+                    throw new Error(`Unsupported operator: ${operator}`);
+                }
+              });
+            } else {
+              qb.andWhere(key as keyof UserShape, value as keyof UserModel);
+            }
+          });
+        })
+        .patch(values);
 
-      return modifiedCount > 0;
+      return returnValues.length ? await query.returning(returnValues as string[]).first() : await query.then(result => result > 0);
     } catch (error) {
-      throw new ServicesError(error);
+      logger.error(error);
+      throw new ServicesError();
     }
   }
 
-  public async findUsers(userData: FilterQuery<UserDocument>, fields?: (keyof Omit<Partial<UserDocument>, 'password'>)[]): Promise<UserDocument[]> {
+  public async findUsers({
+    criteria = {},
+    pagination = { page: 1, limit: 10 },
+    returning,
+  }: {
+    criteria?: QueryCriteria<UserShape>;
+    pagination?: { page: number; limit: number };
+    returning?: (keyof UserShape)[];
+  } = {}): Promise<Page<UserModel>> {
     try {
-      const selectedFields = fields && fields.length ? fields.join(' ') : '-password';
-      return await UserModel.find(userData).select(selectedFields).exec();
+      const selectedFields = returning?.length ? returning : ['email', 'id', 'firstName', 'lastName', 'role', 'society', 'subscribe_status'];
+      return await UserModel.query()
+        .modify(qb => {
+          if (Object.keys(criteria).length) {
+            Object.entries(criteria).forEach(([key, value]: [keyof UserShape, any]) => {
+              if (typeof value === 'object' && value !== null) {
+                Object.entries(value).forEach(([operator, val]) => {
+                  switch (operator) {
+                    case 'not':
+                      Array.isArray(val) ? qb.whereNotIn(key, val) : qb.whereNot({ [key]: val });
+                      break;
+                    case 'are':
+                      Array.isArray(val) ? qb.whereIn(key, val) : qb.andWhere({ [key]: val });
+                      break;
+                    default:
+                      throw new Error(`Unsupported operator: ${operator}`);
+                  }
+                });
+              } else if (value) {
+                qb.andWhere(key as keyof UserShape, value as keyof UserModel);
+              }
+            });
+          }
+        })
+        .select(selectedFields)
+        .page(pagination.page - 1, pagination.limit);
     } catch (error) {
-      throw new ServicesError(error);
+      logger.error(error);
+      throw new ServicesError();
     }
   }
 
-  public async deleteUser(userData: FindUserProps): Promise<DeleteResult> {
+  public async deleteUser(userData: FindUserProps): Promise<boolean> {
     try {
       if ('email' in userData) {
         const { email, oAuthAccount } = userData;
-        return await UserModel.deleteOne({
-          email,
-          password: oAuthAccount ? null : { $ne: null },
-        });
+        return await UserModel.query()
+          .where('email', email)
+          .modify(qb => {
+            if (oAuthAccount) {
+              qb.whereNull('password');
+            } else {
+              qb.whereNotNull('password');
+            }
+          })
+          .del()
+          .then(result => result > 0);
       }
       if ('id' in userData) {
         const { id } = userData;
-        return await UserModel.findByIdAndDelete(id);
+        return UserModel.query()
+          .deleteById(id)
+          .then(result => result > 0);
       }
 
       throw new InvalidArgumentError('Search criteria must be either email or id');
     } catch (error) {
-      throw new ServicesError(error);
+      logger.error(error);
+      throw new ServicesError();
     }
   }
 
-  public async generateTokenAccess(id: string): Promise<returnUpdateCode> {
+  public async generateTokenAccess(id: number): Promise<returnUpdateCode> {
     try {
-      const updatedUser: returnUpdateCode = await UserModel.findByIdAndUpdate(
-        id,
-        {
-          accessToken: uuid(),
-        },
-        { new: true },
-      ).select('accessToken');
-      if (updatedUser) return updatedUser;
-      throw new InvalidSessionError('Unable to update the refreshToken');
+      const updatedUser = await UserModel.query().patchAndFetchById(id, { accessToken: uuid() }).select('accessToken');
+
+      if (updatedUser) {
+        return updatedUser as returnUpdateCode;
+      }
+
+      throw new ServerException();
     } catch (error) {
-      throw new ServicesError(error);
+      logger.error(error);
+      throw new ServicesError();
     }
   }
 
-  public async generateCodeAccess(id: string, digit = 4, secure = false): Promise<returnUpdateCode> {
+  public async generateCodeAccess(id: number, digit = 4, secure = false): Promise<returnUpdateCode> {
     try {
-      const updatedUser: returnUpdateCode = await UserModel.findByIdAndUpdate(
-        id,
-        {
-          ...(!secure ? { accessToken: uuid() } : {}),
+      const updatedUser = await UserModel.query()
+        .patchAndFetchById(id, {
+          ...(secure ? {} : { accessToken: uuid() }),
           accessCode: Number.parseInt(randomatic('0', digit), 10),
-        },
-        { new: true },
-      ).select('accessCode accessToken email firstName');
-      if (updatedUser) return updatedUser;
-      throw new InvalidSessionError('Unable to update the refreshToken');
+        })
+        .select('accessCode', 'accessToken', 'email', 'firstName');
+
+      if (updatedUser) return updatedUser as returnUpdateCode;
+
+      throw new ServerException();
     } catch (error) {
-      throw new ServicesError(error);
+      logger.error(error);
+      throw new ServicesError();
     }
   }
 }

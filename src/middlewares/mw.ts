@@ -21,6 +21,7 @@ const mw =
     if (!middlewaresHandler || middlewaresHandler.length === 0) {
       return nextExpress();
     }
+
     const locals = {};
     const onErrors = [];
     const session: Partial<TokenUser> = {};

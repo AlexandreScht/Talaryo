@@ -3,10 +3,10 @@ import { ctx, validators } from '@/interfaces/middleware';
 import type { Request } from 'express';
 import { z, ZodError, ZodObject } from 'zod';
 
-const Validator = ({ body, params: iniParams, query, token: tokenShame }: validators) => {
+const Validator = ({ body, params: iniParams, query: iniQuery, token: tokenShame }: validators) => {
   const validator = z.object({
     ...(body ? { body: body } : {}),
-    ...(query ? { query: query } : {}),
+    ...(iniQuery ? { query: iniQuery } : {}),
     ...(iniParams ? { params: iniParams } : {}),
   });
 
@@ -22,11 +22,38 @@ const Validator = ({ body, params: iniParams, query, token: tokenShame }: valida
   return async (ctx: ctx) => {
     const { req, next } = ctx;
     try {
+      // const convertedParams: Record<string, any> = { ...req.params };
+      // if (iniParams && iniParams instanceof ZodObject) {
+      //   for (const paramKey in req.params) {
+      //     if (iniParams.shape[paramKey]?._def?.typeName === 'ZodNumber') {
+      //       convertedParams[paramKey] = Number(req.params[paramKey]);
+      //     }
+      //   }
+      // }
       const convertedParams: Record<string, any> = { ...req.params };
       if (iniParams && iniParams instanceof ZodObject) {
         for (const paramKey in req.params) {
-          if (iniParams.shape[paramKey]?._def?.typeName === 'ZodNumber') {
-            convertedParams[paramKey] = Number(req.params[paramKey]);
+          const paramDef = iniParams.shape[paramKey]?._def;
+          if (paramDef) {
+            if (paramDef.typeName === 'ZodNumber') {
+              convertedParams[paramKey] = Number(req.params[paramKey]);
+            } else if (paramDef.typeName === 'ZodArray' && typeof req.params[paramKey] === 'string') {
+              convertedParams[paramKey] = req.params[paramKey].split(',');
+            }
+          }
+        }
+      }
+
+      const convertedQueries: Record<string, any> = { ...req.query };
+      if (iniQuery && iniQuery instanceof ZodObject) {
+        for (const queryKey in req.query) {
+          const queryDef = iniQuery.shape[queryKey]?._def;
+          if (queryDef) {
+            if (queryDef.typeName === 'ZodNumber') {
+              convertedQueries[queryKey] = Number(req.query[queryKey]);
+            } else if (queryDef.typeName === 'ZodArray' && typeof req.query[queryKey] === 'string') {
+              convertedQueries[queryKey] = req.query[queryKey].split(',');
+            }
           }
         }
       }
@@ -34,7 +61,7 @@ const Validator = ({ body, params: iniParams, query, token: tokenShame }: valida
       const { body, params, query } = validator.parse({
         body: req.body,
         params: convertedParams,
-        query: req.query,
+        query: convertedQueries,
       });
       const token = tokenShame ? tokenValidate(req) : undefined;
       ctx.locals = {

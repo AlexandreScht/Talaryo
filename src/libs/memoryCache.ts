@@ -132,7 +132,7 @@ export default class MemoryServerCache {
     }
   }
 
-  public async newUserAccessToken(id: string) {
+  public async newUserAccessToken(id: number) {
     const refreshToken = uuid();
     await this.setMemory({ key: `refreshToken.${id}` }, refreshToken);
     return refreshToken;

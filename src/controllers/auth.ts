@@ -1,17 +1,19 @@
 import config from '@/config';
+import { accessUsers } from '@/config/access';
 import { InvalidArgumentError, InvalidCredentialsError, InvalidSessionError, ServerException, ServicesError } from '@/exceptions';
-import { ctx } from '@/interfaces/middleware';
 import { registerCredentials, registerOauth } from '@/interfaces/service';
 import { codeToken, TokenUser, TwoFactorAuthenticateToken } from '@/interfaces/token';
 import MemoryServerCache from '@/libs/memoryCache';
+import ApiServiceFile from '@/services/api';
 import AuthServiceFile from '@/services/auth';
 import MailerServiceFile from '@/services/mailer';
-import { UserServiceFile } from '@/services/users';
-import { createSessionToken, verifyAuthenticator2FA } from '@/utils/token';
+import UserServiceFile from '@/services/users';
+import createSessionCookie from '@/utils/createCookie';
+import { verifyAuthenticator2FA } from '@/utils/token';
 import {
   AuthControllerActivate2FA,
   AuthControllerAskCode,
-  AuthControllerAuthenticate,
+  AuthControllerLogin,
   AuthControllerOAuth,
   AuthControllerRegister,
   AuthControllerValidAccount,
@@ -19,12 +21,12 @@ import {
   ControllerMethods,
   ExpressHandler,
 } from '@interfaces/controller';
-import type { Response } from 'express';
-import parse from 'parse-duration';
+import { transaction } from 'objection';
 import Container from 'typedi';
 
 export default class AuthControllerFile implements ControllerMethods<AuthControllerFile> {
   private AuthService: AuthServiceFile;
+  private APIService: ApiServiceFile;
   private UserService: UserServiceFile;
   private MailerService: MailerServiceFile;
   private MemoryServerCache: MemoryServerCache;
@@ -34,86 +36,71 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
     this.UserService = Container.get(UserServiceFile);
     this.MailerService = Container.get(MailerServiceFile);
     this.MemoryServerCache = Container.get(MemoryServerCache);
+    this.APIService = Container.get(ApiServiceFile);
   }
 
-  private createSessionCookie<T extends object>(
-    res: Response,
-    values: T & { cookieName: string },
-    timer: string = '15m',
-    eternalCookie?: boolean,
-  ): void {
-    const { cookieName, ...other } = values;
-    const sessionToken = createSessionToken<T>(other as T, timer);
-    res.cookie(cookieName, sessionToken, {
-      signed: true,
-      httpOnly: true,
-      sameSite: 'strict',
-      domain: new URL(config.ORIGIN).hostname,
-      secure: config.ORIGIN.startsWith('https'),
-      ...(eternalCookie ? {} : { maxAge: parse(timer) }),
-    });
-  }
-
-  protected register: ExpressHandler = async ({
+  protected register: ExpressHandler<AuthControllerRegister> = async ({
     locals: {
       body: { email, password, firstName, lastName },
     },
     res,
     next,
-  }: ctx<AuthControllerRegister>) => {
+  }) => {
     try {
-      const userData = await this.UserService.getUser({ email, oAuthAccount: false }, ['_id', 'validateAccount']);
+      if (new URL(config.ORIGIN).hostname === 'test.talaryo.com' && !accessUsers.includes(email)) {
+        throw new InvalidCredentialsError('Seul les comptes développeur peuvent ce connecter sur ce site');
+      }
+
+      const userData = await this.UserService.getUser({ email, oAuthAccount: false }, ['id', 'validate']);
 
       if (userData) {
-        const { _id: userId, validateAccount } = userData;
-        if (!validateAccount) {
+        const { id: userId, validate } = userData;
+        if (!validate) {
           const { accessCode, accessToken } = await this.UserService.generateCodeAccess(userId);
-          await this.MailerService.Registration(email, firstName, accessCode);
-          this.createSessionCookie<codeToken>(res, { id: userId, accessToken, cookieName: 'access_cookie' }, '15m', true);
+          await this.MailerService.Registration(email, firstName, accessCode as number);
+          createSessionCookie<codeToken>(res, { id: userId, accessToken, cookieName: 'access_cookie' }, '15m', true);
         } else {
           //? fake access token
-          this.createSessionCookie<codeToken>(res, { id: null, accessToken: null, cookieName: 'access_cookie' }, '15m', true);
+          createSessionCookie<codeToken>(res, { id: null, accessToken: null, cookieName: 'access_cookie' }, '15m', true);
         }
 
         res.status(201).send(true);
         return;
       }
 
-      const {
-        _id: id,
-        accessToken,
-        accessCode,
-        save,
-      } = await this.AuthService.register<registerCredentials>({ email, password, firstName, lastName });
+      await transaction(this.UserService.getModel, async trx => {
+        const { id, accessCode, accessToken } = await this.AuthService.register<registerCredentials>(
+          { email, password, firstName, lastName, ...(accessUsers.includes(email) ? { role: 'admin' } : {}) },
+          trx,
+        );
+        if (!id || !accessToken || !accessCode) {
+          throw new ServicesError('Une erreur est survenue lors de votre enregistrement');
+        }
 
-      if (!id || !accessToken || !accessCode) {
-        throw new ServicesError('Une erreur est survenue lors de votre enregistrement');
-      }
-      await this.MailerService.Registration(email, firstName, accessCode);
-      await save();
+        await this.APIService.CreateBrevoUser({ email, firstName, lastName, google: false });
+        await this.MailerService.Registration(email, firstName, accessCode);
+        createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
+      });
 
-      this.createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
       res.status(201).send(true);
     } catch (error) {
       next(error);
     }
   };
 
-  protected askCode: ExpressHandler = async ({
+  protected askCode: ExpressHandler<AuthControllerAskCode> = async ({
     locals: {
       cookie: { access_cookie },
     },
     session: { sessionId },
     res,
     next,
-  }: ctx<AuthControllerAskCode>) => {
+  }) => {
     try {
-      console.log(sessionId);
-
       if (sessionId) {
         //? part used for 2FA
         const { accessCode, email, firstName } = await this.UserService.generateCodeAccess(sessionId, 6, true);
-        await this.MailerService.TwoFactorAuthenticate(email, firstName, accessCode);
+        await this.MailerService.TwoFactorAuthenticate(email, firstName, accessCode as number);
         res.send(true);
         return;
       }
@@ -123,23 +110,23 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       }
       const { id } = access_cookie;
       const { accessCode, accessToken, email, firstName } = await this.UserService.generateCodeAccess(id);
-      await this.MailerService.Registration(email, firstName, accessCode);
+      await this.MailerService.Registration(email, firstName, accessCode as number);
 
-      this.createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
+      createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
       res.status(201).send("Un email contenant votre code d'activation de compte vous a été renvoyé");
     } catch (error) {
       next(error);
     }
   };
 
-  protected validateAccount: ExpressHandler = async ({
+  protected validateAccount: ExpressHandler<AuthControllerValidAccount> = async ({
     locals: {
       body: { access_cookie },
       params: { code },
     },
     res,
     next,
-  }: ctx<AuthControllerValidAccount>) => {
+  }) => {
     try {
       if (!access_cookie || access_cookie.expired) throw new InvalidArgumentError("Votre code d'accès a expiré, veuillez en demander un nouveau.");
 
@@ -149,11 +136,11 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       const { id, accessToken } = access_cookie;
       const user = await this.UserService.updateUsers(
         {
-          _id: id,
-          accessToken: { $ne: null, $eq: accessToken },
-          accessCode: { $ne: null, $eq: code },
+          id,
+          accessToken,
+          accessCode: code,
         },
-        { accessToken: null, accessCode: null, validateAccount: true },
+        { accessToken: null, accessCode: null, validate: true },
       );
       if (!user) {
         throw new InvalidArgumentError("Impossible de valider votre compte. Code d'accès incorrect");
@@ -171,28 +158,31 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
     }
   };
 
-  protected authenticate: ExpressHandler = async ({
+  protected login: ExpressHandler<AuthControllerLogin> = async ({
     locals: {
       body: { email, password },
     },
     res,
     next,
-  }: ctx<AuthControllerAuthenticate>) => {
+  }) => {
     try {
       const userData = await this.UserService.getUser({ email, oAuthAccount: false }, [
-        '_id',
-        'validateAccount',
+        'id',
+        'validate',
+        'password',
         'role',
         'twoFactorType',
         'firstName',
+        'checkPassword',
       ]);
+
       if (!userData) {
         throw new InvalidCredentialsError(`Email ou mot de passe invalide`);
       }
-      const { _id: userId, validateAccount, role, twoFactorType, firstName } = userData;
+      const { id: userId, validate, role, twoFactorType, firstName } = userData;
 
-      await this.AuthService.login({ id: userId, password });
-      if (!validateAccount) {
+      await this.AuthService.login(userData, password);
+      if (!validate) {
         throw new InvalidSessionError('Veuillez valider votre compte par e-mail');
       }
 
@@ -202,48 +192,59 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
           twoFactorType === 'email' ? await this.UserService.generateCodeAccess(userId, 6) : await this.UserService.generateTokenAccess(userId);
 
         if (accessCode) {
-          await this.MailerService.Registration(email, firstName, accessCode);
+          await this.MailerService.Registration(email, firstName, accessCode as number);
         }
 
-        this.createSessionCookie<TwoFactorAuthenticateToken>(
-          res,
-          { id: userId, accessToken, twoFA: twoFactorType, cookieName: 'TwoFA_cookie' },
-          '15m',
-        );
+        createSessionCookie<TwoFactorAuthenticateToken>(res, { id: userId, accessToken, twoFA: twoFactorType, cookieName: 'TwoFA_cookie' }, '15m');
         res.send({ role, TwoFA: twoFactorType });
         return;
       }
 
       const refreshToken = await this.MemoryServerCache.newUserAccessToken(userId);
 
-      this.createSessionCookie<TokenUser>(res, { refreshToken, sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
+      createSessionCookie<TokenUser>(res, { refreshToken, sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
       res.send({ role });
     } catch (error) {
       next(error);
     }
   };
 
-  protected oAuthConnect: ExpressHandler = async ({
+  protected oAuthConnect: ExpressHandler<AuthControllerOAuth> = async ({
     locals: {
       query: { email, firstName, lastName },
     },
     res,
     next,
-  }: ctx<AuthControllerOAuth>) => {
+  }) => {
     try {
-      const userFound = await this.UserService.getUser({ email, oAuthAccount: true }, ['_id', 'role']);
-      const { _id: userId, role } = userFound ? userFound : await this.AuthService.register<registerOauth>({ email, firstName, lastName });
+      const userFound = await this.UserService.getUser({ email, oAuthAccount: true }, ['id', 'role']);
+
+      const { id: userId, role } = userFound
+        ? userFound
+        : await transaction(this.UserService.getModel, async trx => {
+            const user = await this.AuthService.register<registerOauth>(
+              { email, firstName, lastName, ...(accessUsers.includes(email) ? { role: 'admin' } : {}) },
+              trx,
+            );
+            if (!user) {
+              throw new ServicesError('Une erreur est survenue lors de votre connexion');
+            }
+
+            await this.APIService.CreateBrevoUser({ email, firstName, lastName, google: false });
+
+            return user;
+          });
 
       const refreshToken = await this.MemoryServerCache.newUserAccessToken(userId);
 
-      this.createSessionCookie<TokenUser>(res, { refreshToken, sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
+      createSessionCookie<TokenUser>(res, { refreshToken, sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
       res.send({ role });
     } catch (error) {
       next(error);
     }
   };
 
-  protected activate2FA: ExpressHandler = async ({
+  protected activate2FA: ExpressHandler<AuthControllerActivate2FA> = async ({
     locals: {
       body: { twoFactorType, otp },
       token,
@@ -251,12 +252,12 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
     session: { sessionId },
     res,
     next,
-  }: ctx<AuthControllerActivate2FA>) => {
+  }) => {
     try {
       if (twoFactorType === 'email') {
         const user = await this.UserService.updateUsers(
           {
-            _id: sessionId,
+            id: sessionId,
             accessCode: otp,
           },
           { twoFactorType: 'email' },
@@ -271,7 +272,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
 
       await this.UserService.updateUsers(
         {
-          _id: sessionId,
+          id: sessionId,
         },
         { twoFactorType: 'authenticator', accessCode: token },
       );
@@ -281,7 +282,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
     }
   };
 
-  protected verify2FA: ExpressHandler = async ({
+  protected verify2FA: ExpressHandler<AuthControllerVerify2FA> = async ({
     locals: {
       params: { otp },
       cookie: {
@@ -290,17 +291,19 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
     },
     res,
     next,
-  }: ctx<AuthControllerVerify2FA>) => {
+  }) => {
     try {
-      const [userFind] = await this.UserService.findUsers(
-        {
-          _id: id,
-          password: { $ne: null },
+      const {
+        results: [userFind],
+      } = await this.UserService.findUsers({
+        criteria: {
+          id: id,
+          password: { not: null },
           accessToken,
-          ...(twoFA === 'email' ? { accessCode: { $ne: null, $eq: otp } } : { accessCode: { $ne: null } }),
+          ...(twoFA === 'email' ? { accessCode: otp } : { accessCode: { not: null } }),
         },
-        ['accessCode', 'email', 'role'],
-      );
+        returning: ['accessCode', 'email', 'role'],
+      });
 
       if (!userFind) throw new InvalidCredentialsError('Échec de la vérification à deux facteurs. Le code que vous avez saisi est incorrect.');
 
@@ -313,7 +316,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
 
       await this.UserService.updateUsers(
         {
-          _id: id,
+          id,
         },
         { ...(twoFA === 'email' ? { accessCode: null } : {}), accessToken: null },
       );
@@ -326,7 +329,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       });
       const refreshToken = await this.MemoryServerCache.newUserAccessToken(id);
 
-      this.createSessionCookie<TokenUser>(res, { refreshToken, sessionId: id, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
+      createSessionCookie<TokenUser>(res, { refreshToken, sessionId: id, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
       res.send({ email, role });
     } catch (error) {
       next(error);

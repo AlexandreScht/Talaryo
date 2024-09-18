@@ -1,8 +1,7 @@
 import type { JwtPayload } from 'jsonwebtoken';
-import type { role, twoFactorType } from './users';
 
 interface TokenUser {
-  sessionId: string;
+  sessionId: number;
   sessionRole: role;
   refreshToken: string;
 }
@@ -15,12 +14,12 @@ export interface TokenData {
 }
 
 interface codeToken {
-  id: string;
+  id: number;
   accessToken: string;
 }
 
 interface TwoFactorAuthenticateToken {
-  id: string;
+  id: number;
   accessToken: string;
   twoFA: twoFactorType;
 }

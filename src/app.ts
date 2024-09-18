@@ -1,5 +1,6 @@
+import { MongodbConnection } from '@/database/mongo';
+import { PGdbConnection } from '@/database/pg';
 import config from '@config';
-import { dbConnection } from '@database';
 import RedisInitializer from '@libs/redis';
 import initializeSocket from '@libs/socketManager';
 import { ErrorMiddleware } from '@middlewares/error';
@@ -60,7 +61,8 @@ export default class App extends ApiRouter {
   }
 
   private async connectToDatabase() {
-    await dbConnection();
+    await PGdbConnection();
+    await MongodbConnection();
   }
 
   private initializeMiddlewares() {

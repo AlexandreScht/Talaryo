@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Bienvenue sur JobFiller.com</title>
+    <title>Bienvenue sur Talaryo.com</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
@@ -30,7 +30,7 @@
         margin-top: 20px;
       }
       .link {
-        background: #18e029;
+        background: #185be0;
         color: white !important;
         font-weight: 600;
         text-align: center;
@@ -42,7 +42,7 @@
         font-weight: bold;
       }
       .support {
-        color: #02c473 !important;
+        color: #0242c4 !important;
         background-color: transparent !important;
         font-weight: 600;
         text-decoration: underline;
@@ -52,23 +52,25 @@
   <body>
     <div class="container">
       <div class="content">
-        <p>Bienvenue sur JobFiller, {{user}},</p>
+        <p>Bienvenue sur Talaryo, {{user}},</p>
         <p>Nous vous remercions d'avoir créé votre compte. Vous pouvez dès maintenant commencer vos premières recherches de candidats !</p>
-        <p>Pour commencer, veuillez activer votre compte en <b>Renseignant le code ci dessous</b></p>
+        <p>Pour commencer, veuillez activer votre compte en <b>cliquant sur le lien ci-dessous :</b></p>
         <br />
         <table align="center" cellpadding="0" cellspacing="0" border="0">
           <tr>
-            <h1>{{code}}</h1>
+            <td align="center">
+              <a class="link" href="{{url}}"> Valider votre compte </a>
+            </td>
           </tr>
         </table>
         <br />
         <p>Si vous n'êtes pas à l'origine de cette demande, veuillez nous envoyer un e-mail à : <a class="support">{{support_MAIL}}</a></p>
         <br />
         <p>Cordialement,</p>
-        <p>L'équipe JobFiller</p>
+        <p>L'équipe Talaryo</p>
       </div>
       <div class="footer">
-        <p>JobFiller © 2023</p>
+        <p>Talaryo © 2023</p>
       </div>
     </div>
   </body>
