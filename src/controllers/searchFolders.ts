@@ -2,14 +2,14 @@ import SearchFolderServiceFile from '@/services/searchFolders';
 import { ControllerMethods, ControllerWithPagination, ControllerWithParams, ExpressHandler, FoldersControllerCreate } from '@interfaces/controller';
 import Container from 'typedi';
 
-export default class FavFoldersControllerFile implements ControllerMethods<FavFoldersControllerFile> {
+export default class SearchesFolderControllerFile implements ControllerMethods<SearchesFolderControllerFile> {
   private SearchFolderService: SearchFolderServiceFile;
 
   constructor() {
     this.SearchFolderService = Container.get(SearchFolderServiceFile);
   }
 
-  protected createFavFolder: ExpressHandler<FoldersControllerCreate> = async ({
+  protected createSearchFolder: ExpressHandler<FoldersControllerCreate> = async ({
     locals: {
       body: { name },
     },
@@ -25,7 +25,7 @@ export default class FavFoldersControllerFile implements ControllerMethods<FavFo
     }
   };
 
-  protected deleteFavFolder: ExpressHandler<ControllerWithParams<'id'>> = async ({
+  protected deleteSearchFolder: ExpressHandler<ControllerWithParams<'id'>> = async ({
     locals: {
       params: { id },
     },
@@ -40,7 +40,7 @@ export default class FavFoldersControllerFile implements ControllerMethods<FavFo
     }
   };
 
-  protected getFavFolders: ExpressHandler<ControllerWithPagination<'name'>> = async ({
+  protected getSearchFolders: ExpressHandler<ControllerWithPagination<'name'>> = async ({
     locals: {
       params: { name },
       query: { page, limit },

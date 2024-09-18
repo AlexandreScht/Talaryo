@@ -69,9 +69,9 @@ export const updateUserSchema = z.object({
   ]),
 });
 
-//> favFoldersSchema
+//> FoldersSchema
 
-export const getFavFoldersSchema = {
+export const getFoldersSchema = {
   params: z.object({
     name: stringValidator,
   }),
@@ -97,6 +97,18 @@ export const getLeastFavorisSchema = z.object({
   isCv: z.boolean().optional().default(false),
   limit: numberValidator.min(3).optional().default(3),
 });
+
+//> searchesSchema
+
+export const getSearchesSchema = {
+  params: z.object({
+    searchFolderName: stringValidator,
+  }),
+  query: z.object({
+    limit: numberValidator.min(10).optional().default(10),
+    page: numberValidator.min(1).optional().default(1),
+  }),
+};
 
 //> scores
 
