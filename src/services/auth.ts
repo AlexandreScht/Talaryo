@@ -16,14 +16,14 @@ export default class AuthServiceFile {
         const salt = await genSalt(10);
         const hashedPassword = await hash(userData.password, salt);
         return (await UserModel.query(trx)
-          .insert({ ...userData, password: hashedPassword, accessToken: uuid(), accessCode: Number.parseInt(randomatic('0', 6), 10) })
+          .insert({ ...userData, password: hashedPassword, accessToken: uuid(), accessCode: randomatic('0', 6) })
           .returning(['accessToken', 'accessCode', 'id'])) as RegisterServiceReturnType<T>;
       }
       return (await UserModel.query(trx)
         .insert({ ...userData, validate: true })
         .returning(['email', 'role', 'id'])) as RegisterServiceReturnType<T>;
     } catch (error) {
-      logger.log(error);
+      logger.error('AuthServiceFile.register => ', error);
       throw new ServicesError('Une erreur est survenue lors de votre enregistrement');
     }
   }
@@ -32,6 +32,6 @@ export default class AuthServiceFile {
     if (await userData.checkPassword(password)) {
       return true;
     }
-    throw new InvalidCredentialsError('Email ou Mot de passe incorrect');
+    throw new InvalidCredentialsError('Email ou mot de passe incorrect !');
   }
 }

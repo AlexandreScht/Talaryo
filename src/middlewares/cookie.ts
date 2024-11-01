@@ -28,12 +28,12 @@ const cookieValues = ({
         if (name in cookiesToCheck) {
           try {
             const value = cookiesToCheck[name];
-            const [err, cookieValues] = decryptSessionToken<unknown>(value, acceptError);
+            const [err, cookieValues] = decryptSessionToken<object | undefined>(value, acceptError);
             if (err instanceof TokenExpiredError) {
               if (acceptError && cookieValues) {
-                return { ...acc, [name]: { cookieValues, expired: true } };
+                return { ...acc, [name]: { ...cookieValues, expired: true } };
               }
-              throw new InvalidArgumentError('Token Expirée');
+              throw new InvalidArgumentError('Accès expiré.');
             }
 
             if (err instanceof Error) {
@@ -50,7 +50,7 @@ const cookieValues = ({
       }, undefined);
 
       if (!foundedCookies) {
-        if (!acceptError) throw new NotFoundError('Le ou les cookies spécifiés sont introuvables');
+        if (!acceptError) throw new NotFoundError('Le ou les cookies nécessaires sont introuvables.');
         ctx.locals = { ...locals, cookie: {} };
       } else {
         ctx.locals = { ...locals, cookie: foundedCookies };
@@ -59,7 +59,6 @@ const cookieValues = ({
       await next();
     } catch (error) {
       if (error instanceof InvalidArgumentError) {
-        console.log(error.message);
         throw new InvalidArgumentError(error.message);
       }
       if (error instanceof NotFoundError) {

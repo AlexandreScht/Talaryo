@@ -1,8 +1,7 @@
-import { ServicesError } from '@/exceptions';
-import { cheerioInfos } from '@/interfaces/scrapping';
+import { InvalidArgumentError, ServicesError } from '@/exceptions';
 import { FavorisModel, type FavorisShape } from '@/models/pg/favoris';
 import { logger } from '@/utils/logger';
-import { ConstraintViolationError, Page } from 'objection';
+import { ConstraintViolationError, ForeignKeyViolationError, Page } from 'objection';
 import { Service } from 'typedi';
 
 @Service()
@@ -14,12 +13,15 @@ export default class FavorisServiceFile {
         .insert({ ...values, userId, email })
         .returning('id');
     } catch (error) {
+      if (error instanceof ForeignKeyViolationError) {
+        throw new InvalidArgumentError("Le dossier assigné au favori n'existe pas.");
+      }
       if (error instanceof ConstraintViolationError) {
         const { link, pdf, favFolderId } = values;
 
         const existingFav = link
-          ? await FavorisModel.query().where({ userId, link, favFolderId }).first()
-          : await FavorisModel.query().where({ userId, pdf, favFolderId }).first();
+          ? await FavorisModel.query().where({ userId, link, favFolderId, deleted: true }).first()
+          : await FavorisModel.query().where({ userId, pdf, favFolderId, deleted: true }).first();
 
         if (existingFav) {
           return await existingFav
@@ -34,31 +36,34 @@ export default class FavorisServiceFile {
         }
         return false;
       }
-      logger.error(error);
+
+      logger.error('FavorisService.create => ', error);
       throw new ServicesError();
     }
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: number, userId: number): Promise<boolean> {
     try {
       return await FavorisModel.query()
         .findById(id)
+        .where({ userId })
         .patch({ deleted: true })
         .then(v => !!v);
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisService.delete => ', error);
       throw new ServicesError();
     }
   }
 
-  public async update(values: Partial<Omit<FavorisShape, 'userId'>>, id: number): Promise<boolean> {
+  public async update(values: Partial<Omit<FavorisShape, 'userId'>>, id: number, userId: number): Promise<boolean> {
     try {
       return await FavorisModel.query()
         .findById(id)
+        .where({ userId })
         .patch({ ...values, email: typeof values.email === 'boolean' ? 'false' : values.email })
         .then(v => !!v);
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisService.update => ', error);
       throw new ServicesError();
     }
   }
@@ -70,7 +75,7 @@ export default class FavorisServiceFile {
         .patch({ deleted: true })
         .then(v => !!v);
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisService.deleteFavorisFromFolder => ', error);
       throw new ServicesError();
     }
   }
@@ -85,22 +90,22 @@ export default class FavorisServiceFile {
           return Number.parseInt(count, 10);
         });
     } catch (error) {
+      logger.error('FavorisService.getTotalCount => ', error);
       throw new ServicesError();
     }
   }
 
-  public async UserFavoris(id: number, objects: cheerioInfos[], pdf?: boolean): Promise<Map<string, number>> {
+  public async userCandidateFavoris(userId: number, cvFav: boolean = false): Promise<Map<string, number | undefined>> {
     try {
-      const links = [...new Set(objects.map(obj => obj.link))];
-      const favorites = await FavorisModel.query()
-        .where({ userId: id, deleted: false })
-        .modify(query => (pdf ? query.whereIn('pdf', links) : query.whereIn('link', links)))
-        .select('link', 'favFolderId');
-
-      return new Map(favorites.map(fav => [fav.link, fav.favFolderId]));
+      return await FavorisModel.query()
+        .where({ userId, deleted: false })
+        .modify(query =>
+          cvFav ? query.whereNot({ pdf: 'none' }).andWhereNot({ pdf: null }) : query.whereNot({ link: 'none' }).andWhereNot({ link: null }),
+        )
+        .select('link', 'favFolderId')
+        .then(v => (v?.length ? new Map(v.map(fav => [cvFav ? fav.pdf : fav.link, fav.favFolderId])) : undefined));
     } catch (error) {
-      logger.error(error);
-
+      logger.error('FavorisService.UserFavoris => ', error);
       throw new ServicesError();
     }
   }
@@ -109,6 +114,7 @@ export default class FavorisServiceFile {
     try {
       return await FavorisModel.query()
         .where({ favFolderId, locked: false, deleted: false })
+        .orderBy('id', 'desc')
         .page(page - 1, limit)
         .then(({ results, total }) => {
           const favoris = results.map(favorite => {
@@ -129,7 +135,7 @@ export default class FavorisServiceFile {
           return { results: favoris as FavorisModel[], total };
         });
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisService.getFavorisFromFolder => ', error);
       throw new ServicesError();
     }
   }
@@ -138,11 +144,15 @@ export default class FavorisServiceFile {
     try {
       return FavorisModel.query()
         .where({ userId, deleted: false, locked: false })
-        .modify(query => (typeof isCv === 'boolean' && isCv === true ? query.whereNot({ pdf: null }) : query.whereNot({ link: null })))
+        .modify(query =>
+          typeof isCv === 'boolean' && isCv === true
+            ? query.whereNot({ pdf: 'none' }).andWhereNot({ pdf: null })
+            : query.whereNot({ link: 'none' }).andWhereNot({ link: null }),
+        )
         .orderBy('id', 'desc')
         .page(page - 1, limit);
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisService.get => ', error);
       throw new ServicesError();
     }
   }
@@ -164,7 +174,7 @@ export default class FavorisServiceFile {
           qb.offset(n).patch({ locked: true });
         });
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisService.lockIn => ', error);
       throw new ServicesError();
     }
   }

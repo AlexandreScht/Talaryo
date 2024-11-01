@@ -25,7 +25,9 @@ export const MongodbConnection = async () => {
 
   try {
     await connect(dbConfig.url, dbConfig.options);
-    console.log(`       Connected to the database: ${DB_DATABASE}`);
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`       Connected to the database: ${DB_DATABASE}`);
+    }
   } catch (error) {
     logger.error('Failed to connect to the database', error);
   }

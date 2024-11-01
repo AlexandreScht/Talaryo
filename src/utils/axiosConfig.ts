@@ -12,9 +12,16 @@ export const brevoAPI = axios.create({
   },
 });
 
-export const dropcontactAPI = axios.create({
+export const dropContactAPI = axios.create({
   baseURL: 'https://api.dropcontact.io',
   headers: {
     'X-Access-Token': EMAILKEY,
+  },
+});
+
+export const signalHireAPI = axios.create({
+  baseURL: 'https://www.signalhire.com/api/v1',
+  headers: {
+    apikey: EMAILKEY,
   },
 });

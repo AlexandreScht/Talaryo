@@ -17,19 +17,21 @@ export default class SearchFolderServiceFile {
         }
         return false;
       }
-      logger.error(error);
+      logger.error('SearchFolderService.create => ', error);
       throw new ServicesError();
     }
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: number, userId: number): Promise<number> {
     try {
       return await SearchFolderModel.query()
-        .where({ id })
+        .where({ userId })
         .patch({ deleted: true })
-        .then(v => !!v);
+        .returning('id')
+        .findById(id)
+        .then(v => (v?.id ? Number.parseInt(String(v?.id)) : undefined));
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchFolderService.delete => ', error);
 
       throw new ServicesError();
     }
@@ -38,30 +40,30 @@ export default class SearchFolderServiceFile {
     try {
       return await SearchFolderModel.query().select('id').where({ name, userId, deleted: false }).first();
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchFolderService.search => ', error);
       throw new ServicesError();
     }
   }
 
   public async getContent(userId: number, { limit, page, name }: { limit: number; page: number; name?: string }): Promise<Page<SearchFolderModel>> {
     try {
-      let query = SearchFolderModel.query().where('searchFolders.userId', userId).andWhere('searchFolders.deleted', false);
+      let query = SearchFolderModel.query().alias('sf').where('sf.userId', userId).andWhere('sf.deleted', false);
 
       if (name) {
-        query = query.andWhereRaw('LOWER(unaccent("name")) LIKE LOWER(unaccent(?))', [`${name}%`]);
+        query = query.andWhereRaw('LOWER(sf.name) LIKE LOWER(?)', [`${name.toLowerCase()}%`]);
       }
 
       return await query
-        .select('searchFolders.id', 'searchFolders.name')
+        .select('sf.id', 'sf.name')
         .leftJoin('searches', function () {
-          this.on('searchFolders.id', '=', 'searches.favFolderId').onVal('searches.locked', false).andOnVal('searches.deleted', false);
+          this.on('sf.id', '=', 'searches.searchFolderId').onVal('searches.locked', false).andOnVal('searches.deleted', false);
         })
-        .groupBy('searchFolders.id')
-        .orderBy('searchFolders.id', 'asc')
+        .groupBy('sf.id')
+        .orderBy('sf.id', 'asc')
         .count('searches.id as itemsCount')
         .page(page - 1, limit);
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchFolderService.getContent => ', error);
       throw new ServicesError();
     }
   }

@@ -1,35 +1,4 @@
-export interface searchValues {
-  fn?: string[];
-  industry?: string[];
-  sector?: string[];
-  date?: number;
-  current?: boolean;
-  key?: string[];
-  skill?: string[];
-  Nindustry?: string[];
-  Nskill?: string[];
-  Nkey?: string[];
-  formation?: string[];
-  zone?: string[];
-  matching?: number;
-}
-interface AiResult {
-  fullName: string;
-  resume: string;
-  currentJob?: string;
-  matching: number;
-  pdf: string;
-  img: string;
-}
-
-export interface puppeteerProps {
-  current?: boolean;
-  url: string;
-  totalNumber?: number;
-  props?: (value: string) => cheerioResult | AiResult[];
-  type: 'cv' | 'reseaux';
-}
-export type sources =
+export type platforms =
   | 'LinkedIn'
   | 'Viadeo'
   | 'Xing'
@@ -47,7 +16,45 @@ export type sources =
   | 'Essec'
   | 'Neoma';
 
-export interface cheerioInfos {
+interface candidateScrapingForm {
+  platform: platforms;
+  fn?: string[];
+  industry?: string[];
+  sector?: string[];
+  time?: boolean;
+  key?: string[];
+  skill?: string[];
+  Nindustry?: string[];
+  Nskill?: string[];
+  Nkey?: string[];
+  zone?: boolean;
+  loc?: string[];
+}
+
+interface cvScrapingForm {
+  industry?: string[];
+  Nindustry?: string[];
+  Nskill?: string[];
+  Nkey?: string[];
+  skill?: string[];
+  formation?: string[];
+  sector?: string[];
+  key?: string[];
+  date?: Date;
+  time: boolean;
+  zone: boolean;
+  loc?: string[];
+  matching: Number;
+  fn?: string[];
+}
+
+export interface ScrappingSource {
+  url: string;
+  platform: platforms;
+  current: boolean;
+}
+
+interface candidateStrategiesResult {
   link: string;
   fullName: string;
   currentJob?: string;
@@ -55,32 +62,38 @@ export interface cheerioInfos {
   currentCompany?: string;
   resume: string;
   img: string;
-  favFolderId?: string;
-}
-export type cheerioResult = cheerioInfos[];
-
-export interface scrappingResult {
-  data: cheerioResult | string[];
-  number: number;
 }
 
-export interface ScrapeInfosResult {
-  scrape?: cheerioInfos[];
-  number?: number;
+interface cvStrategiesResult {
+  fullName: string;
+  resume: string;
+  currentJob?: string;
+  matching: number;
+  pdf: string;
+  img: string;
 }
 
-export interface ScrapeCVResult {
-  cv?: AiResult[];
-  total?: number;
-  number?: number;
-}
-
-export interface ScrappingSource {
+interface puppeteerCandidateProps {
   url: string;
-  site: sources;
-  current: boolean;
+  strategy: (html: string) => candidateStrategiesResult[];
+  type: 'reseaux';
+}
+interface puppeteerCVProps {
+  url: string;
+  strategy: (html: string) => string[];
+  type: 'cv';
 }
 
-export type SourceFunction = {
-  [key in sources]?: (html: string, searchValues: searchValues) => cheerioResult;
-};
+interface puppeteerResult {
+  data?: candidateStrategiesResult[] | string[];
+  total?: number;
+}
+
+interface puppeteerCandidateResult {
+  scrapeResult?: candidateStrategiesResult[];
+  total?: number;
+}
+interface puppeteerCVResult {
+  cvLinks?: string[];
+  total?: number;
+}

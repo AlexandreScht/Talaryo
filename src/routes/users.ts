@@ -17,7 +17,7 @@ export class UserRouter extends UserControllerFile {
   initializeRoutes() {
     this.router.patch('/update', mw([auth(), Validator({ body: updateSchema }), this.updateCurrentUser]));
     this.router.get('/getAll', mw([auth(), Validator({ query: getAllUsersSchema }), this.getAllUsers]));
-    this.router.patch('/update/:user', mw([auth(), Validator({ params: updateUserSchema, body: UserShapeSchema() }), this.getAllUsers]));
+    this.router.patch('/update/:user', mw([auth('admin'), Validator({ params: updateUserSchema, body: UserShapeSchema() }), this.updateUser]));
   }
 
   getRouter() {

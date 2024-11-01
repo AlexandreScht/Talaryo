@@ -1,5 +1,7 @@
 import type { UserShape } from '@/models/pg/users';
 import type { ctx, LocalsCTX } from './middleware';
+import { candidateScrapingForm, cvScrapingForm } from './scrapping';
+import { Feedback } from './stripe';
 import type { codeToken, cookiesValues, TwoFactorAuthenticateToken } from './token';
 
 type ExpressHandler<T extends LocalsCTX = LocalsCTX> = (ctx: ctx<T>) => Promise<void>;
@@ -22,6 +24,15 @@ interface ControllerWithPagination<T extends string> {
 interface ControllerWithBodyModel<T extends object, V extends keyof T | undefined = undefined> {
   body: V extends string ? Partial<Omit<T, V>> : Partial<T>;
 }
+
+//> common
+interface getLeastController {
+  query: {
+    limit: number;
+    isCv?: boolean;
+    page?: number;
+  };
+}
 //> Auth Controller
 
 interface AuthControllerRegister {
@@ -38,8 +49,8 @@ interface AuthControllerAskCode {
 }
 
 interface AuthControllerValidAccount {
-  body: { access_cookie: cookiesValues<codeToken> };
-  params: { code: number };
+  cookie: { access_cookie: cookiesValues<codeToken> };
+  body: { code: number };
 }
 
 interface AuthControllerLogin {
@@ -93,7 +104,7 @@ interface UsersControllerGetAll {
   };
 }
 interface UsersControllerUpdateUser {
-  params: FindUserProps;
+  params: { user: string | number };
   body: Partial<Omit<UserShape, 'id' | 'email'>>;
 }
 
@@ -105,20 +116,11 @@ interface FoldersControllerCreate {
   };
 }
 
-//> Favoris
-
-interface FavorisControllerLeastFavoris {
-  query: {
-    limit: number;
-    isCv?: boolean;
-  };
-}
-
 //> scores
 
 interface ScoreControllerImprove {
   body: {
-    column: scoreColumn;
+    column: Exclude<scoreColumn, 'searchAndCv'>[];
     count: number;
   };
 }
@@ -126,5 +128,59 @@ interface ScoreControllerGetByUser {
   query: {
     startDate: Date;
     endDate: Date;
+  };
+}
+
+//> scrapping
+
+interface ScrappingControllerCandidate {
+  query: candidateScrapingForm & {
+    start: number;
+    index: number;
+  };
+}
+
+interface ScrappingControllerCv {
+  query: cvScrapingForm & {
+    start: number;
+    index: number;
+  };
+}
+interface ScrappingControllerCvContent {
+  params: {
+    link: string;
+  };
+}
+
+interface ScrappingControllerGetPersonalDetails {
+  query: {
+    firstName: string;
+    lastName: string;
+    company: string;
+    link?: string;
+  };
+}
+
+//> subscribe
+interface SubscribeControllerCancel {
+  body: {
+    subId: string;
+    option?: {
+      feedback: Feedback;
+      comment: string;
+    };
+  };
+}
+
+interface SubscribeControllerUpdate {
+  body: {
+    price_id: string;
+    itemSub: string;
+    subId: string;
+  };
+}
+interface SubscribeControllerCreate {
+  body: {
+    price_id: string;
   };
 }

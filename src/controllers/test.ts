@@ -1,16 +1,27 @@
-import { ctx } from '@/interfaces/middleware';
-import { ControllerMethods, ExpressHandler } from '@interfaces/controller';
-
+import { ControllerMethods, ExpressHandler } from '@/interfaces/controller';
+import MemoryServerCache from '@libs/memoryCache';
+import RedisInstance from '@libs/redis';
+import SocketManager from '@libs/socketManager';
 export default class TestControllerFile implements ControllerMethods<TestControllerFile> {
-  protected testParamsValues: ExpressHandler = async ({
-    locals: {
-      query: { keys },
-    },
-    res,
-    next,
-  }: ctx) => {
+  private redisClient: typeof RedisInstance;
+  private MemoryServer: typeof MemoryServerCache;
+  private SocketIo: SocketManager;
+  constructor() {
+    this.redisClient = RedisInstance;
+    this.MemoryServer = MemoryServerCache;
+    this.SocketIo = SocketManager.getInstance();
+  }
+
+  protected test: ExpressHandler = async ({ res, req, next }) => {
     try {
-      res.status(201).send(keys);
+      const protocol = req.protocol;
+      const host = req.get('host');
+
+      const fullUrl = `${protocol}://${host}/api`;
+
+      console.log('URL complète :', fullUrl);
+
+      res.send(`L'URL complète est : ${fullUrl}`);
     } catch (error) {
       next(error);
     }

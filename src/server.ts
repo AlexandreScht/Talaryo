@@ -1,4 +1,7 @@
 import App from '@/app';
-const app = new App();
-
-app.listen();
+const start = async () => {
+  const app = new App();
+  await app.initialize();
+  app.listen();
+};
+start();

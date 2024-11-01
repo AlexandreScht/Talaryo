@@ -1,12 +1,17 @@
+import { ServerException } from '@/exceptions';
 import FavorisFolderServiceFile from '@/services/favFolders';
+import FavorisServiceFile from '@/services/favoris';
+import { logger } from '@/utils/logger';
 import { ControllerMethods, ControllerWithPagination, ControllerWithParams, ExpressHandler, FoldersControllerCreate } from '@interfaces/controller';
 import Container from 'typedi';
 
 export default class FavFoldersControllerFile implements ControllerMethods<FavFoldersControllerFile> {
   private FavorisFolderService: FavorisFolderServiceFile;
+  private FavorisService: FavorisServiceFile;
 
   constructor() {
     this.FavorisFolderService = Container.get(FavorisFolderServiceFile);
+    this.FavorisService = Container.get(FavorisServiceFile);
   }
 
   protected createFavFolder: ExpressHandler<FoldersControllerCreate> = async ({
@@ -19,8 +24,11 @@ export default class FavFoldersControllerFile implements ControllerMethods<FavFo
   }) => {
     try {
       const success = await this.FavorisFolderService.create(name, sessionId);
-      res.send(success);
+      res.status(201).send(success);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavFoldersControllerFile.createFavFolder => ', error);
+      }
       next(error);
     }
   };
@@ -29,13 +37,22 @@ export default class FavFoldersControllerFile implements ControllerMethods<FavFo
     locals: {
       params: { id },
     },
+    session: { sessionId },
     res,
     next,
   }) => {
     try {
-      const success = await this.FavorisFolderService.delete(id);
-      res.send(success);
+      const folderId = await this.FavorisFolderService.delete(id, sessionId);
+      if (id === folderId) {
+        const success = await this.FavorisService.deleteFavorisFromFolder(folderId);
+        res.status(success ? 204 : 201).send(success);
+        return;
+      }
+      res.status(201).send(false);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavFoldersControllerFile.deleteFavFolder => ', error);
+      }
       next(error);
     }
   };
@@ -53,6 +70,9 @@ export default class FavFoldersControllerFile implements ControllerMethods<FavFo
       const foldersMeta = await this.FavorisFolderService.getContent(sessionId, { name, page, limit });
       res.send(foldersMeta);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavFoldersControllerFile.getFavFolders => ', error);
+      }
       next(error);
     }
   };

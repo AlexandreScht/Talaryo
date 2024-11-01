@@ -1,6 +1,7 @@
+import { MongoDocument } from '@/interfaces/models';
 import { model, Schema } from 'mongoose';
 
-const EmailSchema: Schema<EmailsDocument> = new Schema({
+const MongoSchema: Schema<MongoDocument> = new Schema({
   email: {
     type: String,
     required: true,
@@ -24,4 +25,4 @@ const EmailSchema: Schema<EmailsDocument> = new Schema({
 });
 
 // Export the UserModel
-export const UserModel = model<EmailsDocument>('emails', EmailSchema);
+export const MongoModel = model<MongoDocument>('emails', MongoSchema);

@@ -1,4 +1,5 @@
 import { FavorisShape } from '@/models/pg/favoris';
+import { SearchesShape } from '@/models/pg/searches';
 import { UserShape } from '@/models/pg/users';
 import { z, ZodNullable, ZodObject, ZodOptional, ZodRawShape } from 'zod';
 
@@ -25,7 +26,7 @@ export const salarySchema = z.object({
 export const roleValidator = z.enum(['admin', 'business', 'pro', 'free']);
 
 export const stringValidator = z.string({ message: 'Le type attendu est un string' });
-export const numberValidator = z.number().int({ message: 'Le nombre doit être un entier.' });
+export const numberValidator = z.number().int({ message: 'Le type attendu est un nombre entier' });
 
 export const timestampValidator = z.string().refine(
   val => {
@@ -109,7 +110,6 @@ const createShapeSchema = <T extends ZodRawShape>(baseSchema: ZodObject<T>, requ
 
 export const UserShapeSchema = (props?: { required?: (keyof UserShape)[] }) => {
   const schema = z.object({
-    id: z.number().optional(),
     email: z.string().optional(),
     role: roleValidator.optional(),
     firstName: z.string().optional(),
@@ -133,8 +133,6 @@ export const UserShapeSchema = (props?: { required?: (keyof UserShape)[] }) => {
 
 export const FavorisShapeSchema = (props?: { required?: (keyof FavorisShape)[] }) => {
   const schema = z.object({
-    id: z.number().optional(),
-    userId: z.number().optional(),
     link: z.string().optional(),
     pdf: z.string().optional(),
     resume: z.string().optional(),
@@ -143,14 +141,25 @@ export const FavorisShapeSchema = (props?: { required?: (keyof FavorisShape)[] }
     currentJob: z.string().optional(),
     email: z.string().optional(),
     currentCompany: z.string().optional(),
-    disabled: z.boolean().optional(),
     favFolderId: z.number().optional(),
+    deleted: z.boolean().optional(),
+    locked: z.boolean().optional(),
     isFavoris: z.boolean().optional(),
-    createdAt: z.string().optional(),
-    updatedAt: z.string().optional(),
+  });
+  // eslint-disable-next-line prettier/prettier
+  return createShapeSchema<(typeof schema)['shape']>(schema, props?.required);
+};
+
+export const searchSchemaSchema = (props?: { required?: (keyof SearchesShape)[] }) => {
+  const schema = z.object({
+    id: z.number().optional(),
+    searchFolderId: z.number().optional(),
+    searchQueries: z.string().optional(),
+    name: z.string().optional(),
+    society: z.string().optional(),
     locked: z.boolean().optional(),
     deleted: z.boolean().optional(),
-    count: z.string().optional(),
+    isCv: z.boolean().optional(),
   });
   // eslint-disable-next-line prettier/prettier
   return createShapeSchema<(typeof schema)['shape']>(schema, props?.required);

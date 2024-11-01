@@ -1,5 +1,5 @@
 import FavorisControllerFile from '@/controllers/favoris';
-import { getFavorisSchema, getLeastFavorisSchema } from '@/libs/shemaValidate';
+import { getFolderFavSchema, getSchema } from '@/libs/shemaValidate';
 import auth from '@/middlewares/auth';
 import mw from '@/middlewares/mw';
 import Validator from '@/middlewares/validator';
@@ -15,11 +15,14 @@ export class FavorisRouter extends FavorisControllerFile {
   }
 
   initializeRoutes() {
-    this.router.post('/new', mw([auth(), Validator({ body: FavorisShapeSchema() }), this.createFavoris]));
+    this.router.post('/new', mw([auth(), Validator({ body: FavorisShapeSchema({ required: ['favFolderId', 'img'] }) }), this.createFavoris]));
     this.router.delete('/remove/:id', mw([auth(), Validator({ params: z.object({ id: numberValidator }) }), this.deleteFavoris]));
-    this.router.patch('/update', mw([auth(), Validator({ body: FavorisShapeSchema({ required: ['id'] }) }), this.updateFavoris]));
-    this.router.get('/get/:favFolderName', mw([auth(), Validator(getFavorisSchema), this.getFavorites]));
-    this.router.get('/get', mw([auth(), Validator({ query: getLeastFavorisSchema }), this.lastFavoris]));
+    this.router.patch(
+      '/update/:id',
+      mw([auth(), Validator({ params: z.object({ id: numberValidator }), body: FavorisShapeSchema() }), this.updateFavoris]),
+    );
+    this.router.get('/get/:favFolderName', mw([auth(), Validator(getFolderFavSchema), this.getFolderFavorites]));
+    this.router.get('/get', mw([auth(), Validator(getSchema), this.getFavorites]));
   }
 
   getRouter() {

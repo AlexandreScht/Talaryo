@@ -41,6 +41,8 @@ export default class UserServiceFile implements UserServiceFileType {
       }
       return await query;
     } catch (error) {
+      console.log(error);
+
       logger.error(error);
       throw new ServicesError();
     }
@@ -75,7 +77,7 @@ export default class UserServiceFile implements UserServiceFileType {
         })
         .patch(values);
 
-      return returnValues.length ? await query.returning(returnValues as string[]).first() : await query.then(result => result > 0);
+      return returnValues?.length ? await query.returning(returnValues as string[]).first() : await query.then(result => result > 0);
     } catch (error) {
       logger.error(error);
       throw new ServicesError();
@@ -174,7 +176,7 @@ export default class UserServiceFile implements UserServiceFileType {
       const updatedUser = await UserModel.query()
         .patchAndFetchById(id, {
           ...(secure ? {} : { accessToken: uuid() }),
-          accessCode: Number.parseInt(randomatic('0', digit), 10),
+          accessCode: randomatic('0', digit),
         })
         .select('accessCode', 'accessToken', 'email', 'firstName');
 
@@ -182,6 +184,8 @@ export default class UserServiceFile implements UserServiceFileType {
 
       throw new ServerException();
     } catch (error) {
+      console.log(error);
+
       logger.error(error);
       throw new ServicesError();
     }

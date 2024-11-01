@@ -51,7 +51,7 @@ export class InvalidAccessError extends ServerException {
   }
 }
 export class InvalidRoleAccessError extends ServerException {
-  constructor(message: string[] | string = 'Veuillez mettre à jour votre abonnement') {
+  constructor(message: string[] | string = "Veuillez souscrire à une formule d'abonnement supérieure") {
     super(605, message);
   }
 }

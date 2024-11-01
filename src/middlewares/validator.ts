@@ -22,23 +22,28 @@ const Validator = ({ body, params: iniParams, query: iniQuery, token: tokenShame
   return async (ctx: ctx) => {
     const { req, next } = ctx;
     try {
-      // const convertedParams: Record<string, any> = { ...req.params };
-      // if (iniParams && iniParams instanceof ZodObject) {
-      //   for (const paramKey in req.params) {
-      //     if (iniParams.shape[paramKey]?._def?.typeName === 'ZodNumber') {
-      //       convertedParams[paramKey] = Number(req.params[paramKey]);
-      //     }
-      //   }
-      // }
       const convertedParams: Record<string, any> = { ...req.params };
       if (iniParams && iniParams instanceof ZodObject) {
         for (const paramKey in req.params) {
-          const paramDef = iniParams.shape[paramKey]?._def;
+          let paramDef = iniParams.shape[paramKey]?._def;
           if (paramDef) {
+            let round = 0;
+            while ((paramDef?.typeName === 'ZodDefault' || paramDef?.typeName === 'ZodOptional') && round < 10) {
+              paramDef = paramDef.innerType._def;
+              round++;
+            }
             if (paramDef.typeName === 'ZodNumber') {
               convertedParams[paramKey] = Number(req.params[paramKey]);
             } else if (paramDef.typeName === 'ZodArray' && typeof req.params[paramKey] === 'string') {
-              convertedParams[paramKey] = req.params[paramKey].split(',');
+              try {
+                const arr = JSON.parse(req.params[paramKey]);
+                convertedParams[paramKey] = arr;
+              } catch (error) {
+                convertedParams[paramKey] = req.params[paramKey]?.split(',');
+              }
+            } else if (paramDef.typeName === 'ZodBoolean' && typeof req.params[paramKey] === 'string') {
+              const currentVal = req.params[paramKey];
+              convertedParams[paramKey] = currentVal === 'true' ? true : currentVal === 'false' ? false : currentVal;
             }
           }
         }
@@ -47,12 +52,25 @@ const Validator = ({ body, params: iniParams, query: iniQuery, token: tokenShame
       const convertedQueries: Record<string, any> = { ...req.query };
       if (iniQuery && iniQuery instanceof ZodObject) {
         for (const queryKey in req.query) {
-          const queryDef = iniQuery.shape[queryKey]?._def;
+          let queryDef = iniQuery.shape[queryKey]?._def;
           if (queryDef) {
+            let round = 0;
+            while ((queryDef?.typeName === 'ZodDefault' || queryDef?.typeName === 'ZodOptional') && round < 10) {
+              queryDef = queryDef.innerType._def;
+              round++;
+            }
             if (queryDef.typeName === 'ZodNumber') {
               convertedQueries[queryKey] = Number(req.query[queryKey]);
             } else if (queryDef.typeName === 'ZodArray' && typeof req.query[queryKey] === 'string') {
-              convertedQueries[queryKey] = req.query[queryKey].split(',');
+              try {
+                const arr = JSON.parse(req.query[queryKey]);
+                convertedQueries[queryKey] = arr;
+              } catch (error) {
+                convertedQueries[queryKey] = req.query[queryKey]?.split(',') || req.query[queryKey];
+              }
+            } else if (queryDef.typeName === 'ZodBoolean' && typeof req.query[queryKey] === 'string') {
+              const currentVal = req.query[queryKey];
+              convertedQueries[queryKey] = currentVal === 'true' ? true : currentVal === 'false' ? false : currentVal;
             }
           }
         }

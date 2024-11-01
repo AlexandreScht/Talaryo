@@ -11,7 +11,7 @@ export class ScoreModel extends Model implements scores {
   profils: number;
   cv: number;
   mails: number;
-  count?: number;
+  searchAndCv?: number;
 
   static tableName = 'scores';
   static idColumn = 'id';

@@ -8,7 +8,7 @@ try {
     process.exit(1);
   }
   cleanEnv(process.env, {
-    NODE_ENV: str({ choices: ['development', 'production'] }),
+    NODE_ENV: str({ choices: ['development', 'production', 'test'] }),
     PORT: port(),
     LOG_FORMAT: str({ choices: ['combined', 'dev'] }),
     LOG_DIR: str({ default: '../logs' }),
@@ -37,12 +37,11 @@ try {
     MAILER_PASSWORD: str(),
     MAILER_PORT: str(),
     MAILER_HOST: str(),
-
+    EXECUTABLE_PATH: str(),
     RECAPTCHA_SECRET_KEY: str(),
     EMAIL_KEY: str(),
     GPT_KEY: str(),
     IP: str(),
-    PASSWORD_PEPPER: str(),
     PROXY_SERVER: str(),
     PROXY_USERNAME: str(),
     PROXY_PASSWORD: str(),

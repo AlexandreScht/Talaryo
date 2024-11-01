@@ -2,11 +2,11 @@ import { ServicesError } from '@/exceptions';
 import { ScoreModel } from '@/models/pg/scores';
 import { logger } from '@/utils/logger';
 import { Service } from 'typedi';
-
 @Service()
 class ScoreServiceFile {
-  public currentDate: Date = new Date();
-
+  public get currentDate(): Date {
+    return new Date();
+  }
   private extractDate(date: Date) {
     return { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() };
   }
@@ -24,23 +24,27 @@ class ScoreServiceFile {
   }
 
   //; public methods
-  public async improveScore(column: scoreColumn, count: number, userId: number): Promise<ScoreModel> {
+  public async improveScore(columns: Exclude<scoreColumn, 'searchAndCv'>[], count: number, userId: number): Promise<ScoreModel> {
     try {
       const { year, month, day } = this.extractDate(this.currentDate);
-      return await ScoreModel.query()
-        .insert({
-          userId,
-          year,
-          month,
-          day,
-          [column]: count,
-        })
-        .onConflict(['userId', 'year', 'month', 'day'])
-        .merge({
-          [column]: ScoreModel.raw('?? + ?', [`scores.${column}`, count]),
-        });
-    } catch (err) {
-      logger.error(err);
+      const insertData: any = {
+        userId,
+        year,
+        month,
+        day,
+      };
+      columns.forEach(column => {
+        insertData[column] = count;
+      });
+
+      const mergeData: any = {};
+      columns.forEach(column => {
+        mergeData[column] = ScoreModel.raw('?? + ?', [`scores.${column}`, count]);
+      });
+
+      return await ScoreModel.query().insert(insertData).onConflict(['userId', 'year', 'month', 'day']).merge(mergeData);
+    } catch (error) {
+      logger.error('ScoreService.improveScore => ', error);
       throw new ServicesError();
     }
   }
@@ -66,13 +70,13 @@ class ScoreServiceFile {
           cv: ScoreModel.raw('?? - ?', ['scores.cv', 1]),
         })
         .where({ userId, year: recentRecord.year, month: recentRecord.month, day: recentRecord.day });
-    } catch (err) {
-      logger.error(err);
+    } catch (error) {
+      logger.error('ScoreService.decrementCv => ', error);
       throw new ServicesError();
     }
   }
 
-  public async getTotalMonthValues(userId: number, column: scoreColumn | 'searchAndCv'): Promise<number> {
+  public async getTotalMonthValues(userId: number, columns: scoreColumn[]): Promise<Partial<Record<scoreColumn, number>>> {
     try {
       const { startDate, endDate } = this.getDateRangeQuery();
       return await ScoreModel.query()
@@ -80,12 +84,23 @@ class ScoreServiceFile {
         .whereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') >= ?`, [startDate])
         .andWhereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') <= ?`, [endDate])
         .modify(qb => {
-          column === 'searchAndCv' ? qb.select(ScoreModel.raw('SUM(searches + cv) as count')) : qb.sum(`${column} as count`);
+          columns.forEach(column => {
+            if (column === 'searchAndCv') {
+              qb.select(ScoreModel.raw('SUM(searches + cv) as searchAndCv'));
+            } else {
+              qb.sum(`${column} as ${column}`);
+            }
+          });
         })
-        .then(([{ count }]) => count);
-    } catch (err) {
-      logger.error(err);
-      throw new ServicesError(err.message || 'Error calculating total searches.');
+        .first()
+        .then(result => {
+          return columns.reduce((acc, column) => {
+            return { ...acc, [column]: Number.parseInt(String(result[column])) || 0 };
+          }, {}) as Partial<Record<scoreColumn, number>>;
+        });
+    } catch (error) {
+      logger.error('ScoreService.getTotalMonthValues => ', error);
+      throw new ServicesError();
     }
   }
 
@@ -126,7 +141,8 @@ class ScoreServiceFile {
             },
           };
         });
-    } catch (err) {
+    } catch (error) {
+      logger.error('ScoreService.getUserCurrentScores => ', error);
       throw new ServicesError();
     }
   }
@@ -145,8 +161,8 @@ class ScoreServiceFile {
         .andWhereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') <= ?`, [endDate])
         .select('searches', 'profils', 'year', 'month', 'day')
         .orderBy('id', 'asc');
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      logger.error('ScoreService.getUserRangeScores => ', error);
       throw new ServicesError();
     }
   }

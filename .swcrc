@@ -23,7 +23,7 @@
       "@/*": ["*"],
       "@config": ["config"],
       "@controllers/*": ["controllers/*"],
-      "@database": ["database"],
+      "@database": ["database/*"],
       "@libs/*": ["libs/*"],
       "@exceptions": ["exceptions"],
       "@interfaces/*": ["interfaces/*"],
@@ -31,6 +31,7 @@
       "@models/*": ["models/*"],
       "@routes/*": ["routes/*"],
       "@services/*": ["services/*"],
+      "@webhooks/*": ["webhooks/*"],
       "@utils/*": ["utils/*"]
     }
   },

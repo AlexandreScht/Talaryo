@@ -1,16 +1,21 @@
-import { totalFavorisSave, totalMailFind, totalSearch } from '@/config/access';
+import { ROLE_FAVORIS_SAVE_LIMIT, ROLE_MAIL_FOUND_LIMIT, ROLE_SEARCH_LIMIT } from '@/config/access';
+import { ServerException } from '@/exceptions';
 import FavorisServiceFile from '@/services/favoris';
 import ScoreServiceFile from '@/services/scores';
+import SearchesServiceFile from '@/services/searches';
+import { logger } from '@/utils/logger';
 import { ControllerMethods, ControllerWithParams, ExpressHandler, ScoreControllerGetByUser, ScoreControllerImprove } from '@interfaces/controller';
 import Container from 'typedi';
 
 export default class ScoresControllerFile implements ControllerMethods<ScoresControllerFile> {
-  protected ScoreService: ScoreServiceFile;
-  protected FavorisService: FavorisServiceFile;
+  private ScoreService: ScoreServiceFile;
+  private FavorisService: FavorisServiceFile;
+  private SearchesService: SearchesServiceFile;
 
   constructor() {
     this.ScoreService = Container.get(ScoreServiceFile);
     this.FavorisService = Container.get(FavorisServiceFile);
+    this.SearchesService = Container.get(SearchesServiceFile);
   }
 
   protected improveScore: ExpressHandler<ScoreControllerImprove> = async ({
@@ -23,8 +28,11 @@ export default class ScoresControllerFile implements ControllerMethods<ScoresCon
   }) => {
     try {
       await this.ScoreService.improveScore(column, count, sessionId);
-      res.send(true);
+      res.status(204).send();
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('ScoresControllerFile.improveScore => ', error);
+      }
       next(error);
     }
   };
@@ -59,11 +67,14 @@ export default class ScoresControllerFile implements ControllerMethods<ScoresCon
 
       res.send({ isCurrentData: false, score: result });
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('ScoresControllerFile.getUserScore => ', error);
+      }
       next(error);
     }
   };
 
-  protected getTotalScores: ExpressHandler<ControllerWithParams<{ keys: scoreServiceNames }>> = async ({
+  protected getTotalScores: ExpressHandler<ControllerWithParams<{ keys: scoreServiceNames[] }>> = async ({
     locals: {
       params: { keys },
     },
@@ -72,43 +83,52 @@ export default class ScoresControllerFile implements ControllerMethods<ScoresCon
     next,
   }) => {
     try {
-      const requestedTotalsKeys = keys.split(',').map(key => key.trim());
-      const totalServices: { [key: string]: { service: () => Promise<number>; totalLimit: number | string } } = {
+      const requestedTotalsKeys = keys.map(key => key.trim());
+
+      const totalServices: { [key: string]: { service: () => Promise<Record<string, number>>; totalLimit: number | string } } = {
         searches: {
-          service: () => this.ScoreService.getTotalMonthValues(sessionId, 'searches'),
-          totalLimit: totalSearch[sessionRole],
+          service: () => this.ScoreService.getTotalMonthValues(sessionId, ['searches']),
+          totalLimit: ROLE_SEARCH_LIMIT[sessionRole],
         },
         mails: {
-          service: () => this.ScoreService.getTotalMonthValues(sessionId, 'mails'),
-          totalLimit: totalMailFind[sessionRole],
+          service: () => this.ScoreService.getTotalMonthValues(sessionId, ['mails']),
+          totalLimit: ROLE_MAIL_FOUND_LIMIT[sessionRole],
         },
         favorisSave: {
-          service: () => this.FavorisService.getTotal(sessionId),
-          totalLimit: totalFavorisSave[sessionRole],
+          service: () => this.FavorisService.getTotalCount(sessionId).then(count => ({ favorisSave: count })),
+          totalLimit: ROLE_FAVORIS_SAVE_LIMIT[sessionRole],
         },
         searchSave: {
-          service: () => this.FavorisService.getTotal(sessionId),
-          totalLimit: totalFavorisSave[sessionRole],
+          service: () => this.SearchesService.getTotalCount(sessionId).then(count => ({ searchSave: count })),
+          totalLimit: ROLE_FAVORIS_SAVE_LIMIT[sessionRole],
         },
       };
 
-      const response: any = {};
-      await Promise.all(
-        requestedTotalsKeys.map(async totalName => {
-          const totalService = totalServices[totalName];
-          if (totalService) {
-            return totalService.service().then(totalValue => {
-              response[totalName] = {
-                score: totalValue ?? 0,
-                total: totalService.totalLimit,
-              };
-            });
+      const response = await requestedTotalsKeys.reduce(async (accPromise, totalName) => {
+        const acc = await accPromise;
+        const totalService = totalServices[totalName];
+        if (totalService) {
+          try {
+            const totalValue = await totalService.service();
+            acc[totalName] = {
+              score: totalValue[totalName] ?? 0,
+              total: totalService.totalLimit,
+            };
+          } catch (error) {
+            acc[totalName] = {
+              score: 0,
+              total: totalService.totalLimit,
+            };
           }
-        }),
-      );
+        }
+        return acc;
+      }, Promise.resolve({}));
 
       res.send(response);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('ScoresControllerFile.getTotalScores => ', error);
+      }
       next(error);
     }
   };

@@ -1,15 +1,15 @@
 import config from '@/config';
 import { accessUsers } from '@/config/access';
-import { InvalidArgumentError, InvalidCredentialsError, InvalidSessionError, ServerException, ServicesError } from '@/exceptions';
+import { InvalidArgumentError, InvalidCredentialsError, InvalidSessionError, NotFoundError, ServerException, ServicesError } from '@/exceptions';
 import { registerCredentials, registerOauth } from '@/interfaces/service';
 import { codeToken, TokenUser, TwoFactorAuthenticateToken } from '@/interfaces/token';
-import MemoryServerCache from '@/libs/memoryCache';
 import ApiServiceFile from '@/services/api';
 import AuthServiceFile from '@/services/auth';
 import MailerServiceFile from '@/services/mailer';
 import UserServiceFile from '@/services/users';
 import createSessionCookie from '@/utils/createCookie';
-import { verifyAuthenticator2FA } from '@/utils/token';
+import { logger } from '@/utils/logger';
+import * as tokenUtils from '@/utils/token';
 import {
   AuthControllerActivate2FA,
   AuthControllerAskCode,
@@ -23,19 +23,18 @@ import {
 } from '@interfaces/controller';
 import { transaction } from 'objection';
 import Container from 'typedi';
+import { v7 as uuid } from 'uuid';
 
 export default class AuthControllerFile implements ControllerMethods<AuthControllerFile> {
   private AuthService: AuthServiceFile;
   private APIService: ApiServiceFile;
   private UserService: UserServiceFile;
   private MailerService: MailerServiceFile;
-  private MemoryServerCache: MemoryServerCache;
 
   constructor() {
     this.AuthService = Container.get(AuthServiceFile);
     this.UserService = Container.get(UserServiceFile);
     this.MailerService = Container.get(MailerServiceFile);
-    this.MemoryServerCache = Container.get(MemoryServerCache);
     this.APIService = Container.get(ApiServiceFile);
   }
 
@@ -63,7 +62,6 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
           //? fake access token
           createSessionCookie<codeToken>(res, { id: null, accessToken: null, cookieName: 'access_cookie' }, '15m', true);
         }
-
         res.status(201).send(true);
         return;
       }
@@ -76,7 +74,6 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         if (!id || !accessToken || !accessCode) {
           throw new ServicesError('Une erreur est survenue lors de votre enregistrement');
         }
-
         await this.APIService.CreateBrevoUser({ email, firstName, lastName, google: false });
         await this.MailerService.Registration(email, firstName, accessCode);
         createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
@@ -84,6 +81,9 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
 
       res.status(201).send(true);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.register => ', error);
+      }
       next(error);
     }
   };
@@ -104,46 +104,53 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         res.send(true);
         return;
       }
-      if (!access_cookie) throw new InvalidArgumentError("Votre code d'accès est introuvable, veuillez vous réinscrire");
-      if (!access_cookie.id || !access_cookie.accessToken) {
-        res.status(201).send("Un email contenant votre code d'activation de compte vous a été renvoyé");
+      if (!access_cookie) throw new NotFoundError("Votre code d'accès est introuvable, veuillez vous réinscrire");
+      if (!access_cookie?.id || !access_cookie?.accessToken) {
+        res.send(true);
+        return;
       }
       const { id } = access_cookie;
       const { accessCode, accessToken, email, firstName } = await this.UserService.generateCodeAccess(id);
       await this.MailerService.Registration(email, firstName, accessCode as number);
 
       createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
-      res.status(201).send("Un email contenant votre code d'activation de compte vous a été renvoyé");
+      res.send(true);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.askCode => ', error);
+      }
       next(error);
     }
   };
 
   protected validateAccount: ExpressHandler<AuthControllerValidAccount> = async ({
     locals: {
-      body: { access_cookie },
-      params: { code },
+      cookie: { access_cookie },
+      body: { code },
     },
     res,
     next,
   }) => {
     try {
-      if (!access_cookie || access_cookie.expired) throw new InvalidArgumentError("Votre code d'accès a expiré, veuillez en demander un nouveau.");
+      if (!access_cookie || access_cookie?.expired) throw new InvalidArgumentError("Votre code d'accès a expiré, veuillez en demander un nouveau.");
 
       if (!access_cookie.id || !access_cookie.accessToken) {
-        throw new InvalidArgumentError("Impossible de valider votre compte. Code d'accès incorrect");
+        throw new InvalidArgumentError("Impossible de valider votre compte. Code d'accès incorrect.");
       }
+
       const { id, accessToken } = access_cookie;
+
       const user = await this.UserService.updateUsers(
         {
           id,
           accessToken,
-          accessCode: code,
+          accessCode: String(code),
         },
         { accessToken: null, accessCode: null, validate: true },
       );
+
       if (!user) {
-        throw new InvalidArgumentError("Impossible de valider votre compte. Code d'accès incorrect");
+        throw new InvalidArgumentError("Impossible de valider votre compte. Code d'accès incorrect.");
       }
       res.clearCookie('access_cookie', {
         signed: true,
@@ -154,6 +161,9 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
 
       res.status(201).send('Votre compte a été validé. Vous allez être redirigé vers la page de connexion.');
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.validateAccount => ', error);
+      }
       next(error);
     }
   };
@@ -173,17 +183,16 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         'role',
         'twoFactorType',
         'firstName',
-        'checkPassword',
       ]);
 
       if (!userData) {
-        throw new InvalidCredentialsError(`Email ou mot de passe invalide`);
+        throw new InvalidCredentialsError(`Email ou mot de passe incorrect !`);
       }
       const { id: userId, validate, role, twoFactorType, firstName } = userData;
 
       await this.AuthService.login(userData, password);
       if (!validate) {
-        throw new InvalidSessionError('Veuillez valider votre compte par e-mail');
+        throw new InvalidSessionError('Veuillez valider votre compte par e-mail.');
       }
 
       //; credentials required 2FA
@@ -192,19 +201,20 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
           twoFactorType === 'email' ? await this.UserService.generateCodeAccess(userId, 6) : await this.UserService.generateTokenAccess(userId);
 
         if (accessCode) {
-          await this.MailerService.Registration(email, firstName, accessCode as number);
+          await this.MailerService.TwoFactorAuthenticate(email, firstName, accessCode as number);
         }
 
         createSessionCookie<TwoFactorAuthenticateToken>(res, { id: userId, accessToken, twoFA: twoFactorType, cookieName: 'TwoFA_cookie' }, '15m');
-        res.send({ role, TwoFA: twoFactorType });
+        res.send({ TwoFA: twoFactorType });
         return;
       }
 
-      const refreshToken = await this.MemoryServerCache.newUserAccessToken(userId);
-
-      createSessionCookie<TokenUser>(res, { refreshToken, sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
-      res.send({ role });
+      createSessionCookie<TokenUser>(res, { refreshToken: uuid(), sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
+      res.send({ role, email });
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.login => ', error);
+      }
       next(error);
     }
   };
@@ -235,11 +245,12 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
             return user;
           });
 
-      const refreshToken = await this.MemoryServerCache.newUserAccessToken(userId);
-
-      createSessionCookie<TokenUser>(res, { refreshToken, sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
+      createSessionCookie<TokenUser>(res, { refreshToken: uuid(), sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
       res.send({ role });
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.oAuthConnect => ', error);
+      }
       next(error);
     }
   };
@@ -258,7 +269,8 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         const user = await this.UserService.updateUsers(
           {
             id: sessionId,
-            accessCode: otp,
+            password: { not: null },
+            accessCode: String(otp),
           },
           { twoFactorType: 'email' },
         );
@@ -266,8 +278,10 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         res.send(true);
         return;
       }
+
       if (!token) throw new ServerException();
-      const success = verifyAuthenticator2FA(token as string, String(otp));
+      const success = tokenUtils.verifyAuthenticator2FA(token as string, String(otp));
+
       if (!success) throw new InvalidCredentialsError("Le code d'accès est incorrect");
 
       await this.UserService.updateUsers(
@@ -278,6 +292,9 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       );
       res.send(true);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.activate2FA => ', error);
+      }
       next(error);
     }
   };
@@ -300,7 +317,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
           id: id,
           password: { not: null },
           accessToken,
-          ...(twoFA === 'email' ? { accessCode: otp } : { accessCode: { not: null } }),
+          ...(twoFA === 'email' ? { accessCode: String(otp) } : { accessCode: { not: null } }),
         },
         returning: ['accessCode', 'email', 'role'],
       });
@@ -310,7 +327,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       const { accessCode, email, role } = userFind;
 
       if (twoFA === 'authenticator') {
-        const success = verifyAuthenticator2FA(accessCode as string, String(otp));
+        const success = tokenUtils.verifyAuthenticator2FA(accessCode as string, String(otp));
         if (!success) throw new InvalidCredentialsError('Échec de la vérification à deux facteurs. Le code que vous avez saisi est incorrect.');
       }
 
@@ -327,11 +344,12 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         domain: new URL(config.ORIGIN).hostname,
         secure: config.ORIGIN.startsWith('https'),
       });
-      const refreshToken = await this.MemoryServerCache.newUserAccessToken(id);
-
-      createSessionCookie<TokenUser>(res, { refreshToken, sessionId: id, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
+      createSessionCookie<TokenUser>(res, { refreshToken: uuid(), sessionId: id, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
       res.send({ email, role });
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.verify2FA => ', error);
+      }
       next(error);
     }
   };

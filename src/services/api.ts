@@ -1,17 +1,17 @@
 import config from '@/config';
 import { ServicesError } from '@/exceptions';
-import { brevoAPI, dropcontactAPI } from '@/utils/axiosConfig';
+import { brevoAPI, dropContactAPI, signalHireAPI } from '@/utils/axiosConfig';
 import { logger } from '@/utils/logger';
 import axios from 'axios';
 import { Service } from 'typedi';
 
 @Service()
-class ApiServiceFile {
+export default class ApiServiceFile {
   public async FetchMailRequestId({ first_name, last_name, company }: { first_name: string; last_name: string; company: string }) {
     try {
       const {
         data: { request_id },
-      } = await dropcontactAPI.post(
+      } = await dropContactAPI.post(
         '/batch',
         {
           data: [
@@ -33,7 +33,7 @@ class ApiServiceFile {
       );
       return request_id;
     } catch (error) {
-      logger.error(error);
+      logger.error('ApiService.FetchMailRequestId => ', error);
       throw new ServicesError();
     }
   }
@@ -44,11 +44,27 @@ class ApiServiceFile {
         data: {
           data: [{ email }],
         },
-      } = await dropcontactAPI.get(`/batch/${requestId}?forceResults=true`);
+      } = await dropContactAPI.get(`/batch/${requestId}?forceResults=true`);
 
-      return [!!email, email];
+      return email;
     } catch (error) {
-      logger.error(error);
+      logger.error('ApiService.FetchMailData => ', error);
+      throw new ServicesError();
+    }
+  }
+
+  public async SendSignalHireRequest(link: string, callbackUrl: string) {
+    try {
+      const {
+        data: { requestId },
+      } = await signalHireAPI.post('/candidate/search', {
+        items: [link],
+        callbackUrl: `${callbackUrl}/webhook/`,
+      });
+
+      return requestId;
+    } catch (error) {
+      logger.error('ApiService.SendSignalHireRequest => ', error);
       throw new ServicesError();
     }
   }
@@ -57,13 +73,13 @@ class ApiServiceFile {
     try {
       const { data } = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
         params: {
-          secret: config.CAPTCHA_KEY,
+          secret: config.apiKey.CAPTCHA_KEY,
           response,
         },
       });
       return data.success && new URL(config.ORIGIN).hostname === data.hostname;
     } catch (error) {
-      logger.error(error);
+      logger.error('ApiService.FetchRecaptchaIdentity => ', error);
       throw new ServicesError();
     }
   }
@@ -79,8 +95,7 @@ class ApiServiceFile {
         listIds: [google ? 8 : 9, 6],
       });
     } catch (error) {
-      logger.error(error);
-      throw new ServicesError();
+      logger.error('ApiService.CreateBrevoUser => ', error);
     }
   }
 
@@ -90,7 +105,7 @@ class ApiServiceFile {
         emails: [email],
       });
     } catch (error) {
-      logger.error(error);
+      logger.error('ApiService.removeContactFromList => ', error);
     }
   }
 
@@ -128,10 +143,8 @@ class ApiServiceFile {
         ...(tags?.length ? { listIds: tags } : {}),
       });
     } catch (error) {
-      logger.error(error);
+      logger.error('ApiService.UpdateBrevoUser => ', error);
       throw new ServicesError();
     }
   }
 }
-
-export default ApiServiceFile;

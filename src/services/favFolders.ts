@@ -1,9 +1,9 @@
 import { ServicesError } from '@/exceptions';
 import { FavFoldersModel, type FavFoldersShape } from '@/models/pg/favFolders';
 import { logger } from '@/utils/logger';
+// import { normalizeString } from '@/utils/serializer';
 import { ConstraintViolationError, Page } from 'objection';
 import { Service } from 'typedi';
-
 @Service()
 export default class FavorisFolderServiceFile {
   public async create(name: string, userId: number): Promise<FavFoldersShape | boolean> {
@@ -17,20 +17,21 @@ export default class FavorisFolderServiceFile {
         }
         return false;
       }
-      logger.error(error);
+      logger.error('FavorisFolderService.create => ', error);
       throw new ServicesError();
     }
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: number, userId: number): Promise<number> {
     try {
       return await FavFoldersModel.query()
-        .where({ id })
+        .where({ userId })
         .patch({ deleted: true })
-        .then(v => !!v);
+        .returning('id')
+        .findById(id)
+        .then(v => (v?.id ? Number.parseInt(String(v?.id)) : undefined));
     } catch (error) {
-      logger.error(error);
-
+      logger.error('FavorisFolderService.delete => ', error);
       throw new ServicesError();
     }
   }
@@ -38,7 +39,7 @@ export default class FavorisFolderServiceFile {
     try {
       return await FavFoldersModel.query().select('id').where({ name, userId, deleted: false }).first();
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisFolderService.search => ', error);
       throw new ServicesError();
     }
   }
@@ -48,7 +49,7 @@ export default class FavorisFolderServiceFile {
       let query = FavFoldersModel.query().where('favFolders.userId', userId).andWhere('favFolders.deleted', false);
 
       if (name) {
-        query = query.andWhereRaw('LOWER(unaccent("name")) LIKE LOWER(unaccent(?))', [`${name}%`]);
+        query = query.andWhereRaw('LOWER("name") LIKE LOWER(?)', [`${name.toLocaleLowerCase()}%`]);
       }
 
       return await query
@@ -61,7 +62,7 @@ export default class FavorisFolderServiceFile {
         .count('favoris.id as itemsCount')
         .page(page - 1, limit);
     } catch (error) {
-      logger.error(error);
+      logger.error('FavorisFolderService.getContent => ', error);
       throw new ServicesError();
     }
   }

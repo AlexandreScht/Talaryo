@@ -1,8 +1,9 @@
 import { MongodbConnection } from '@/database/mongo';
 import { PGdbConnection } from '@/database/pg';
 import config from '@config';
-import RedisInitializer from '@libs/redis';
-import initializeSocket from '@libs/socketManager';
+import MemoryServerCache from '@libs/memoryCache';
+import RedisInstance from '@libs/redis';
+import SocketManager from '@libs/socketManager';
 import { ErrorMiddleware } from '@middlewares/error';
 import { logger, stream } from '@utils/logger';
 import compression from 'compression';
@@ -14,9 +15,11 @@ import { IpFilter } from 'express-ipfilter';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
+import type Knex from 'knex';
 import morgan from 'morgan';
 import 'reflect-metadata';
 import { Server } from 'socket.io';
+import { SkipInTest } from './libs/decorators';
 import ApiRouter from './routes';
 const {
   log,
@@ -31,6 +34,7 @@ export default class App extends ApiRouter {
   public port: string | number;
   private server: http.Server;
   private io: Server;
+  public knexDb: Knex.Knex<any, unknown[]>;
 
   constructor() {
     super();
@@ -39,8 +43,10 @@ export default class App extends ApiRouter {
     this.port = config.PORT || 3005;
     this.server = http.createServer(this.app);
     this.io = new Server(this.server);
+  }
 
-    this.connectToDatabase();
+  public async initialize() {
+    await this.connectToDatabase();
     this.initializeStoredLibs();
     this.initializeMiddlewares();
     this.initializeAppRoutes();
@@ -49,28 +55,27 @@ export default class App extends ApiRouter {
   }
 
   public listen() {
-    this.server.listen(this.port, () => {
-      logger.info(`======= Version: ${this.env} =======
-        🚀 server listening port: ${this.port} 🚀`);
-    });
+    this.server.listen(
+      this.port,
+      SkipInTest(() => {
+        logger.info(`======= Version: ${this.env} =======
+          🚀 server listening port: ${this.port} 🚀`);
+      })(),
+    );
     return this.server;
   }
 
-  public getServer() {
-    return this.app;
-  }
-
   private async connectToDatabase() {
-    await PGdbConnection();
+    this.knexDb = await PGdbConnection();
     await MongodbConnection();
   }
 
   private initializeMiddlewares() {
-    this.app.use(morgan(log.FORMAT, { stream }));
+    if (config.NODE_ENV !== 'test') this.app.use(morgan(log.FORMAT, { stream }));
     this.app.use(
       cors({
         origin: config.ORIGIN,
-        credentials: true,
+        credentials: config.CREDENTIALS,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         allowedHeaders: 'Content-Type,Authorization',
       }),
@@ -96,6 +101,7 @@ export default class App extends ApiRouter {
   private initializeBodyContent() {
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       //  for stripe webhook
+      //! modify for /api/webhooks/stripe
       if (req.url === '/api/stripe_webhook') {
         express.raw({ type: 'application/json' })(req, res, next);
       } else {
@@ -105,8 +111,9 @@ export default class App extends ApiRouter {
   }
 
   private initializeStoredLibs() {
-    RedisInitializer();
-    initializeSocket(this.io);
+    RedisInstance;
+    MemoryServerCache;
+    SocketManager.getInstance(this.io);
   }
 
   private initializeAppRoutes() {

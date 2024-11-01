@@ -1,12 +1,11 @@
 import config from '@config';
 import { decode, sign, TokenExpiredError, verify } from 'jsonwebtoken';
 import speakeasy from 'speakeasy';
-import { logger } from './logger';
 
-export const createSessionToken = <T extends object>(values: T, expiresIn: string | number) => {
+export function createSessionToken<T extends object>(values: T, expiresIn: string | number) {
   const { security } = config;
   return sign(values, security.session.SESSION_TOKEN, { expiresIn });
-};
+}
 
 export const decryptSessionToken = <T>(Token: string, allowExpiredToken?: boolean): [boolean | Error, T?] => {
   const { security } = config;
@@ -21,7 +20,6 @@ export const decryptSessionToken = <T>(Token: string, allowExpiredToken?: boolea
       }
       return [error];
     }
-    logger.error(error);
     return [error];
   }
 };

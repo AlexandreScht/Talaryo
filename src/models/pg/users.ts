@@ -14,7 +14,7 @@ export class UserModel extends Model implements UserSchema {
   society?: string;
   accessToken?: string;
   twoFactorType?: twoFactorType;
-  accessCode?: string | number;
+  accessCode?: string;
   stripeCustomer?: string | Stripe.Customer | Stripe.DeletedCustomer;
   subscribe_status: 'active' | 'pending' | 'disable' | 'waiting';
   subscribe_start?: Date;
@@ -26,15 +26,6 @@ export class UserModel extends Model implements UserSchema {
 
   static tableName = 'users';
   static idColumn = 'id';
-
-  static jsonSchema = {
-    type: 'object',
-    properties: {
-      accessCode: {
-        type: ['string', 'number', 'null'],
-      },
-    },
-  };
 
   checkPassword = async (password: string): Promise<boolean> => {
     return await compare(password, this.password);

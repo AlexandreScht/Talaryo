@@ -15,8 +15,8 @@ export class SearchesFoldersRouter extends SearchesFolderControllerFile {
   }
 
   initializeRoutes() {
-    this.router.patch('/new', mw([auth(), Validator({ body: z.object({ name: stringValidator }) }), this.createSearchFolder]));
-    this.router.delete('/remove/:id', mw([auth(), Validator({ params: z.object({ id: numberValidator }) }), this.deleteSearchFolder]));
+    this.router.post('/new', mw([auth(), Validator({ body: z.object({ name: stringValidator }) }), this.createSearchFolder]));
+    this.router.delete('/remove/:id', mw([auth(), Validator({ params: z.object({ id: numberValidator.min(1) }) }), this.deleteSearchFolder]));
     this.router.get('/get-folder/:name', mw([auth(), Validator(getFoldersSchema), this.getSearchFolders]));
   }
 

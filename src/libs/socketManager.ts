@@ -1,78 +1,116 @@
 // socketManager.ts
 
 import { ServerException } from '@/exceptions';
-import { socketList } from '@interfaces/webSocket';
-import socketIoMiddleware from '@middlewares/socket';
+import socketMiddleware from '@/middlewares/webSocket';
+import type { eventData, SocketIo, socketPropsList } from '@interfaces/webSocket';
 import { logger } from '@utils/logger';
-import { Server, Socket } from 'socket.io';
+import type Redis from 'ioredis';
+import { Server } from 'socket.io';
+import RedisInstance from './redis';
 
-class SocketManager {
-  private socketList: socketList[] = [];
+export default class SocketManager {
+  private static instance: SocketManager;
+  private socketList: Map<string, socketPropsList> = new Map();
   private io: Server;
+  private redisClient: Redis;
 
   constructor(io: Server) {
     this.io = io;
+    this.redisClient = RedisInstance.getRedisClient();
     this.initializeSocket();
   }
 
   private async initializeSocket() {
-    this.io.on('connection', (socket: Socket) => {
-      socket.on('ioLogged', ({ secret_key }) => {
-        try {
-          socketIoMiddleware({ socket, secret_key, list: this.socketList }, async ({ err, result }) => {
-            if (err) {
-              logger.error('Erreur lors de la connexion socket-Io :', err);
-              return;
-            }
-            const { user, session_double } = result;
-            if (session_double) {
-              this.ioSendTo({ socketId: session_double.socketId }, 'session_double', undefined);
-            }
-            this.socketList.push({ refreshToken: user.refreshToken, socketId: socket.id, userId: user.sessionId, secret_key });
-            // this.sendUserListEvent(user.sessionId);
-          });
-        } catch (error) {}
-      });
-
-      socket.on('disconnect', async () => {
-        this.socketList = this.socketList.filter(o => o.socketId !== socket.id);
+    this.io.use(socketMiddleware(this.socketList));
+    this.io.on('connection', async (socket: SocketIo) => {
+      const GetAllEvents = await this.getUserEvent(socket.user.sessionId);
+      if (GetAllEvents.size > 0) {
+        GetAllEvents.forEach(async (eventData, userId) => {
+          if (this.socketList.has(userId)) {
+            await this.redisClient.del(`Event.${userId}`);
+            this.ioSendTo(userId, eventData);
+          }
+        });
+      }
+      socket.on('disconnect', () => {
+        for (const [userId, value] of this.socketList.entries()) {
+          if (value.socketId === socket.id) {
+            this.socketList.delete(userId);
+            break;
+          }
+        }
       });
     });
   }
 
-  public ioSendTo(target: { socketId: string } | { userId: string }, eventName: string, eventData: any) {
-    if ('socketId' in target) {
-      const sender = this.socketList.find(u => u.socketId === target.socketId);
-      if (!sender) {
-        throw new ServerException(500, `L'utilisateur avec le socketId: ${target.socketId} est introuvable`);
-      }
-      return this.io.to(target.socketId).emit(eventName, { ...eventData, auth: { server_key: sender.secret_key, emitFrom: target.socketId } });
-    }
-    const sender = this.socketList.find(u => u.userId === Number.parseInt(target.userId, 10));
+  private async getUserEvent(userId: number): Promise<Map<string, eventData>> {
+    try {
+      let cursor = '0';
+      const streams = new Map<string, eventData>();
 
-    if (!sender) {
-      // stock userid
-      return;
+      do {
+        const [newCursor, keys] = await this.redisClient.scan(cursor, 'MATCH', `Event.${userId}`, 'COUNT', '100');
+        cursor = newCursor;
+
+        if (keys.length > 0) {
+          const values = await this.redisClient.mget(...keys);
+
+          keys.reduce((acc, key, index) => {
+            const value = values[index];
+            if (value) {
+              acc.set(key.replace(/^Event\./, ''), JSON.parse(value));
+            }
+            return acc;
+          }, streams);
+        }
+      } while (cursor !== '0');
+
+      return streams;
+    } catch (error) {
+      logger.error('SocketManager.getUserEvent => ', error);
+      throw new ServerException(500, 'Could not fetch all streams');
     }
-    this.io.to(sender.socketId).emit(eventName, { ...eventData, auth: { server_key: sender.secret_key, emitFrom: sender.socketId } });
+  }
+
+  private async setUserEvent(userId: string, eventData: eventData) {
+    await this.redisClient.set(`Event.${userId}`, JSON.stringify(eventData));
+  }
+
+  public ioSendTo(idUser: string | number, eventData: eventData) {
+    try {
+      const userId = typeof idUser === 'number' ? String(idUser) : idUser;
+      const user = this.socketList.get(userId);
+      if (!user) {
+        this.setUserEvent(userId, eventData);
+        return;
+      }
+      const { socketId, secret_key } = user;
+      const { eventName, ...res } = eventData;
+      this.io.to(socketId).emit(eventName, { res, auth: { secret_key } });
+    } catch (error) {
+      logger.error('SocketManager.ioSendTo => ', error);
+    }
+  }
+
+  public async ioSendToAll(eventName: string, eventData: eventData) {
+    try {
+      this.io.emit(eventName, eventData);
+    } catch (error) {
+      logger.error('SocketManager.ioSendToAll => ', error);
+    }
+  }
+
+  public static getInstance(io?: Server): SocketManager {
+    try {
+      if (!SocketManager.instance) {
+        if (!io) {
+          throw new ServerException(500, 'SocketManager not initialized yet. Please provide the io parameter the first time.');
+        }
+        SocketManager.instance = new SocketManager(io);
+      }
+      return SocketManager.instance;
+    } catch (error) {
+      logger.error('SocketManager.getInstance => ', error);
+    }
   }
 }
-
-export const StoredSocket: { socketIo: SocketManager | undefined } = { socketIo: undefined };
-
-const initializeSocket = (io: Server) => {
-  try {
-    const socketIo = new SocketManager(io);
-    Object.defineProperty(StoredSocket, 'socketIo', {
-      value: socketIo,
-      writable: false,
-      enumerable: true,
-      configurable: false,
-    });
-    logger.info('webSocket server initialized');
-  } catch (error) {
-    logger.error(`error during the socket initialize instance: ${error}`);
-  }
-};
-
-export default initializeSocket;

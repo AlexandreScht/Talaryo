@@ -68,7 +68,12 @@ const logger = winston.createLogger({
       zippedArchive: true,
       format: winston.format.combine(filterOnly('error')),
     }),
-    // Console parts
+  ],
+});
+
+// Ajouter cette condition autour du transport Console
+if (process.env.NODE_ENV !== 'test') {
+  logger.add(
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
@@ -81,8 +86,8 @@ const logger = winston.createLogger({
         })(),
       ),
     }),
-  ],
-});
+  );
+}
 
 const stream = {
   write: (message: string) => {

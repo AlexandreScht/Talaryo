@@ -1,15 +1,17 @@
-import { totalFavorisSave } from '@/config/access';
-import { InvalidArgumentError, InvalidRoleAccessError } from '@/exceptions';
+import config from '@/config';
+import { ROLE_FAVORIS_SAVE_LIMIT } from '@/config/access';
+import { InvalidRoleAccessError, ServerException } from '@/exceptions';
 import type { FavorisShape } from '@/models/pg/favoris';
 import FavorisFolderServiceFile from '@/services/favFolders';
 import FavorisServiceFile from '@/services/favoris';
+import { logger } from '@/utils/logger';
 import {
   ControllerMethods,
   ControllerWithBodyModel,
   ControllerWithPagination,
   ControllerWithParams,
   ExpressHandler,
-  FavorisControllerLeastFavoris,
+  getLeastController,
 } from '@interfaces/controller';
 import Container from 'typedi';
 
@@ -31,18 +33,23 @@ export default class FavorisControllerFile implements ControllerMethods<FavorisC
     try {
       if (sessionRole !== 'admin') {
         const limit = await this.FavorisService.getTotalCount(sessionId);
-        if (sessionRole === 'business' && limit >= totalFavorisSave.business) {
+        if (sessionRole === 'business' && limit >= ROLE_FAVORIS_SAVE_LIMIT.business) {
           throw new InvalidRoleAccessError('Vous avez atteint la limite maximale de favoris enregistrés.');
         }
-        if (sessionRole === 'free' && limit >= totalFavorisSave[sessionRole]) {
+        if (sessionRole === 'free' && limit >= (config.NODE_ENV === 'test' ? 3 : ROLE_FAVORIS_SAVE_LIMIT[sessionRole])) {
           throw new InvalidRoleAccessError(
-            `Vous avez atteint la limite de favoris enregistrés avec votre abonnement ${sessionRole.toLocaleUpperCase}.`,
+            `Vous avez atteint la limite de favoris enregistrés avec votre abonnement ${sessionRole.toLocaleUpperCase()}.`,
           );
         }
       }
+
       const createResult = await this.FavorisService.create(body, sessionId);
-      res.send(createResult);
+
+      res.status(201).send(createResult);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavorisControllerFile.createFavoris => ', error);
+      }
       next(error);
     }
   };
@@ -51,29 +58,42 @@ export default class FavorisControllerFile implements ControllerMethods<FavorisC
     locals: {
       params: { id },
     },
+    session: { sessionId },
     res,
     next,
   }) => {
     try {
-      const success = await this.FavorisService.delete(id);
-      res.send(success);
+      const success = await this.FavorisService.delete(id, sessionId);
+      res.status(success ? 204 : 201).send(success);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavorisControllerFile.deleteFavoris => ', error);
+      }
       next(error);
     }
   };
 
-  protected updateFavoris: ExpressHandler<ControllerWithBodyModel<FavorisShape>> = async ({ locals: { body }, res, next }) => {
+  protected updateFavoris: ExpressHandler<ControllerWithBodyModel<FavorisShape> & ControllerWithParams<'id'>> = async ({
+    locals: {
+      body,
+      params: { id },
+    },
+    session: { sessionId },
+    res,
+    next,
+  }) => {
     try {
-      const { id, ...values } = body;
-      if (id) throw new InvalidArgumentError();
-      const update = await this.FavorisService.update(values, id);
-      res.send(update);
+      const update = await this.FavorisService.update(body, id, sessionId);
+      res.status(update ? 204 : 201).send(update);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavorisControllerFile.updateFavoris => ', error);
+      }
       next(error);
     }
   };
 
-  protected getFavorites: ExpressHandler<ControllerWithPagination<'favFolderName'>> = async ({
+  protected getFolderFavorites: ExpressHandler<ControllerWithPagination<'favFolderName'>> = async ({
     locals: {
       params: { favFolderName },
       query: { page, limit },
@@ -83,27 +103,36 @@ export default class FavorisControllerFile implements ControllerMethods<FavorisC
     next,
   }) => {
     try {
-      const { id } = await this.FavorisFolderService.search(decodeURIComponent(favFolderName), sessionId);
-      if (id) throw new InvalidArgumentError();
-      const favoris = await this.FavorisService.getFavorisFromFolder(limit, page, id);
-      res.send(favoris);
+      const folder = await this.FavorisFolderService.search(decodeURIComponent(favFolderName), sessionId);
+      if (!folder?.id) {
+        res.send(false);
+        return;
+      }
+      const favorisInFolder = await this.FavorisService.getFavorisFromFolder(limit, page, folder.id);
+      res.send(favorisInFolder);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavorisControllerFile.getFolderFavorites => ', error);
+      }
       next(error);
     }
   };
 
-  protected lastFavoris: ExpressHandler<FavorisControllerLeastFavoris> = async ({
+  protected getFavorites: ExpressHandler<getLeastController> = async ({
     locals: {
-      query: { isCv, limit = 3 },
+      query: { isCv, limit, page },
     },
     session: { sessionId },
     res,
     next,
   }) => {
     try {
-      const foldersMeta = await this.FavorisService.get({ isCv, limit }, sessionId);
-      res.send(foldersMeta);
+      const favoris = await this.FavorisService.get({ isCv, limit, page }, sessionId);
+      res.send(favoris);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('FavorisControllerFile.getFavorites => ', error);
+      }
       next(error);
     }
   };

@@ -1,6 +1,5 @@
 import { ctx } from '@/interfaces/middleware';
-import { role } from '@/interfaces/users';
-import { ExpiredSessionError, InvalidRoleAccessError } from '@exceptions';
+import { ExpiredSessionError, InvalidAccessError, InvalidRoleAccessError } from '@exceptions';
 
 const auth = (role?: role | role[]) => {
   return async (ctx: ctx) => {
@@ -13,7 +12,10 @@ const auth = (role?: role | role[]) => {
     }
 
     if (role && sessionRole !== role && !role.includes(sessionRole)) {
-      throw new InvalidRoleAccessError(Array.isArray(role) ? role[0] : role);
+      if (role === 'admin') {
+        throw new InvalidAccessError("Requiert les droits d'un compte administrateur.");
+      }
+      throw new InvalidRoleAccessError();
     }
 
     next();

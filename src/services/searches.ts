@@ -1,7 +1,7 @@
-import { ServicesError } from '@/exceptions';
+import { InvalidArgumentError, ServicesError } from '@/exceptions';
 import { SearchesModel, type SearchesShape } from '@/models/pg/searches';
 import { logger } from '@/utils/logger';
-import { ConstraintViolationError, Page } from 'objection';
+import { ConstraintViolationError, ForeignKeyViolationError, Page } from 'objection';
 import { Service } from 'typedi';
 
 @Service()
@@ -12,10 +12,13 @@ export default class SearchesServiceFile {
         .insert({ ...values, userId })
         .returning('id');
     } catch (error) {
+      if (error instanceof ForeignKeyViolationError) {
+        throw new InvalidArgumentError("Le dossier assigné a la recherche n'existe pas.");
+      }
       if (error instanceof ConstraintViolationError) {
         const { name, searchQueries } = values;
 
-        const existingSearch = await SearchesModel.query().where({ userId, name, searchQueries }).first();
+        const existingSearch = await SearchesModel.query().where({ userId, name, searchQueries, deleted: true }).first();
 
         if (existingSearch) {
           return await existingSearch
@@ -29,34 +32,36 @@ export default class SearchesServiceFile {
         }
         return false;
       }
-      logger.error(error);
+      logger.error('SearchesService.create => ', error);
       throw new ServicesError();
     }
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: number, userId: number): Promise<boolean> {
     try {
       return await SearchesModel.query()
         .findById(id)
+        .where({ userId })
         .patch({ deleted: true })
         .then(v => !!v);
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchesService.delete => ', error);
       throw new ServicesError();
     }
   }
 
-  public async update(values: Partial<Omit<SearchesShape, 'userId'>>, id: number): Promise<boolean> {
-    try {
-      return await SearchesModel.query()
-        .findById(id)
-        .patch({ ...values })
-        .then(v => !!v);
-    } catch (error) {
-      logger.error(error);
-      throw new ServicesError();
-    }
-  }
+  // public async update(values: Partial<Omit<SearchesShape, 'userId'>>, id: number, userId: number): Promise<boolean> {
+  //   try {
+  //     return await SearchesModel.query()
+  //       .findById(id)
+  //       .where({ userId })
+  //       .patch({ ...values })
+  //       .then(v => !!v);
+  //   } catch (error) {
+  //     logger.error('SearchesService.update => ', error);
+  //     throw new ServicesError();
+  //   }
+  // }
 
   public async deleteSearchesFromFolder(searchFolderId: number): Promise<boolean> {
     try {
@@ -65,7 +70,7 @@ export default class SearchesServiceFile {
         .patch({ deleted: true })
         .then(v => !!v);
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchesService.deleteSearchesFromFolder => ', error);
       throw new ServicesError();
     }
   }
@@ -80,6 +85,7 @@ export default class SearchesServiceFile {
           return Number.parseInt(count, 10);
         });
     } catch (error) {
+      logger.error('SearchesService.getTotalCount => ', error);
       throw new ServicesError();
     }
   }
@@ -88,9 +94,10 @@ export default class SearchesServiceFile {
     try {
       return await SearchesModel.query()
         .where({ searchFolderId, locked: false, deleted: false })
+        .orderBy('id', 'desc')
         .page(page - 1, limit);
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchesService.getSearchesFromFolder => ', error);
       throw new ServicesError();
     }
   }
@@ -102,7 +109,7 @@ export default class SearchesServiceFile {
         .orderBy('id', 'desc')
         .page(page - 1, limit);
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchesService.get => ', error);
       throw new ServicesError();
     }
   }
@@ -124,7 +131,7 @@ export default class SearchesServiceFile {
           qb.offset(n).patch({ locked: true });
         });
     } catch (error) {
-      logger.error(error);
+      logger.error('SearchesService.lockIn => ', error);
       throw new ServicesError();
     }
   }

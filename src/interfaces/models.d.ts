@@ -12,7 +12,7 @@ export interface UserSchema {
   society?: string;
   accessToken?: string;
   twoFactorType?: twoFactorType;
-  accessCode?: string | number;
+  accessCode?: string;
   stripeCustomer?: string | Stripe.Customer | Stripe.DeletedCustomer;
   subscribe_status: 'active' | 'pending' | 'disable' | 'waiting';
   subscribe_start?: Date;
@@ -81,7 +81,7 @@ export interface event {
   date: string;
 }
 
-interface EmailsDocument extends Document {
+interface MongoDocument extends Document {
   _id: string;
   email: string;
   firstName?: string | string[];

@@ -1,9 +1,18 @@
-import { totalSearchSave } from '@/config/access';
-import { InvalidArgumentError, InvalidRoleAccessError } from '@/exceptions';
+import config from '@/config';
+import { ROLE_SEARCH_SAVE_LIMIT } from '@/config/access';
+import { InvalidRoleAccessError, ServerException } from '@/exceptions';
 import type { SearchesShape } from '@/models/pg/searches';
 import SearchesServiceFile from '@/services/searches';
 import SearchFolderServiceFile from '@/services/searchFolders';
-import { ControllerMethods, ControllerWithBodyModel, ControllerWithPagination, ControllerWithParams, ExpressHandler } from '@interfaces/controller';
+import { logger } from '@/utils/logger';
+import {
+  ControllerMethods,
+  ControllerWithBodyModel,
+  ControllerWithPagination,
+  ControllerWithParams,
+  ExpressHandler,
+  getLeastController,
+} from '@interfaces/controller';
 import Container from 'typedi';
 
 export default class SearchesControllerFile implements ControllerMethods<SearchesControllerFile> {
@@ -24,18 +33,21 @@ export default class SearchesControllerFile implements ControllerMethods<Searche
     try {
       if (sessionRole !== 'admin') {
         const limit = await this.SearchService.getTotalCount(sessionId);
-        if (sessionRole === 'business' && limit >= totalSearchSave.business) {
+        if (sessionRole === 'business' && limit >= ROLE_SEARCH_SAVE_LIMIT.business) {
           throw new InvalidRoleAccessError('Vous avez atteint la limite maximale de favoris enregistrés.');
         }
-        if (sessionRole === 'free' && limit >= totalSearchSave[sessionRole]) {
+        if (sessionRole === 'free' && limit >= (config.NODE_ENV === 'test' ? 4 : ROLE_SEARCH_SAVE_LIMIT[sessionRole])) {
           throw new InvalidRoleAccessError(
-            `Vous avez atteint la limite de favoris enregistrés avec votre abonnement ${sessionRole.toLocaleUpperCase}.`,
+            `Vous avez atteint la limite de favoris enregistrés avec votre abonnement ${sessionRole.toLocaleUpperCase()}.`,
           );
         }
       }
       const createResult = await this.SearchService.create(body, sessionId);
-      res.send(createResult);
+      res.status(201).send(createResult);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('SearchesControllerFile.createSearch =>' + error);
+      }
       next(error);
     }
   };
@@ -44,20 +56,24 @@ export default class SearchesControllerFile implements ControllerMethods<Searche
     locals: {
       params: { id },
     },
+    session: { sessionId },
     res,
     next,
   }) => {
     try {
-      const success = await this.SearchService.delete(id);
-      res.send(success);
+      const success = await this.SearchService.delete(id, sessionId);
+      res.status(success ? 204 : 201).send(success);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('SearchesControllerFile.deleteSearch =>' + error);
+      }
       next(error);
     }
   };
 
-  protected getSearches: ExpressHandler<ControllerWithPagination<'SearchFolderName'>> = async ({
+  protected getFolderSearches: ExpressHandler<ControllerWithPagination<'searchFolderName'>> = async ({
     locals: {
-      params: { SearchFolderName },
+      params: { searchFolderName },
       query: { page, limit },
     },
     session: { sessionId },
@@ -65,11 +81,36 @@ export default class SearchesControllerFile implements ControllerMethods<Searche
     next,
   }) => {
     try {
-      const { id } = await this.SearchFolderService.search(decodeURIComponent(SearchFolderName), sessionId);
-      if (id) throw new InvalidArgumentError();
-      const favoris = await this.SearchService.getSearchesFromFolder(limit, page, id);
+      const folder = await this.SearchFolderService.search(decodeURIComponent(searchFolderName), sessionId);
+      if (!folder?.id) {
+        res.send(false);
+        return;
+      }
+      const favoris = await this.SearchService.getSearchesFromFolder(limit, page, folder.id);
       res.send(favoris);
     } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('SearchesControllerFile.getFolderSearches =>' + error);
+      }
+      next(error);
+    }
+  };
+
+  protected getSearches: ExpressHandler<getLeastController> = async ({
+    locals: {
+      query: { isCv, limit, page },
+    },
+    session: { sessionId },
+    res,
+    next,
+  }) => {
+    try {
+      const favoris = await this.SearchService.get({ isCv, limit, page }, sessionId);
+      res.send(favoris);
+    } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('SearchesControllerFile.getSearches =>' + error);
+      }
       next(error);
     }
   };

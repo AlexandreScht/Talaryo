@@ -1,0 +1,3 @@
+Webhook => strip et signalHire
+subscribe a refaire en mockant correctement stripe
+libs ( manager )

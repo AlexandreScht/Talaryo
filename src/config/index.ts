@@ -1,11 +1,10 @@
 import dotenv from 'dotenv';
+import { executablePath } from 'puppeteer';
 dotenv.config();
 
 const config = {
   CREDENTIALS: process.env.CREDENTIALS === 'true',
   ORIGIN: process.env.ORIGIN,
-  BASEURL: 'http://localhost:3005/api',
-  CAPTCHA_KEY: process.env.RECAPTCHA_SECRET_KEY,
   db: {
     mongo: {
       DB_USER: process.env.MONGO_DB_USER,
@@ -43,13 +42,28 @@ const config = {
       keylen: 512,
       iterations: 100000,
       digest: 'sha512',
-      PASSWORD_PEPPER: process.env.PASSWORD_PEPPER,
     },
     TWO_FA: process.env.TWO_FACTOR_AUTHENTICATOR,
+  },
+  stripeENV: {
+    KEY: process.env.STRIPE_SECRET_KEY,
+    WEBHOOK: process.env.STRIPE_SECRET_WEBHOOK,
+  },
+  proxy: {
+    SERVER: process.env.PROXY_SERVER,
+    USERNAME: process.env.PROXY_USERNAME,
+    PASSWORD: process.env.PROXY_PASSWORD,
+    v2: {
+      SERVER: process.env.PROXY_V2_SERVER,
+      USERNAME: process.env.PROXY_V2_USERNAME,
+      PASSWORD: process.env.PROXY_V2_PASSWORD,
+    },
   },
   apiKey: {
     EMAILKEY: process.env.EMAIL_KEY,
     BREVOKEY: process.env.BREVOKEY,
+    CAPTCHA_KEY: process.env.RECAPTCHA_SECRET_KEY,
+    GPT_KEY: process.env.GPT_KEY,
   },
   mailer: {
     DIR: process.env.MAILER_DIR,
@@ -66,7 +80,27 @@ const config = {
     FORMAT: process.env.LOG_FORMAT,
     DIR: process.env.LOG_DIR,
   },
+  IP: process.env.IP,
   NODE_ENV: process.env.NODE_ENV,
+  sites: {
+    LinkedIn: process.env.LINKEDIN,
+    Viadeo: process.env.VIADEO,
+    Xing: process.env.XING,
+    Batiactu: process.env.BATIACTU,
+    Dribble: process.env.DRIBBLE,
+    Behance: process.env.BEHANCE,
+    'Culinary agents': process.env.CULINARY_AGENTS,
+    Symfony: process.env.SYMFONY,
+    HEC: process.env.HEC,
+    Polytechnique: process.env.POLYTECHNIQUE,
+    Ferrandi: process.env.FERRANDI,
+    UTC: process.env.UTC,
+    'Centrale Supélec': process.env.CENTRALE_SUPELEC,
+    'Centrale Lille': process.env.CENTRALE_LILLE,
+    Essec: process.env.ESSEC,
+    Neoma: process.env.NEOMA,
+  },
+  EXECUTABLE_PATH: process.env.EXECUTABLE_PATH || executablePath(),
 };
 
 export default config;
