@@ -87,13 +87,13 @@ export default class MailerServiceFile {
     email: string;
     invoice_link: string;
     invoice_amount: string;
-    invoice_date: number;
+    invoice_date: string;
     user: string;
   }): Promise<void> {
     try {
       const templateDir: string = join(__dirname, mailer.DIR);
       const confirmationEmail = fs.readFileSync(join(templateDir, 'invoices.html'), { encoding: 'utf-8' });
-      const [day, month, year] = new Date(invoice_date).toLocaleDateString('fr-FR').split('/');
+      const [day, month, year] = invoice_date.split('/');
       const htmlMailer = confirmationEmail
         .replace('{{invoice_link}}', invoice_link)
         .replace('{{user}}', user)
@@ -118,7 +118,6 @@ export default class MailerServiceFile {
     email,
     old_name_plan,
     old_price_plan,
-    old_period_plan,
     new_name_plan,
     new_price_plan,
     new_period_plan,
@@ -129,7 +128,6 @@ export default class MailerServiceFile {
     email: string;
     old_name_plan: string;
     old_price_plan: string;
-    old_period_plan: string;
     new_name_plan: string;
     new_price_plan: string;
     new_period_plan: string;
@@ -143,7 +141,6 @@ export default class MailerServiceFile {
       const htmlMailer = confirmationEmail
         .replace('{{old_name_plan}}', old_name_plan)
         .replace('{{old_price_plan}}', old_price_plan)
-        .replace('{{old_period_plan}}', old_period_plan)
         .replace('{{new_name_plan}}', new_name_plan)
         .replace('{{new_price_plan}}', new_price_plan)
         .replace('{{new_period_plan}}', new_period_plan)
@@ -170,13 +167,13 @@ export default class MailerServiceFile {
     email,
     plan,
     invoice_amount,
-    invoice_date,
+    cancel_date,
     user,
   }: {
     email: string;
     plan: role;
     invoice_amount: string;
-    invoice_date: string;
+    cancel_date: string;
     user: string;
   }): Promise<void> {
     try {
@@ -185,7 +182,7 @@ export default class MailerServiceFile {
       const htmlMailer = confirmationEmail
         .replace('{{plan}}', plan)
         .replace('{{user}}', user)
-        .replace('{{invoice_date}}', invoice_date)
+        .replace('{{cancel_date}}', cancel_date)
         .replace('{{invoice_price}}', invoice_amount);
 
       const mailOptions = {

@@ -5,7 +5,6 @@ interface paypal_payment {
   payment_method: 'paypal';
   payer_email: string;
   payer_name: string;
-  dangerous?: boolean;
   transaction_id: string;
 }
 
@@ -15,19 +14,49 @@ interface card_payment {
   exp_year: number;
   card_number: string;
   brand: string;
-  dangerous?: boolean;
 }
 
 type payment = card_payment | paypal_payment;
 
+interface session {
+  userId: number;
+}
+
+type recurring_period = 'Annuel' | 'Mensuel' | 'Trimestriel';
+interface subscribe {
+  role: role;
+  period: string;
+  end_at: string;
+  start_at: string;
+  amount: string;
+}
+
+interface previous {
+  role: role;
+  isComeBack: boolean;
+  amount: string;
+}
+
+interface invoice {
+  invoice_link: string;
+  invoiceId: string;
+  auto?: boolean;
+}
+
+type endEvent = 'create' | 'update' | 'cancel' | 'auto';
+
 interface subscribeStripe {
-  sub_end?: Date;
-  role?: role;
-  period_plan?: Stripe.Price.Recurring;
+  invoice?: invoice;
+  session?: session;
+  subscribe?: subscribe;
+  previous?: previous;
   payment?: payment;
-  invoice_link?: string;
+  correct: boolean;
 }
 export type stripeStore = Map<string | Stripe.Customer | Stripe.DeletedCustomer, subscribeStripe>;
+interface stripeEnd extends subscribeStripe {
+  customer: string;
+}
 export type stripeHandler = (req: Request, res: Response, next: NextFunction) => Promise<void | NodeJS.Timeout>;
 
 type Feedback = 'customer_service' | 'too_expensive' | 'missing_features' | 'unused' | 'other';

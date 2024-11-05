@@ -111,7 +111,7 @@
     "speakeasy": "^2.0.0",
     "stream-chain": "^3.1.0",
     "stream-json": "^1.8.0",
-    "stripe": "^13.11.0",
+    "stripe": "^17.0.0",
     "supertest": "^6.3.3",
     "tesseract.js": "^5.1.0",
     "ts-to-zod": "^3.13.0",

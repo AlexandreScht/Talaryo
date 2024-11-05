@@ -1,23 +1,25 @@
 import { regionCode, regionLoc } from '@/config/regionLoc';
+import type { recurring_period } from '@/interfaces/stripe';
 import { deburr } from 'lodash';
-import type Stripe from 'stripe';
 
-export function serialize_recurring(recurring: Stripe.Price.Recurring, name: boolean) {
+export function serialize_recurring(recurring: recurring_period, name: boolean = true) {
   if (!name) {
-    if (recurring.interval === 'month') {
-      return `${recurring.interval_count > 1 ? recurring.interval_count + ' mois' : 'mois'}`;
+    if (recurring === 'Mensuel') {
+      return 'par Mois';
     }
-    if (recurring.interval === 'year') {
-      return 'ans';
+    if (recurring === 'Annuel') {
+      return 'par An';
     }
+    return 'par Trimestre';
   }
-  if (recurring.interval === 'month') {
-    if (recurring.interval_count === 3) {
-      return 'Trimestriel';
-    }
+  if (recurring === 'Mensuel') {
     return 'Mensuel';
   }
-  return 'Annuel';
+  if (recurring === 'Annuel') {
+    return 'Annuel';
+  }
+
+  return 'Trimestriel';
 }
 
 export function serializeLoc(locs: string[], zone: boolean): string {

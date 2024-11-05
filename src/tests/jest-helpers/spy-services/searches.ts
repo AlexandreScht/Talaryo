@@ -12,6 +12,7 @@ export default function searchMockedService(): SearchServicesJest {
   const get = jest.spyOn(SearchService, 'get');
   const getSearchesFromFolder = jest.spyOn(SearchService, 'getSearchesFromFolder');
   const deleteFav = jest.spyOn(SearchService, 'delete');
+  const lockIn = jest.spyOn(SearchService, 'lockIn');
 
   return {
     deleteSearchesFromFolder,
@@ -20,5 +21,6 @@ export default function searchMockedService(): SearchServicesJest {
     get,
     getSearchesFromFolder,
     deleteFav,
+    lockIn,
   };
 }

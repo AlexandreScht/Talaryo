@@ -22,7 +22,7 @@ export async function seed(knex: Knex): Promise<void> {
     firstName: 'Alexandre',
     lastName: 'Scht',
     subscribe_status: 'active',
-    stripeCustomer: 'cus_PrhCl2nTEJhznf',
+    stripeCustomer: 'cus_R9P9Mgbt5blYPQ',
     validate: true,
   });
   await knex('users').insert({

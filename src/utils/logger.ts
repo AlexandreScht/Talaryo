@@ -7,11 +7,16 @@ import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 
 const { log } = config;
+
+const isTestEnv = process.env.NODE_ENV === 'test';
+
 // logs dir
 const logDir: string = join(__dirname, log.DIR);
 
-if (!existsSync(logDir)) {
-  mkdirSync(logDir);
+if (!isTestEnv) {
+  if (!existsSync(logDir)) {
+    mkdirSync(logDir);
+  }
 }
 
 // Define log format
@@ -24,43 +29,37 @@ const filterOnly = level => {
   })();
 };
 
-/*
- * Log Level
- * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
- */
-const logger = winston.createLogger({
-  format: winston.format.combine(
-    winston.format.timestamp({
-      format: () => moment().tz('Europe/Paris').format('YYYY-MM-DD HH:mm:ss'), // Change 'Europe/Paris' to your timezone
-    }),
-    logFormat,
-  ),
-  transports: [
-    // debug log setting
+const transports = [];
+
+if (!isTestEnv) {
+  // Add file transports only if not in test environment
+  transports.push(
+    // Debug log setting
     new winstonDaily({
       level: 'debug',
       datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/debug', // dir log file -> /logs/debug/*.log
+      dirname: `${logDir}/debug`, // dir log file -> /logs/debug/*.log
       filename: `%DATE%.log`,
       maxFiles: 30, // 30 Days saved
       json: false,
       zippedArchive: true,
     }),
+    // Warn log setting
     new winstonDaily({
       level: 'warn',
       datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/warn', // dir log file -> /logs/warn/*.log
+      dirname: `${logDir}/warn`, // dir log file -> /logs/warn/*.log
       filename: `%DATE%.log`,
       maxFiles: 90, // 90 Days saved
       json: false,
       zippedArchive: true,
       format: winston.format.combine(filterOnly('warn')),
     }),
-    // error log setting
+    // Error log setting
     new winstonDaily({
       level: 'error',
       datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/error', // dir log file -> /logs/error/*.log
+      dirname: `${logDir}/error`, // dir log file -> /logs/error/*.log
       filename: `%DATE%.log`,
       maxFiles: 30, // 30 Days saved
       handleExceptions: true,
@@ -68,12 +67,10 @@ const logger = winston.createLogger({
       zippedArchive: true,
       format: winston.format.combine(filterOnly('error')),
     }),
-  ],
-});
+  );
 
-// Ajouter cette condition autour du transport Console
-if (process.env.NODE_ENV !== 'test') {
-  logger.add(
+  // Add console transport only if not in test environment
+  transports.push(
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
@@ -89,10 +86,23 @@ if (process.env.NODE_ENV !== 'test') {
   );
 }
 
+// Create the logger with the transports
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp({
+      format: () => moment().tz('Europe/Paris').format('YYYY-MM-DD HH:mm:ss'),
+    }),
+    logFormat,
+  ),
+  transports,
+  silent: isTestEnv, // Silence all logs during tests
+});
+
 const stream = {
   write: (message: string) => {
-    if (!/POST \/api\/stripe_webhook/.test(message)) {
-      logger.info(message.substring(0, message.lastIndexOf('\n')));
+    if (!isTestEnv && !/POST \/api\/stripe_webhook/.test(message)) {
+      logger.info(message.trim());
     }
   },
 };

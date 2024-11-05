@@ -17,7 +17,7 @@ export default class SignalHereWebhook {
     this.ScoreService = Container.get(ScoreServiceFile);
   }
 
-  public async Event(req: Request, res: Response, next: NextFunction) {
+  public Event = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const requestId = req.headers['request-id'];
       const [
@@ -51,9 +51,10 @@ export default class SignalHereWebhook {
         },
       });
       await this.MemoryServer.delMemory(`signalHire.${requestId}`);
+      res.send();
     } catch (error) {
       logger.error('SignalHereWebhook.Event =>' + error);
       next(error);
     }
-  }
+  };
 }

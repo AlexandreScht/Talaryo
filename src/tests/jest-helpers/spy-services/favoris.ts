@@ -13,6 +13,7 @@ export default function favorisMockedService(): FavorisServicesJest {
   const create = jest.spyOn(FavoriteService, 'create');
   const deleteFavorisFromFolder = jest.spyOn(FavoriteService, 'deleteFavorisFromFolder');
   const userCandidateFavoris = jest.spyOn(FavoriteService, 'userCandidateFavoris');
+  const lockIn = jest.spyOn(FavoriteService, 'lockIn');
 
   return {
     getTotalFavorisCount,
@@ -23,5 +24,6 @@ export default function favorisMockedService(): FavorisServicesJest {
     create,
     deleteFavorisFromFolder,
     userCandidateFavoris,
+    lockIn,
   };
 }

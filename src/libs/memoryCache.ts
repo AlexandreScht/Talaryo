@@ -5,13 +5,11 @@ import RedisInstance from './redis';
 
 class MemoryServerCache {
   private static instance: MemoryServerCache;
-  public memory: Map<string, unknown>;
+  public memory: Map<string, unknown> = new Map();
   private redisClient: Redis;
 
   private constructor() {
-    this.memory = new Map();
     this.redisClient = RedisInstance.getRedisClient();
-
     this.init();
   }
 
@@ -22,6 +20,8 @@ class MemoryServerCache {
       }
       return MemoryServerCache.instance;
     } catch (error) {
+      console.log(error);
+
       logger.error('MemoryServerCache.getInstance => ', error);
       throw new ServerException(500, "Couldn't create MemoryServerCache instance");
     }
@@ -45,6 +45,7 @@ class MemoryServerCache {
       };
       await processKeys('0');
     } catch (error) {
+      console.log(error);
       logger.error('MemoryServerCache.init => ', error);
       throw new ServerException(500, "Couldn't initialize the server memory cache");
     }
@@ -61,6 +62,7 @@ class MemoryServerCache {
       }
       return this.memory as Map<string, T | unknown>;
     } catch (error) {
+      console.log(error);
       logger.error('MemoryServerCache.getMemory => ', error);
       throw new ServerException(500, "Couldn't retrieve memory data");
     }
@@ -71,6 +73,7 @@ class MemoryServerCache {
       this.memory.delete(key);
       this.redisClient.del(`Cache.${key}`);
     } catch (error) {
+      console.log(error);
       logger.error('MemoryServerCache.delMemory => ', error);
       throw new ServerException(500, "Couldn't delete memory entries");
     }
@@ -81,27 +84,9 @@ class MemoryServerCache {
       this.memory.set(key, value);
       await this.redisClient.set(`Cache.${key}`, JSON.stringify(value));
     } catch (error) {
+      console.log(error);
       logger.error('MemoryServerCache.setMemory => ', error);
       throw new ServerException(500, "Couldn't set memory entries");
-    }
-  }
-
-  public async addMemory<T>(key: string, value: T): Promise<boolean> {
-    try {
-      const existingValues = this.memory.get(key) as Record<string, unknown> | unknown[] | undefined;
-
-      if (existingValues) {
-        if (typeof existingValues?.length === 'number') {
-          this.memory.set(key, [...(existingValues as unknown[]), value]);
-        }
-        this.memory.set(key, { ...(existingValues as Record<string, unknown>), ...value });
-        await this.redisClient.set(`Cache.${key}`, JSON.stringify(this.memory.get(key)));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      logger.error('MemoryServerCache.addMemory => ', error);
-      throw new ServerException(500, "Couldn't add memory entries");
     }
   }
 
@@ -120,6 +105,7 @@ class MemoryServerCache {
       };
       await deleteRedisKeys('0');
     } catch (error) {
+      console.log(error);
       logger.error('MemoryServerCache.clearMemory => ', error);
       throw new ServerException(500, "Couldn't clear the server memory and cache");
     }

@@ -11,9 +11,9 @@ import type ScoreServiceFile from '@/services/scores';
 import type SearchesServiceFile from '@/services/searches';
 import type SearchFolderServiceFile from '@/services/searchFolders';
 import type UserServiceFile from '@/services/users';
-import ScrapperServiceFile from '@/strategys/scrapper';
+import type ScrapperServiceFile from '@/strategys/scrapper';
 import type { AxiosRequestConfig } from 'axios';
-import Tesseract from 'tesseract.js';
+import type Tesseract from 'tesseract.js';
 import type { eventData } from './webSocket';
 
 //; modules
@@ -41,7 +41,6 @@ interface StreamManagerJest {
 interface MemoryCacheJest {
   setMemory: jest.SpiedFunction<MemoryServerCache['setMemory']>;
   getMemory: jest.SpiedFunction<MemoryServerCache['getMemory']>;
-  addMemory: jest.SpiedFunction<MemoryServerCache['addMemory']>;
   clearMemory: jest.SpiedFunction<MemoryServerCache['clearMemory']>;
   delMemory: jest.SpiedFunction<MemoryServerCache['delMemory']>;
   memoryData: MemoryServerCache['memory'];
@@ -108,6 +107,7 @@ interface SearchServicesJest {
   get: jest.SpiedFunction<SearchesServiceFile['get']>;
   getSearchesFromFolder: jest.SpiedFunction<SearchesServiceFile['getSearchesFromFolder']>;
   deleteFav: jest.SpiedFunction<SearchesServiceFile['delete']>;
+  lockIn: jest.SpiedFunction<SearchesServiceFile['lockIn']>;
 }
 
 //> scores
@@ -136,6 +136,7 @@ interface FavorisServicesJest {
   create: jest.SpiedFunction<FavorisServiceFile['create']>;
   deleteFavorisFromFolder: jest.SpiedFunction<FavorisServiceFile['deleteFavorisFromFolder']>;
   userCandidateFavoris: jest.SpiedFunction<FavorisServiceFile['userCandidateFavoris']>;
+  lockIn: jest.SpiedFunction<FavorisServiceFile['lockIn']>;
 }
 
 //> favFolder
@@ -146,6 +147,7 @@ interface FavFolderServicesJest {
   deleteFavFolder: jest.SpiedFunction<FavorisFolderServiceFile['delete']>;
 }
 
+//> mailer
 interface MailerServicesJest {
   Registration: jest.SpiedFunction<MailerServiceFile['Registration']>;
   TwoFactorAuthenticate: jest.SpiedFunction<MailerServiceFile['TwoFactorAuthenticate']>;

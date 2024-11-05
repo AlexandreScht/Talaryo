@@ -1,4 +1,5 @@
-import { stripeHandler } from '@/interfaces/stripe';
+import { InvalidCredentialsError } from '@/exceptions';
+import type { stripeHandler } from '@/interfaces/stripe';
 import type { StripeRequest } from '@/interfaces/webhook';
 import config from '@config';
 import { logger } from '@utils/logger';
@@ -6,7 +7,6 @@ import type { NextFunction, Response } from 'express';
 import type Stripe from 'stripe';
 
 const { stripeENV } = config;
-
 //? check signature of stripe token
 const stripeHost =
   (handle: stripeHandler, stripe: Stripe) =>
@@ -20,7 +20,7 @@ const stripeHost =
       await handle(req, res, next);
     } catch (err) {
       logger.error(err.message);
-      next(err);
+      next(new InvalidCredentialsError('stripe signature incorrect'));
     }
   };
 

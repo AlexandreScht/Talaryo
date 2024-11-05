@@ -3,8 +3,9 @@ import type Stripe from 'stripe';
 
 const stripeMock = {
   subscriptions: {
-    update: jest.fn().mockResolvedValue('ta grand mere'),
+    update: jest.fn(),
     list: jest.fn(),
+    cancel: jest.fn(),
   },
   billingPortal: {
     sessions: {
@@ -25,8 +26,8 @@ const stripeMock = {
   charges: {
     retrieve: jest.fn(),
   },
-} as unknown as Stripe;
-export default function stripeMocked() {
-  jest.spyOn(stripeInstance, 'default').mockReturnValue(stripeMock);
-  return stripeMock as any;
-}
+} as jest.MockedObjectDeep<Stripe>;
+
+jest.spyOn(stripeInstance, 'default').mockReturnValue(stripeMock);
+
+export default stripeMock;

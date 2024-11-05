@@ -100,7 +100,7 @@ const config = {
     Essec: process.env.ESSEC,
     Neoma: process.env.NEOMA,
   },
-  EXECUTABLE_PATH: process.env.EXECUTABLE_PATH || executablePath(),
+  EXECUTABLE_PATH: process.env.NODE_ENV !== 'production' ? executablePath() : process.env.EXECUTABLE_PATH,
 };
 
 export default config;
