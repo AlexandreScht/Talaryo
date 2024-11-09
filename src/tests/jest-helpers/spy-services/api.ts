@@ -10,6 +10,7 @@ export default function apiMockedService(): APIServicesJest {
   const FetchMailRequestId = jest.spyOn(ApiService, 'FetchMailRequestId');
   const FetchMailData = jest.spyOn(ApiService, 'FetchMailData');
   const SendSignalHireRequest = jest.spyOn(ApiService, 'SendSignalHireRequest');
+  const checkSignalHireCredit = jest.spyOn(ApiService, 'checkSignalHireCredit');
 
   return {
     updateBrevoUser,
@@ -17,5 +18,6 @@ export default function apiMockedService(): APIServicesJest {
     FetchMailRequestId,
     FetchMailData,
     SendSignalHireRequest,
+    checkSignalHireCredit,
   };
 }

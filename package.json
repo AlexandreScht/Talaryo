@@ -19,7 +19,6 @@
     "rollback": "knex migrate:rollback --knexfile=knexfile.ts --verbose",
     "make:seeder": "knex seed:make --knexfile=knexfile.ts -x ts --env development",
     "make:migration": "knex migrate:make --knexfile=knexfile.ts -x ts --env development",
-    "generate-zod": "ts-to-zod convertZodType.ts tsTypeZod.ts",
     "deploy:dev": "node deploy.js dev",
     "deploy:prod": "node deploy.js prod"
   },
@@ -114,7 +113,6 @@
     "stripe": "^17.0.0",
     "supertest": "^6.3.3",
     "tesseract.js": "^5.1.0",
-    "ts-to-zod": "^3.13.0",
     "typedi": "^0.10.0",
     "uuid": "^10.0.0",
     "winston": "^3.10.0",

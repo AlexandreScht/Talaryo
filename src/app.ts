@@ -11,7 +11,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import type { NextFunction, Request, Response } from 'express';
 import express from 'express';
-import { IpFilter } from 'express-ipfilter';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
@@ -84,7 +83,6 @@ export default class App extends ApiRouter {
     this.app.use(helmet());
     this.app.use(compression());
     this.initializeBodyContent();
-    this.app.use(IpFilter(config.allowedIp, { mode: 'allow', log: false }));
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser(COOKIE_TOKEN));
     this.app.options(

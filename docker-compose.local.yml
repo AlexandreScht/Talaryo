@@ -1,0 +1,26 @@
+services:
+  server-local:
+    container_name: localapi-talaryo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3005:3000'
+    env_file:
+      - .env.docker
+    environment:
+      PORT: 3000
+      DB_HOST: 192.168.1.123
+      REDIS_HOST: 192.168.1.123
+      MDB_HOST: 192.168.1.123
+      EXECUTABLE_PATH: 'google-chrome-stable'
+
+    restart: on-failure:5
+    networks:
+      local-docker-network:
+        aliases:
+          - localapi-talaryo
+
+networks:
+  local-docker-network:
+    external: true

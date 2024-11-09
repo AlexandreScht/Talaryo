@@ -47,7 +47,17 @@ interface AuthControllerRegister {
 interface AuthControllerAskCode {
   cookie: { access_cookie: cookiesValues<codeToken> };
 }
+interface AuthControllerResetPassword {
+  cookie: { reset_access: cookiesValues<codeToken> };
+  body: {
+    password: string;
+  };
+  token: string;
+}
 
+interface AuthControllerAskResetPassword {
+  params: { email: string };
+}
 interface AuthControllerValidAccount {
   cookie: { access_cookie: cookiesValues<codeToken> };
   body: { code: number };

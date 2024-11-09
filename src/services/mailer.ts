@@ -46,7 +46,7 @@ export default class MailerServiceFile {
       const mailOptions = {
         from: mailer.USER,
         to: email,
-        subject: 'Validez votre inscription - JobFiller',
+        subject: 'Validez votre inscription - Talaryo',
         html: htmlMailer,
       };
 
@@ -66,7 +66,7 @@ export default class MailerServiceFile {
       const mailOptions = {
         from: mailer.USER,
         to: email,
-        subject: 'Votre code 2FA - JobFiller',
+        subject: 'Votre code 2FA - Talaryo',
         html: htmlMailer,
       };
 
@@ -340,18 +340,19 @@ export default class MailerServiceFile {
     }
   }
 
-  public async ResetPassword(email: string, token: string): Promise<void> {
+  public async ResetPassword(email: string, resetToken: string): Promise<void> {
     try {
       const templateDir: string = join(__dirname, mailer.DIR);
       const confirmationEmail = fs.readFileSync(join(templateDir, 'reset-password.html'), { encoding: 'utf-8' });
       const htmlMailer = confirmationEmail
         .replace('{{support_MAIL}}', mailer.USER)
-        .replace('{{url}}', ORIGIN + `/reset-password/new?token=${encodeURIComponent(token)}`);
+        .replace('{{link}}', `${ORIGIN}/reset-password/new?resetToken=${resetToken}`);
 
       const mailOptions = {
         from: mailer.USER,
         to: email,
-        subject: 'Lien de réinitialisation de mot de passe - Talaryo',
+        subject: 'Demande de réinitialisation de mot de passe',
+
         html: htmlMailer,
       };
 

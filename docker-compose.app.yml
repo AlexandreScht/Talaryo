@@ -1,0 +1,23 @@
+services:
+  server-app:
+    container_name: appapi-talaryo
+    image: ir0ws/appapi-talaryo:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3005:3000'
+    env_file:
+      - .env
+    environment:
+      EXECUTABLE_PATH: 'google-chrome-stable'
+
+    restart: on-failure:5
+    networks:
+      app-docker-network:
+        aliases:
+          - appapi-talaryo
+
+networks:
+  app-docker-network:
+    external: true

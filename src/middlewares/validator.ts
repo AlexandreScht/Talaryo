@@ -91,6 +91,9 @@ const Validator = ({ body, params: iniParams, query: iniQuery, token: tokenShame
       await next();
     } catch (error) {
       if (error instanceof ZodError) {
+        if (error.errors.some(err => err.path.join('.') === 'token')) {
+          throw new InvalidArgumentError('Votre token est invalide');
+        }
         const combinedErrorMessage = error.errors
           .map(err => {
             const path = err.path.join('.');

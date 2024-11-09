@@ -7,6 +7,7 @@ import {
   SubscribeControllerCreate,
   SubscribeControllerUpdate,
 } from '@/interfaces/controller';
+import { recurring_period } from '@/interfaces/stripe';
 import UserServiceFile from '@/services/users';
 import { logger } from '@/utils/logger';
 import { serialize_recurring } from '@/utils/serializer';
@@ -223,7 +224,7 @@ export default class SubscribeControllerFile implements ControllerMethods<Subscr
         return {
           plan: price.metadata?.sub_id.toLocaleUpperCase(),
           start: new Date(period.end * 1000).toLocaleDateString('fr-FR'),
-          recurring: serialize_recurring(price.recurring, false),
+          recurring: serialize_recurring(price.nickname as recurring_period, false),
         };
       };
 

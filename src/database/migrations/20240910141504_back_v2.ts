@@ -21,6 +21,16 @@ export async function up(knex: Knex): Promise<void> {
       table.enu('twoFactorType', ['authenticator', 'email', null]).nullable();
     });
   }
+
+  const hasPasswordReset = await knex.schema.hasColumn('users', 'passwordReset');
+  if (hasPasswordReset) {
+    await knex.schema.alterTable('users', table => {
+      table.dropColumn('passwordReset');
+    });
+  }
+  await knex.schema.alterTable('users', table => {
+    table.string('passwordReset', 125).nullable();
+  });
 }
 
 export async function down(knex: Knex): Promise<void> {
@@ -41,6 +51,13 @@ export async function down(knex: Knex): Promise<void> {
   if (hasTwoFactorType) {
     await knex.schema.alterTable('users', table => {
       table.dropColumn('twoFactorType');
+    });
+  }
+
+  const hasPasswordReset = await knex.schema.hasColumn('users', 'passwordReset');
+  if (hasPasswordReset) {
+    await knex.schema.alterTable('users', table => {
+      table.dropColumn('passwordReset');
     });
   }
 }

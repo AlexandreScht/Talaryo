@@ -1,5 +1,5 @@
 import AuthControllerFile from '@/controllers/auth';
-import { activate2FASchema, askCodeSchema, loginSchema, registerSchema, verify2FASchema } from '@/libs/shemaValidate';
+import { activate2FASchema, askCodeSchema, loginSchema, registerSchema, resetPasswordSchema, verify2FASchema } from '@/libs/shemaValidate';
 import auth from '@/middlewares/auth';
 import captchaTest from '@/middlewares/captcha';
 import { googleOAuthToken } from '@/middlewares/checkOAuth';
@@ -9,6 +9,7 @@ import slowDown from '@/middlewares/slowDown';
 import Validator from '@/middlewares/validator';
 import { stringValidator } from '@/utils/zodValidate';
 import { Router } from 'express';
+import { z } from 'zod';
 
 export class AuthRouter extends AuthControllerFile {
   public router = Router();
@@ -21,6 +22,11 @@ export class AuthRouter extends AuthControllerFile {
   initializeRoutes() {
     this.router.post('/register', mw([Validator({ body: registerSchema }), captchaTest(), this.register]));
     this.router.get('/askCode', mw([cookieValues({ names: 'access_cookie', acceptError: true }), this.askCode]));
+    this.router.patch(
+      '/reset-password',
+      mw([cookieValues({ names: 'reset_access' }), Validator({ body: resetPasswordSchema, token: stringValidator }), this.resetPassword]),
+    );
+    this.router.patch('/reset-password/:email', mw([Validator({ params: z.object({ email: stringValidator }) }), this.askResetPassword]));
     this.router.patch(
       '/validate-account',
       mw([Validator({ body: askCodeSchema }), cookieValues({ names: 'access_cookie', acceptError: true }), this.validateAccount]),

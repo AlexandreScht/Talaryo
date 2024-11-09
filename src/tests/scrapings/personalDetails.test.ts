@@ -23,6 +23,7 @@ describe('GET scrapping/personal-data', () => {
   let improveScore: ScoresServicesJest['improveScore'];
   let FetchMailRequestId: APIServicesJest['FetchMailRequestId'];
   let SendSignalHireRequest: APIServicesJest['SendSignalHireRequest'];
+  let checkSignalHireCredit: APIServicesJest['checkSignalHireCredit'];
   let FetchMailData: APIServicesJest['FetchMailData'];
   let personalData: jest.SpyInstance<
     Promise<{ color: any; email: any; phone: any }[] | { email: string; phone: string | string[]; color: number }>,
@@ -40,6 +41,7 @@ describe('GET scrapping/personal-data', () => {
 
     FetchMailRequestId = apiMockedService().FetchMailRequestId;
     SendSignalHireRequest = apiMockedService().SendSignalHireRequest;
+    checkSignalHireCredit = apiMockedService().checkSignalHireCredit;
     FetchMailData = apiMockedService().FetchMailData;
 
     personalData = jest.spyOn(MongoService, 'personalData');
@@ -58,6 +60,7 @@ describe('GET scrapping/personal-data', () => {
     expect(improveScore).not.toHaveBeenCalled();
     expect(FetchMailRequestId).not.toHaveBeenCalled();
     expect(SendSignalHireRequest).not.toHaveBeenCalled();
+    expect(checkSignalHireCredit).not.toHaveBeenCalled();
     expect(FetchMailData).not.toHaveBeenCalled();
     expect(personalData).not.toHaveBeenCalled();
     expect(setMemory).not.toHaveBeenCalled();
@@ -77,6 +80,7 @@ describe('GET scrapping/personal-data', () => {
     expect(improveScore).not.toHaveBeenCalled();
     expect(FetchMailRequestId).not.toHaveBeenCalled();
     expect(SendSignalHireRequest).not.toHaveBeenCalled();
+    expect(checkSignalHireCredit).not.toHaveBeenCalled();
     expect(FetchMailData).not.toHaveBeenCalled();
     expect(personalData).not.toHaveBeenCalled();
     expect(setMemory).not.toHaveBeenCalled();
@@ -99,6 +103,7 @@ describe('GET scrapping/personal-data', () => {
     expect(improveScore).not.toHaveBeenCalled();
     expect(FetchMailRequestId).not.toHaveBeenCalled();
     expect(SendSignalHireRequest).not.toHaveBeenCalled();
+    expect(checkSignalHireCredit).not.toHaveBeenCalled();
     expect(FetchMailData).not.toHaveBeenCalled();
     expect(personalData).not.toHaveBeenCalled();
     expect(setMemory).not.toHaveBeenCalled();
@@ -126,6 +131,7 @@ describe('GET scrapping/personal-data', () => {
     expect(personalData).not.toHaveBeenCalled();
     expect(improveScore).not.toHaveBeenCalled();
     expect(SendSignalHireRequest).not.toHaveBeenCalled();
+    expect(checkSignalHireCredit).not.toHaveBeenCalled();
     expect(setMemory).not.toHaveBeenCalled();
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
@@ -153,6 +159,7 @@ describe('GET scrapping/personal-data', () => {
     expect(personalData).toHaveBeenNthCalledWith(1, 'alexandre', 'schecht');
     expect(improveScore).not.toHaveBeenCalled();
     expect(SendSignalHireRequest).not.toHaveBeenCalled();
+    expect(checkSignalHireCredit).not.toHaveBeenCalled();
     expect(setMemory).not.toHaveBeenCalled();
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
@@ -182,6 +189,7 @@ describe('GET scrapping/personal-data', () => {
     expect(personalData).not.toHaveBeenCalled();
     expect(improveScore).toHaveBeenNthCalledWith(1, ['mails'], 1, 1);
     expect(SendSignalHireRequest).not.toHaveBeenCalled();
+    expect(checkSignalHireCredit).not.toHaveBeenCalled();
     expect(setMemory).not.toHaveBeenCalled();
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -215,6 +223,7 @@ describe('GET scrapping/personal-data', () => {
     expect(personalData).toHaveBeenNthCalledWith(1, 'alexandre', 'schecht');
     expect(improveScore).toHaveBeenNthCalledWith(1, ['mails'], 1, 1);
     expect(SendSignalHireRequest).not.toHaveBeenCalled();
+    expect(checkSignalHireCredit).not.toHaveBeenCalled();
     expect(setMemory).not.toHaveBeenCalled();
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -228,6 +237,7 @@ describe('GET scrapping/personal-data', () => {
     FetchMailRequestId.mockResolvedValue('fetchId');
     FetchMailData.mockResolvedValue(undefined);
     personalData.mockResolvedValue(undefined);
+    checkSignalHireCredit.mockResolvedValue(1).mockResolvedValueOnce(0);
     SendSignalHireRequest.mockResolvedValue('signalHireId');
     const response = await scrapePersonalDataRequest({ refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'pro' }).query({
       firstName: 'alexandre',
@@ -245,7 +255,14 @@ describe('GET scrapping/personal-data', () => {
     });
     expect(personalData).toHaveBeenNthCalledWith(1, 'alexandre', 'schecht');
     expect(improveScore).not.toHaveBeenCalled();
-    expect(SendSignalHireRequest).toHaveBeenNthCalledWith(1, 'http://linkedIn.com', expect.stringMatching(/^http.*\/api$/));
+    expect(checkSignalHireCredit).toHaveBeenCalledTimes(2);
+    expect(checkSignalHireCredit).toHaveBeenCalledWith(expect.stringMatching(/^202./));
+    expect(SendSignalHireRequest).toHaveBeenNthCalledWith(
+      1,
+      'http://linkedIn.com',
+      expect.stringMatching(/^http.*\/api\/signalHire$/),
+      expect.stringMatching(/^202./),
+    );
     expect(setMemory).toHaveBeenNthCalledWith(1, 'signalHire.signalHireId', { userId: 1, link: 'http://linkedIn.com' });
     expect(response.status).toBe(206);
     expect(response.body).toEqual({});

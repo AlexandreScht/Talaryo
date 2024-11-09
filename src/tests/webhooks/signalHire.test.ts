@@ -9,7 +9,7 @@ describe('WEBHOOK signalHire', () => {
   const contacts = [{ type: 'email', value: 'alexandreschecht@gmail.com', rating: 25 }];
   const signalHireEvent = (empty: boolean) => {
     return request(global.app)
-      .post('/api/webhook/signalHere')
+      .post('/api/webhook/signalHire')
       .set('request-id', 'requestId')
       .send([{ candidate: { ...(!empty ? {} : { contacts }) } }]);
   };

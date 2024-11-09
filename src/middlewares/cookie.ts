@@ -50,7 +50,7 @@ const cookieValues = ({
       }, undefined);
 
       if (!foundedCookies) {
-        if (!acceptError) throw new NotFoundError('Le ou les cookies nécessaires sont introuvables.');
+        if (!acceptError) throw new NotFoundError("Votre code d'accès est introuvable. Veuillez refaire votre demande.");
         ctx.locals = { ...locals, cookie: {} };
       } else {
         ctx.locals = { ...locals, cookie: foundedCookies };

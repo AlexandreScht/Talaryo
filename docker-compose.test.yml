@@ -1,0 +1,23 @@
+services:
+  server-test:
+    container_name: testapi-talaryo
+    image: ir0ws/testapi-talaryo:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3006:3000'
+    env_file:
+      - .env
+    environment:
+      EXECUTABLE_PATH: 'google-chrome-stable'
+
+    restart: on-failure:5
+    networks:
+      test-docker-network:
+        aliases:
+          - testapi-talaryo
+
+networks:
+  test-docker-network:
+    external: true

@@ -41,6 +41,21 @@ export const askCodeSchema = z.object({
   code: numberValidator,
 });
 
+export const resetPasswordSchema = z
+  .object({
+    password: passwordValidator,
+    confirm: stringValidator,
+  })
+  .superRefine((data, ctx) => {
+    if (data.confirm !== data.password) {
+      ctx.addIssue({
+        path: ['confirm'],
+        message: 'Les mots de passe doivent être identiques',
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
+
 export const verify2FASchema = z.object({
   otp: numberValidator,
 });

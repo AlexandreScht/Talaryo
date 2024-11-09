@@ -42,13 +42,13 @@ describe('GET auth/verify2FA', () => {
   });
 
   //; without cookie: TwoFA_cookie
-  it('without cookie: TwoFA_cookie => 404 error ( Le ou les cookies nécessaires sont introuvables )', async () => {
+  it("without cookie: TwoFA_cookie => 404 error ( Votre code d'accès est introuvable. Veuillez refaire votre demande )", async () => {
     const response = await verify2FaRequest('08');
 
     expect(response.status).toBe(404);
     expect(updateUsers).not.toHaveBeenCalled();
     expect(findUsers).not.toHaveBeenCalled();
-    expect(response.body.error).toBe('Le ou les cookies nécessaires sont introuvables.');
+    expect(response.body.error).toBe("Votre code d'accès est introuvable. Veuillez refaire votre demande.");
   });
 
   //; with expired cookie: TwoFA_cookie

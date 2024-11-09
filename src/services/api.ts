@@ -53,16 +53,29 @@ export default class ApiServiceFile {
     }
   }
 
-  public async SendSignalHireRequest(link: string, callbackUrl: string) {
+  public async SendSignalHireRequest(link: string, callbackUrl: string, apiKey: string): Promise<string> {
     try {
       const {
         data: { requestId },
-      } = await signalHireAPI.post('/candidate/search', {
+      } = await signalHireAPI(apiKey).post('/candidate/search', {
         items: [link],
         callbackUrl: `${callbackUrl}/webhook/`,
       });
 
-      return requestId;
+      return requestId as string;
+    } catch (error) {
+      logger.error('ApiService.SendSignalHireRequest => ', error);
+      throw new ServicesError();
+    }
+  }
+
+  public async checkSignalHireCredit(apiKey: string): Promise<number> {
+    try {
+      const {
+        data: { credits },
+      } = await signalHireAPI(apiKey).get('/credits');
+
+      return (credits as number) || 0;
     } catch (error) {
       logger.error('ApiService.SendSignalHireRequest => ', error);
       throw new ServicesError();

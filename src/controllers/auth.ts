@@ -13,9 +13,11 @@ import * as tokenUtils from '@/utils/token';
 import {
   AuthControllerActivate2FA,
   AuthControllerAskCode,
+  AuthControllerAskResetPassword,
   AuthControllerLogin,
   AuthControllerOAuth,
   AuthControllerRegister,
+  AuthControllerResetPassword,
   AuthControllerValidAccount,
   AuthControllerVerify2FA,
   ControllerMethods,
@@ -57,10 +59,10 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         if (!validate) {
           const { accessCode, accessToken } = await this.UserService.generateCodeAccess(userId);
           await this.MailerService.Registration(email, firstName, accessCode as number);
-          createSessionCookie<codeToken>(res, { id: userId, accessToken, cookieName: 'access_cookie' }, '15m', true);
+          createSessionCookie<codeToken>(res, { id: userId, accessToken, cookieName: 'access_cookie' }, '15m');
         } else {
           //? fake access token
-          createSessionCookie<codeToken>(res, { id: null, accessToken: null, cookieName: 'access_cookie' }, '15m', true);
+          createSessionCookie<codeToken>(res, { id: null, accessToken: null, cookieName: 'access_cookie' }, '15m');
         }
         res.status(201).send(true);
         return;
@@ -76,13 +78,75 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         }
         await this.APIService.CreateBrevoUser({ email, firstName, lastName, google: false });
         await this.MailerService.Registration(email, firstName, accessCode);
-        createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
+        createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m');
       });
 
       res.status(201).send(true);
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('AuthControllerFile.register => ', error);
+      }
+      next(error);
+    }
+  };
+
+  protected askResetPassword: ExpressHandler<AuthControllerAskResetPassword> = async ({
+    locals: {
+      params: { email },
+    },
+    res,
+    next,
+  }) => {
+    try {
+      const { id: userId, validate } = (await this.UserService.getUser({ email, oAuthAccount: false }, ['id', 'validate'])) || {};
+      if (!userId) {
+        res.status(204).send(true);
+        return;
+      }
+      if (!validate) throw new InvalidSessionError('Veuillez valider votre compte par e-mail.');
+      const { accessToken, passwordReset } = await this.UserService.presetNewPassword(userId);
+      await this.MailerService.ResetPassword(email, passwordReset);
+
+      createSessionCookie<codeToken>(res, { id: userId, accessToken, cookieName: 'reset_access' }, '15m');
+      res.status(204).send(true);
+    } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.askCode => ', error);
+      }
+      next(error);
+    }
+  };
+
+  protected resetPassword: ExpressHandler<AuthControllerResetPassword> = async ({
+    locals: {
+      cookie: { reset_access },
+      body: { password },
+      token: passwordReset,
+    },
+    res,
+    next,
+  }) => {
+    try {
+      if (!reset_access) throw new NotFoundError("Votre code d'accès est introuvable. Veuillez refaire votre demande.");
+      if (!reset_access?.id || !reset_access?.accessToken)
+        throw new InvalidArgumentError("Votre code d'accès est incorrect. Veuillez refaire votre demande.");
+      const { id, accessToken } = reset_access;
+      const success = await this.UserService.updateUsers(
+        { id, accessToken, password: { not: null }, passwordReset },
+        { password, passwordReset: null },
+      );
+
+      if (!success) throw new ServicesError('Impossible de mettre à jour votre mot de passe. Veuillez contacter le support.');
+      res.clearCookie('reset_access', {
+        signed: true,
+        httpOnly: true,
+        domain: new URL(config.ORIGIN).hostname,
+        secure: config.ORIGIN.startsWith('https'),
+      });
+      res.status(204).send(true);
+    } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.askCode => ', error);
       }
       next(error);
     }
@@ -113,7 +177,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       const { accessCode, accessToken, email, firstName } = await this.UserService.generateCodeAccess(id);
       await this.MailerService.Registration(email, firstName, accessCode as number);
 
-      createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m', true);
+      createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m');
       res.send(true);
     } catch (error) {
       if (!(error instanceof ServerException)) {

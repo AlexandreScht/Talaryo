@@ -74,6 +74,7 @@ interface APIServicesJest {
   FetchMailRequestId: jest.SpiedFunction<ApiServiceFile['FetchMailRequestId']>;
   FetchMailData: jest.SpiedFunction<ApiServiceFile['FetchMailData']>;
   SendSignalHireRequest: jest.SpiedFunction<ApiServiceFile['SendSignalHireRequest']>;
+  checkSignalHireCredit: jest.SpiedFunction<ApiServiceFile['checkSignalHireCredit']>;
 }
 
 //> auth
@@ -87,6 +88,7 @@ interface UserServicesJest {
   findUsers: jest.SpiedFunction<UserServiceFile['findUsers']>;
   updateUsers: jest.SpiedFunction<UserServiceFile['updateUsers']>;
   getUser: jest.SpiedFunction<UserServiceFile['getUser']>;
+  presetNewPassword: jest.SpiedFunction<UserServiceFile['presetNewPassword']>;
   generateCodeAccess: jest.SpiedFunction<UserServiceFile['generateCodeAccess']>;
   generateTokenAccess: jest.SpiedFunction<UserServiceFile['generateTokenAccess']>;
 }

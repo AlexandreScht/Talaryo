@@ -19,9 +19,10 @@ export const dropContactAPI = axios.create({
   },
 });
 
-export const signalHireAPI = axios.create({
-  baseURL: 'https://www.signalhire.com/api/v1',
-  headers: {
-    apikey: EMAILKEY,
-  },
-});
+export const signalHireAPI = (apiKey: string) =>
+  axios.create({
+    baseURL: 'https://www.signalhire.com/api/v1',
+    headers: {
+      apikey: apiKey,
+    },
+  });

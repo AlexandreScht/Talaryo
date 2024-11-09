@@ -10,6 +10,7 @@ export default function userMockedService(): UserServicesJest {
   const generateCodeAccess = jest.spyOn(UserService, 'generateCodeAccess');
   const generateTokenAccess = jest.spyOn(UserService, 'generateTokenAccess');
   const getUser = jest.spyOn(UserService, 'getUser');
+  const presetNewPassword = jest.spyOn(UserService, 'presetNewPassword');
 
   return {
     findUsers,
@@ -17,5 +18,6 @@ export default function userMockedService(): UserServicesJest {
     generateCodeAccess,
     generateTokenAccess,
     getUser,
+    presetNewPassword,
   };
 }

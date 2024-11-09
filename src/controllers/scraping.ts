@@ -1,3 +1,4 @@
+import config from '@/config';
 import { platformsBusiness, platformsPro, ROLE_CV_SEARCH_LIMIT, ROLE_MAIL_FOUND_LIMIT, ROLE_SEARCH_LIMIT } from '@/config/access';
 import { InvalidArgumentError, InvalidRoleAccessError, ServerException } from '@/exceptions';
 import { candidateScrapingForm, cvScrapingForm, cvStrategiesResult, platforms } from '@/interfaces/scrapping';
@@ -339,15 +340,30 @@ export default class ScrappingController implements ControllerMethods<ScrappingC
       const protocol = req.protocol;
       const host = req.get('host');
 
-      const callbackUrl = `${protocol}://${host}/api`;
-      const requestId = await this.ApiService.SendSignalHireRequest(link, callbackUrl);
+      const callbackUrl = `${protocol}://${host}/api/signalHire`;
+      const requestId = await this.setSignalHireRequest(link, callbackUrl);
       this.MemoryServer.setMemory(`signalHire.${requestId}`, { userId: sessionId, link });
       res.status(206).send();
     } catch (error) {
       if (!(error instanceof ServerException)) {
-        logger.error('ScrappingController.get_personal_details =>' + error);
+        logger.error('ScrappingController.get_personal_details =>', error);
       }
       next(error);
     }
   };
+
+  private async setSignalHireRequest(link: string, callbackUrl: string): Promise<string | undefined> {
+    for (const apiKey of config.apiKey.SIGNAL_HIRE || []) {
+      try {
+        const credits = await this.ApiService.checkSignalHireCredit(apiKey);
+        if (credits >= 1) {
+          return await this.ApiService.SendSignalHireRequest(link, callbackUrl, apiKey);
+        }
+      } catch (error) {
+        logger.error('ScrappingController.setSignalHireRequest =>', error);
+        throw new ServerException();
+      }
+    }
+    throw new ServerException(500, 'crédit épuisé');
+  }
 }

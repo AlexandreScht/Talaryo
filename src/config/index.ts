@@ -28,9 +28,6 @@ const config = {
   PORT: process.env.PORT,
   COOKIE_NAME: `${process.env.COOKIE_NAME}${process.env.NODE_ENV === 'production' ? 'Prod' : 'Test'}`,
   security: {
-    client: {
-      CLIENT_TOKEN: process.env.JWT_SECRET,
-    },
     session: {
       SESSION_TOKEN: process.env.SESSION_SECRET,
     },
@@ -43,7 +40,6 @@ const config = {
       iterations: 100000,
       digest: 'sha512',
     },
-    TWO_FA: process.env.TWO_FACTOR_AUTHENTICATOR,
   },
   stripeENV: {
     KEY: process.env.STRIPE_SECRET_KEY,
@@ -64,6 +60,7 @@ const config = {
     BREVOKEY: process.env.BREVOKEY,
     CAPTCHA_KEY: process.env.RECAPTCHA_SECRET_KEY,
     GPT_KEY: process.env.GPT_KEY,
+    SIGNAL_HIRE: process.env.SIGNAL_HIRE_KEYS?.split(','),
   },
   mailer: {
     DIR: process.env.MAILER_DIR,
@@ -75,12 +72,10 @@ const config = {
   oAuth: {
     clientID: process.env.GOOGLE_CLIENT_ID,
   },
-  allowedIp: process.env.ALLOWED_IP.split(','),
   log: {
     FORMAT: process.env.LOG_FORMAT,
     DIR: process.env.LOG_DIR,
   },
-  IP: process.env.IP,
   NODE_ENV: process.env.NODE_ENV,
   sites: {
     LinkedIn: process.env.LINKEDIN,

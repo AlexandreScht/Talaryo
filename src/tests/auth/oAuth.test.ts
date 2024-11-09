@@ -32,7 +32,7 @@ describe('GET /oAuth', () => {
   afterEach(() => jest.restoreAllMocks());
 
   //; Invalid type keys test
-  it('Invalid type keys test => 422 error (Invalid type keys)', async () => {
+  it('Invalid type keys test => 422 error (Votre token est invalide)', async () => {
     const response = await oAuthRequest();
 
     expect(response.status).toBe(422);
@@ -40,7 +40,7 @@ describe('GET /oAuth', () => {
     expect(Register).not.toHaveBeenCalled();
     expect(CreateBrevoUser).not.toHaveBeenCalled();
     expect(response.body).toHaveProperty('error');
-    expect(response.body.error).toBe('Invalid type for keys: token: Le type attendu est un string');
+    expect(response.body.error).toBe('Votre token est invalide');
   });
 
   //; Invalid google address

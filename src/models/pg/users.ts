@@ -19,7 +19,7 @@ export class UserModel extends Model implements UserSchema {
   subscribe_status: 'active' | 'pending' | 'disable' | 'waiting';
   subscribe_start?: Date;
   subscribe_end?: Date;
-  passwordReset?: boolean;
+  passwordReset?: string;
   createdAt: string;
   updatedAt: string;
   count?: string;

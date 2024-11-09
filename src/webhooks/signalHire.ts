@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 import Container, { Service } from 'typedi';
 
 @Service()
-export default class SignalHereWebhook {
+export default class SignalHireWebhook {
   private SocketIo: SocketManager;
   private MemoryServer: MemoryServerCache;
   private ScoreService: ScoreServiceFile;

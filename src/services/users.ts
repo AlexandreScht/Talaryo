@@ -171,6 +171,23 @@ export default class UserServiceFile implements UserServiceFileType {
     }
   }
 
+  public async presetNewPassword(id: number): Promise<Pick<UserShape, 'accessToken' | 'passwordReset'>> {
+    try {
+      const updatedUser = await UserModel.query()
+        .patchAndFetchById(id, { accessToken: uuid(), passwordReset: uuid() })
+        .select('accessToken', 'passwordReset');
+
+      if (updatedUser) {
+        return updatedUser as returnUpdateCode;
+      }
+
+      throw new ServerException();
+    } catch (error) {
+      logger.error('UserServiceFile.presetNewPassword', error);
+      throw new ServicesError();
+    }
+  }
+
   public async generateCodeAccess(id: number, digit = 4, secure = false): Promise<returnUpdateCode> {
     try {
       const updatedUser = await UserModel.query()
