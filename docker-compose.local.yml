@@ -1,0 +1,39 @@
+services:
+  client-local:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: local-talaryo
+    ports:
+      - '3000:3000'
+    environment:
+      SERVER_URI: 'http://kong-local:8000'
+    restart: on-failure:5
+    networks:
+      local-docker-network:
+        aliases:
+          - frontend-local
+
+  kong-local:
+    image: kong:latest
+    container_name: kong-local
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+    volumes:
+      - ./kong/kong-local.yml:/usr/local/kong/declarative/kong.yml
+    ports:
+      - '8000:8000'
+      - '8443:8443'
+      - '8001:8001'
+      - '8444:8444'
+    command: /bin/sh -c "rm -f /usr/local/kong/sockets/we && kong start"
+    restart: unless-stopped
+    networks:
+      local-docker-network:
+        aliases:
+          - kong-local
+
+networks:
+  local-docker-network:
+    external: true

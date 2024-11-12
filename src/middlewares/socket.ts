@@ -1,39 +1,40 @@
-import config from '@/config';
-import { ServerException } from '@/exceptions';
-import type { TokenUser } from '@/interfaces/token';
-import type { socketList } from '@/interfaces/webSocket';
-import { decryptUserToken } from '@/utils/token';
-import { parse } from 'cookie';
-import { Socket } from 'socket.io';
+'use client';
 
-const socketIoMiddleware = async (
-  { socket, secret_key, list }: { socket: Socket; secret_key: string; list: socketList[] },
-  next: (result: { err?: ServerException; result?: { user: TokenUser; session_double?: socketList } }) => void,
+import { ClientException } from '@/exceptions';
+import { IoSocket } from '@/interfaces/routes';
+import { Socket } from 'socket.io-client';
+
+const socketUrl = (uri: string) => uri.slice(0, -4);
+type authIo = {
+  server_key: string;
+  emitFrom: string;
+};
+const SocketIoMiddleware = async (
+  { newSocket, auth: { server_key, emitFrom } }: { newSocket: Socket; auth: authIo },
+  { secret_key }: { secret_key: string },
+  socket_url: string,
+  next: (err?: ClientException) => void,
 ) => {
   if (!secret_key) {
-    next({ err: new ServerException(500, 'Secret_key is required') });
+    next(new ClientException(500, 'Secret_key is required'));
     return;
   }
-  const { cookie: allCookie, origin } = socket.handshake.headers;
-  const cookieAuth = parse(allCookie)[config.COOKIE_NAME];
+  const {
+    io: { uri },
+    id: socketId,
+  } = newSocket as IoSocket;
 
-  if (!cookieAuth || origin !== config.ORIGIN) {
-    next({ err: new ServerException(500, 'Io props incorrect') });
-    return;
-  }
-
-  const [error, user] = decryptUserToken(cookieAuth);
-
-  if (error) {
-    console.log(error);
-    next({ err: new ServerException(500, 'Cookie incorrect') });
+  if (uri === socketUrl(socket_url)) {
+    next(new ClientException(500, 'Incorrect Origin io emitted'));
     return;
   }
 
-  const withoutDoubleUser = list.filter(u => u.userId !== user.sessionId || u.refreshToken !== user.refreshToken);
-  const isDoubleLogin = withoutDoubleUser.find(u => u.userId === user.sessionId);
+  if (server_key !== secret_key || emitFrom !== socketId) {
+    next(new ClientException(500, 'Invalid payload'));
+    return;
+  }
 
-  next({ result: { user, session_double: isDoubleLogin } });
+  next();
 };
 
-export default socketIoMiddleware;
+export default SocketIoMiddleware;

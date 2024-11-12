@@ -1,88 +1,147 @@
-import type FranceTravailStrategyFile from '@/strategys/francTravail';
-import type HelloWorkStrategyFile from '@/strategys/helloWork';
-import type IndeedStrategyFile from '@/strategys/indeed';
-import type JobTeaserStrategyFile from '@/strategys/JobTeaser';
-import type LesJeudisStrategyFile from '@/strategys/lesJeudis';
-import type LinkedInStrategyFile from '@/strategys/linkedin.ts';
-import type MonsterStrategyFile from '@/strategys/monster';
-import type TheJunglerStrategyFile from '@/strategys/theJungler';
-import Container from 'typedi';
-import type { contracts, graduations, homeWork, salary, site } from '.';
+import { mainParams } from './components';
+import { favCreate } from './services';
 
-export interface puppeteerProps {
-  url: string;
-  site: site;
+interface emailProps {
+  email: string;
+  color?: number;
+  phone?: string;
+}
+export interface scrappingReseauProps {
+  id?: string;
+  link: string;
+  fullName: string;
+  currentJob?: string;
+  diplome?: string;
+  currentCompany?: string;
+  resume: string;
+  img: string;
+  isFavoris?: boolean;
+  email?: emailProps[];
+  favFolderId?: number;
+}
+export interface scrappingCVProps {
+  id?: string;
+  fullName: string;
+  resume: string;
+  currentJob?: string;
+  currentCompany?: string;
+  isFavoris?: boolean;
+  favFolderId?: number;
+  diplome?: string;
+  img: string;
+  pdf: string;
+  link?: string;
+  isEnd?: boolean;
 }
 
-interface localization {
-  label: string;
-  letterCode: 'C' | 'D' | 'R';
-  postal: number;
-  code: number;
-  lng: number;
-  lat: number;
-  parentZone?: {
-    region: {
-      label: string;
-      postal: number;
-    };
-    department?: {
-      label: string;
-      postal: number;
-    };
+interface jsonPersonalProps {
+  email: string;
+  color: 1 | 2 | 3;
+  phone: string;
+}
+
+interface personalDataProps {
+  email?: string;
+  json?: jsonPersonalProps[];
+}
+
+type scrappingInfos = scrappingReseauProps | scrappingCVProps;
+
+interface candidateDataProps {
+  start: number;
+  index: number;
+  total: number;
+  inStream?: boolean;
+}
+interface searchParamsIA {
+  fn: string[];
+  industry?: string[];
+  sector?: string[];
+  skill?: string[];
+  key?: string[];
+  loc?: string[];
+  Nindustry?: string[];
+  Nskill?: string[];
+  Nkey?: string[];
+  current?: boolean;
+  matching?: number;
+  date?: number;
+  formation?: string[];
+}
+interface convertParamsIA {
+  company?: {
+    lookFor?: string[];
+    banned?: string[];
+    current?: boolean;
+  };
+  sector?: string[];
+  skill?: {
+    lookFor?: string[];
+    banned?: string[];
+  };
+  key?: {
+    lookFor?: string[];
+    banned?: string[];
+  };
+  loc?: string[];
+  matching?: number;
+  date?: number;
+  formation?: string[];
+}
+interface trainingDataProps {
+  start: number;
+  index: number;
+  total: number;
+  searchParams: searchParamsIA;
+}
+type scrappingDataStorage = {
+  search: mainParams;
+  nPages?: number;
+} & candidateDataProps;
+
+export interface profils {
+  res: scrappingInfos[];
+  data: candidateDataProps;
+}
+interface train {
+  system: string;
+  prompt: string;
+  link: string;
+}
+interface trainingData {
+  res: train[];
+  data: trainingDataProps;
+}
+
+export interface initializedStorage {
+  pages: scrappingInfos[];
+  data: scrappingDataStorage;
+}
+export interface scrappingStorage {
+  pages: scrappingInfos[];
+  pro?: {
+    data: scrappingDataStorage;
+  };
+  cv?: {
+    data: scrappingDataStorage;
   };
 }
-
-interface searchForm {
-  jobName: string;
-  homeWork?: homeWork[];
-  rayon?: number;
-  salary?: salary;
-  page: number;
-  experience?: number;
-  partTime?: boolean;
-  contract?: contracts[];
-  nightWork?: boolean;
-  graduations?: graduations[];
-  loc?: localization;
-}
-interface puppeteerQueue {
-  props: puppeteerProps[];
-  search: searchForm;
-}
-interface puppeteerQueuing {
-  props: puppeteerProps;
-  search: searchForm;
+export interface trainingStorage {
+  list: train[];
+  data: trainingDataProps;
 }
 
-interface puppeteerScrapped {
-  content: string;
-  site: site;
-  search: searchForm;
+interface serializeCandidateProps {
+  nPage: number;
+  list: scrappingInfos[];
+  lastPage: boolean;
+  skippedCandidate: boolean;
+  search: mainParams;
+  total: number;
 }
 
-export interface cheerioResult {
-  link: string;
-  jobName: string;
-  company?: string;
-  workPlace?: string;
-  loc?: string;
-  salary?: salary;
-  others?: string[];
-}
-
-interface scrappingResult {
-  result?: string;
-  id: site | number;
-}
-
-interface WebsiteStrategy {
-  IndeedStrategy: ReturnType<typeof Container.get<IndeedStrategyFile>>;
-  FranceTravailStrategy: ReturnType<typeof Container.get<FranceTravailStrategyFile>>;
-  HelloWorkStrategy: ReturnType<typeof Container.get<HelloWorkStrategyFile>>;
-  JobTeaserStrategy: ReturnType<typeof Container.get<JobTeaserStrategyFile>>;
-  LesJeudisStrategy: ReturnType<typeof Container.get<LesJeudisStrategyFile>>;
-  LinkedInStrategy: ReturnType<typeof Container.get<LinkedInStrategyFile>>;
-  MonsterStrategy: ReturnType<typeof Container.get<MonsterStrategyFile>>;
-  TheJunglerStrategy: ReturnType<typeof Container.get<TheJunglerStrategyFile>>;
+interface FolderAction {
+  folderBack?: boolean;
+  folderClosed?: boolean;
+  selectFav?: favCreate;
 }

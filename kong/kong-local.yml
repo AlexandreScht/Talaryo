@@ -1,0 +1,19 @@
+_format_version: '2.1'
+services:
+  - name: local-service
+    url: http://localapi-talaryo:3000
+    routes:
+      - name: local-route
+        paths:
+          - /api
+        strip_path: false
+        protocols:
+          - http
+          - https
+      - name: local-socket-io-route
+        paths:
+          - /socket.io
+        strip_path: false
+        protocols:
+          - http
+          - https

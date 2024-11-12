@@ -1,0 +1,45 @@
+_format_version: '2.1'
+services:
+  - name: test-service
+    url: http://testapi-talaryo:3000
+    routes:
+      - name: test-route
+        paths:
+          - /api
+        hosts:
+          - test.talaryo.com
+        strip_path: false
+        protocols:
+          - http
+          - https
+      - name: test-socket-io-route
+        paths:
+          - /socket.io
+        hosts:
+          - test.talaryo.com
+        strip_path: false
+        protocols:
+          - http
+          - https
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - https://test.talaryo.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Origin
+            - Accept
+            - Content-Type
+            - Authorization
+          exposed_headers:
+            - Content-Length
+            - Content-Type
+          credentials: true
+          max_age: 3600

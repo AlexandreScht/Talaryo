@@ -1,0 +1,42 @@
+services:
+  client-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app-talaryo
+    image: ir0ws/app-talaryo:latest
+    ports:
+      - '3000:3000'
+    restart: on-failure:5
+    env_file:
+      - .env
+    networks:
+      app-docker-network:
+        aliases:
+          - frontend-app
+
+  kong-app:
+    image: kong:latest
+    container_name: kong-app
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/app/kong.yml
+      KONG_SSL_CERT: /etc/kong/certs/fullchain.pem
+      KONG_SSL_CERT_KEY: /etc/kong/certs/privkey.pem
+    volumes:
+      - ./kong/kong-app.yml:/usr/local/kong/declarative/app/kong.yml
+      - ./kong/certs:/etc/kong/certs:ro
+    ports:
+      - '8000:8000'
+      - '8443:8443'
+      - '8001:8001'
+      - '8444:8444'
+    restart: unless-stopped
+    networks:
+      app-docker-network:
+        aliases:
+          - kong-app
+
+networks:
+  app-docker-network:
+    external: true

@@ -1,0 +1,45 @@
+_format_version: '2.1'
+services:
+  - name: app-service
+    url: http://appapi-talaryo:3000
+    routes:
+      - name: app-route
+        hosts:
+          - app.talaryo.com
+        paths:
+          - /api
+        strip_path: false
+        protocols:
+          - http
+          - https
+      - name: app-socket-io-route
+        paths:
+          - /socket.io
+        hosts:
+          - app.talaryo.com
+        strip_path: false
+        protocols:
+          - http
+          - https
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - https://app.talaryo.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Origin
+            - Accept
+            - Content-Type
+            - Authorization
+          exposed_headers:
+            - Content-Length
+            - Content-Type
+          credentials: true
+          max_age: 3600

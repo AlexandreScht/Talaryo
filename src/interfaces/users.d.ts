@@ -1,27 +1,65 @@
-import type Stripe from 'stripe';
+import type { JwtPayload } from 'jsonwebtoken';
 
-type role = 'free' | 'standard' | 'advanced' | 'premium' | 'admin';
-type stripe_status = 'active' | 'pending' | 'disable' | 'waiting';
-type twoFactorType = 'authenticator' | 'email';
+type role = 'admin' | 'business' | 'pro' | 'free';
+type extendedRole = 'admin' | 'business' | 'pro' | 'free';
+type sessionKey = 'firstName' | 'lastName' | 'society';
 
-interface UserDocument extends Document {
-  _id: string;
+type abonnement = {
+  label: extendedRole;
+  value: extendedRole;
+};
+
+export interface UserSchema {
+  id?: number;
   email: string;
-  password: string;
   role: role;
-  firstName: string;
-  lastName: string;
-  validateAccount: boolean;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+  validate: boolean;
+  society?: string;
   accessToken?: string;
-  accessCode?: number | string;
   twoFactorType?: twoFactorType;
+  accessCode?: string;
   stripeCustomer?: string | Stripe.Customer | Stripe.DeletedCustomer;
-  subscribeStatus: {
-    status: stripe_status;
-    start?: Date;
-    end?: Date;
-  };
-  checkPassword(password: string): Promise<boolean>;
+  subscribe_status: 'active' | 'pending' | 'disable' | 'waiting';
+  subscribe_start?: Date;
+  subscribe_end?: Date;
+  passwordReset?: string;
 }
 
-type FindUserProps = { email: string; oAuthAccount?: boolean } | { id: string };
+export type userPayload = {
+  firstName: string;
+  email: string;
+  role: role;
+  createdAt: Date;
+  society?: string;
+};
+
+type clientPayload = {
+  User: userPayload;
+} & JwtPayload;
+
+interface tableUser {
+  id: number;
+  email: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface updateSession {
+  key: sessionKey;
+  label?: string;
+  required?: boolean;
+}
+
+interface loggedUser {
+  secret_key: string;
+  reset(): void;
+}
+
+interface loginResponse {
+  msg: string;
+  success: boolean;
+}

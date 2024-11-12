@@ -1,0 +1,42 @@
+services:
+  client-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test-talaryo
+    image: ir0ws/test-talaryo:latest
+    ports:
+      - '3001:3000'
+    restart: on-failure:5
+    env_file:
+      - .env
+    networks:
+      test-docker-network:
+        aliases:
+          - frontend-test
+
+  kong-test:
+    image: kong:latest
+    container_name: kong-test
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/test/kong.yml
+      KONG_SSL_CERT: /etc/kong/certs/fullchain.pem
+      KONG_SSL_CERT_KEY: /etc/kong/certs/privkey.pem
+    volumes:
+      - ./kong/kong-test.yml:/usr/local/kong/declarative/test/kong.yml
+      - ./kong/certs:/etc/kong/certs:ro
+    ports:
+      - '9000:8000'
+      - '9443:8443' #https
+      - '9001:8001'
+      - '9444:8444'
+    restart: unless-stopped
+    networks:
+      test-docker-network:
+        aliases:
+          - kong-test
+
+networks:
+  test-docker-network:
+    external: true

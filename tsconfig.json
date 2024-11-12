@@ -1,40 +1,32 @@
 {
   "compilerOptions": {
-    "target": "es2021",
-    "lib": ["es2021", "esnext.asynciterable"],
+    "target": "es5",
+    "downlevelIteration": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
     "typeRoots": ["node_modules/@types"],
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "module": "commonjs",
-    "pretty": true,
-    "sourceMap": true,
-    "declaration": true,
-    "outDir": "dist",
     "allowJs": true,
-    "noEmit": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
     "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
-    "importHelpers": true,
-    "baseUrl": "src",
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["*"],
-      "@config": ["config"],
-      "@controllers/*": ["controllers/*"],
-      "@database": ["database"],
-      "@libs/*": ["libs/*"],
-      "@exceptions": ["exceptions"],
-      "@interfaces/*": ["interfaces/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@models/*": ["models/*"],
-      "@routes/*": ["routes/*"],
-      "@services/*": ["services/*"],
-      "@webhooks/*": ["webhooks/*"],
-      "@utils/*": ["utils/*"]
+      "@/*": ["./src/*"],
+      "@@/*": ["./src/app/*"]
     }
   },
-  "include": ["./src/**/*.ts", "./src/**/*.json", ".env", "src/utils/regionLoc.ts"],
-  "exclude": ["node_modules", "src/logs"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "tailwind.config.ts", "logger.ts"],
+  "exclude": ["node_modules", ".next"]
 }

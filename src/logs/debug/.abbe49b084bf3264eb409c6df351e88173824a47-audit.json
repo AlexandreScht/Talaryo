@@ -1,0 +1,160 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\.abbe49b084bf3264eb409c6df351e88173824a47-audit.json",
+    "files": [
+        {
+            "date": 1719829589843,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-01.log",
+            "hash": "8667596cd965c62fcfd0eedc5ce2831d2faba80dfa75053074885066f3d7feec"
+        },
+        {
+            "date": 1719911390921,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-02.log",
+            "hash": "994a24fab88f71a7f3938fb27cf4f60a7d4de68a97edf0f479185aad49ae8fab"
+        },
+        {
+            "date": 1720003100523,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-03.log",
+            "hash": "21ee0cd21419e08c0b9ec5ab8bb0078ead249d4dae5a9407521840864beca19c"
+        },
+        {
+            "date": 1720084047317,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-04.log",
+            "hash": "850fa3ca4db11c648635b4a14dd980b47253d63a5211e40803be5bd95739c5ed"
+        },
+        {
+            "date": 1720172256176,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-05.log",
+            "hash": "0c9b6e3b686d304629c5c490db8e3dfff64e0943d4cc3185a1f3c20561554728"
+        },
+        {
+            "date": 1720294307218,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-06.log",
+            "hash": "66f0e3b76344f8ac960634cdd6726e329b53b118bce748e47490dcfdc528ea4f"
+        },
+        {
+            "date": 1720344270842,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-07.log",
+            "hash": "56b831ca5256b3088be8e639e6ff278105e2844016c4de621a0e3c4db104a1d8"
+        },
+        {
+            "date": 1720443701016,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-08.log",
+            "hash": "f43cb9c5e210e7bbc1e529b09aef9165e2ddf51c8d87c8fb6a089c1ebda75e0b"
+        },
+        {
+            "date": 1720517011715,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-09.log",
+            "hash": "b0c0e47dccdfe7f47738a1a45fbe1ff959fa01018fc457a1b8146612b1358278"
+        },
+        {
+            "date": 1720701173608,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-11.log",
+            "hash": "6596ff7587195f9af7701e53388def4a51b123e3f091894cd7221c1d3fce93e1"
+        },
+        {
+            "date": 1720788279187,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-12.log",
+            "hash": "64121956e3467b128e3f2fd7649c09808b6b72e732dad808da79e2ec7665fc85"
+        },
+        {
+            "date": 1720822885877,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-13.log",
+            "hash": "2547713a1bdc3c8bb6064bba1679f5c576513794a9eb2789d8524bb82502eec2"
+        },
+        {
+            "date": 1721928342127,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-25.log",
+            "hash": "e6285a4faecfd411c8191fd94714d7e0d7b1a93928a21d0d0116299b61aca302"
+        },
+        {
+            "date": 1722099326909,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-27.log",
+            "hash": "440d91ede9c9a28966bc425acc684d1080b14fc8be82493b63bfc6d513ecc8a0"
+        },
+        {
+            "date": 1722276808748,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-29.log",
+            "hash": "688ea1937edd8500e59e3e0dc88c79deb6ebb292683c4f2d6b3dbc634438e8ea"
+        },
+        {
+            "date": 1722340870823,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-30.log",
+            "hash": "95c5f1849a3030e5ec1382ea36411e6a8ef4e7894c2ad49488b1d25dcc3c2d4e"
+        },
+        {
+            "date": 1722444955812,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-07-31.log",
+            "hash": "50567cba84a95b4374315a06970c567a8d4b53f867085f3e85630898bd164ca4"
+        },
+        {
+            "date": 1722526708552,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-01.log",
+            "hash": "a5ae04ac0b0d5aaab1942d0041c1c9f7451eb079f90759458d929a9eb0c8040f"
+        },
+        {
+            "date": 1722612189516,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-02.log",
+            "hash": "e4a06f958b2164255091229c2d513b358442ecbf1283e579eee58c7f65ab7b02"
+        },
+        {
+            "date": 1722698469406,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-03.log",
+            "hash": "c180d3abb3058c92973c8b762b4cfd46f0794c793b18eda773efa7cbbf64dd30"
+        },
+        {
+            "date": 1722787690837,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-04.log",
+            "hash": "1b2e238eb8382fb92d33ff82fb907e36930a0fbfca3851d6b23e76530fe1ecf2"
+        },
+        {
+            "date": 1722817866137,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-05.log",
+            "hash": "f5d10f67ccfe334633d942ea425e2f6b07ba1f4c2171bf06f77b1db54eb9fbc3"
+        },
+        {
+            "date": 1722955229417,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-06.log",
+            "hash": "8318aa26e21e241cb74a8b68f7b9142c3bdaffc328b0a83961af4e015624a2d2"
+        },
+        {
+            "date": 1723021047144,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-07.log",
+            "hash": "a0da33dfdef679b5587098336129e4d7d1aac346351f5be39b16638160a02cf6"
+        },
+        {
+            "date": 1723111421760,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-08.log",
+            "hash": "80102fbcef8fb536d6cd993e5fafd59da68c9f56ae21041f77f20fac90a9ca23"
+        },
+        {
+            "date": 1723242811613,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-10.log",
+            "hash": "711eb17252cecfe8e7f0c25274f71d35d7ca82fe6628b357959a7d2f35b2261f"
+        },
+        {
+            "date": 1723381443085,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-11.log",
+            "hash": "321b56c45092af32c6507b7c6befc1e61f203c64e596c14feed6bbc941c672f9"
+        },
+        {
+            "date": 1723466049034,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-08-12.log",
+            "hash": "3a7de3dde5efe2d2259e746329ea68d5f183aea6731f2eb98fca411adfd68146"
+        },
+        {
+            "date": 1727095178818,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-09-23.log",
+            "hash": "d882afff72351a094195b56e2ef7f13ac9bd85f7fd6261fc8124fb9f6b774d1a"
+        },
+        {
+            "date": 1727138418939,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\ProfiiloApp\\front\\src\\logs\\debug\\2024-09-24.log",
+            "hash": "fe90111a54a418d031957f281c0dd1c3927b9627492aaad0ba8d5ddf7299998c"
+        }
+    ],
+    "hashType": "sha256"
+}

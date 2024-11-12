@@ -1,0 +1,3487 @@
+{
+  "jobNames": [
+    {
+      "H": "Accessoiriste (H/F)",
+      "F": null,
+      "S": 0.7
+    },
+    {
+      "H": "Accompagnant (H/F)",
+      "F": "Accompagnante",
+      "S": 0.3
+    },
+    {
+      "H": "Accompagnateur médicosocial (H/F)",
+      "F": "Accompagnatrice médicosociale",
+      "S": 0.4
+    },
+    {
+      "H": "Accueillant familial auprès d'enfants (H/F)",
+      "F": "Accueillante familiale auprès d'enfants",
+      "S": 0.5
+    },
+    {
+      "H": "Actuaire (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Administrateur réseau informatique (H/F)",
+      "F": "Administratrice réseau informatique",
+      "S": 0.1
+    },
+    {
+      "H": "Affréteur (H/F)",
+      "F": "Affréteuse",
+      "S": 0.6
+    },
+    {
+      "H": "Agent administratif (H/F)",
+      "F": "Agente administrative",
+      "S": 0.5
+    },
+    {
+      "H": "Agent administratif banque ou assurance (H/F)",
+      "F": "Agente administrative banque ou assurance",
+      "S": 0.4
+    },
+    {
+      "H": "Agent d'accueil (H/F)",
+      "F": "Agente d'accueil",
+      "S": 0.6
+    },
+    {
+      "H": "Agent d'accueil social (H/F)",
+      "F": "Agente d'accueil social",
+      "S": 0.5
+    },
+    {
+      "H": "Agent d'artiste (H/F)",
+      "F": "Agente d'artiste",
+      "S": 0.8
+    },
+    {
+      "H": "Agent d'assainissement (H/F)",
+      "F": "Agente d'assainissement",
+      "S": 0.6
+    },
+    {
+      "H": "Agent de conditionnement (H/F)",
+      "F": "Agente de conditionnement",
+      "S": 0.7
+    },
+    {
+      "H": "Agent de constatation des douanes (H/F)",
+      "F": "Agente de constatation des douanes",
+      "S": 0.3
+    },
+    {
+      "H": "Agent de contrôle (H/F)",
+      "F": "Agente de contrôle",
+      "S": 0.4
+    },
+    {
+      "H": "Agent de désinsectisation (H/F)",
+      "F": "Agente de désinsectisation",
+      "S": 0.6
+    },
+    {
+      "H": "Agent de fabrication du verre (H/F)",
+      "F": "Agente de fabrication du verre",
+      "S": 0.6
+    },
+    {
+      "H": "Agent de façonnage et routage (H/F)",
+      "F": "Agente de façonnage et routage",
+      "S": 0.7
+    },
+    {
+      "H": "Agent d'entretien de la voirie (H/F)",
+      "F": "Agente d'entretien de la voirie",
+      "S": 0.6
+    },
+    {
+      "H": "Agent d'entretien des espaces naturels (H/F)",
+      "F": "Agente d'entretien des espaces naturels",
+      "S": 0.6
+    },
+    {
+      "H": "Agent d'entretien du bâtiment (H/F)",
+      "F": "Agente d'entretien du bâtiment",
+      "S": 0.5
+    },
+    {
+      "H": "Agent d'entretien/propreté de locaux (H/F)",
+      "F": "Agente d'entretien/propreté de locaux",
+      "S": 0.5
+    },
+    {
+      "H": "Agent de piste (H/F)",
+      "F": "Agente de piste",
+      "S": 0.6
+    },
+    {
+      "H": "Agent de port de plaisance (H/F)",
+      "F": "Agente de port de plaisance",
+      "S": 0.7
+    },
+    {
+      "H": "Agent d'escale (H/F)",
+      "F": "Agente d'escale",
+      "S": 0.5
+    },
+    {
+      "H": "Agent de sécurité (H/F)",
+      "F": "Agente de sécurité",
+      "S": 0.3
+    },
+    {
+      "H": "Agent de sécurité événementielle (H/F)",
+      "F": "Agente de sécurité événementielle",
+      "S": 0.4
+    },
+    {
+      "H": "Agent de service hospitalier (H/F)",
+      "F": "Agente de service hospitalier",
+      "S": 0.3,
+      "short": "ASH"
+    },
+    {
+      "H": "Agent de stérilisation de service hospitalier (H/F)",
+      "F": "Agente de stérilisation de service hospitalier",
+      "S": 0.4
+    },
+    {
+      "H": "Agent de trafic aérien (H/F)",
+      "F": "Agente de trafic aérien",
+      "S": 0.4
+    },
+    {
+      "H": "Agent de traitement de surface (H/F)",
+      "F": "Agente de traitement de surface",
+      "S": 0.6
+    },
+    {
+      "H": "Agent de transit (H/F)",
+      "F": "Agente de transit",
+      "S": 0.5
+    },
+    {
+      "H": "Agent de tri des déchets (H/F)",
+      "F": "Agente de tri des déchets",
+      "S": 0.5
+    },
+    {
+      "H": "Agent de voyages (H/F)",
+      "F": "Agente de voyages",
+      "S": 0.6
+    },
+    {
+      "H": "Agent d'exploitation des remontées mécaniques (H/F)",
+      "F": "Agente d'exploitation des remontées mécaniques",
+      "S": 0.7
+    },
+    {
+      "H": "Agent d'exploitation transport routier de personnes (H/F)",
+      "F": "Agente d'exploitation transport routier de personnes",
+      "S": 0.5
+    },
+    {
+      "H": "Agent général (H/F)",
+      "F": "Agente générale",
+      "S": 0.4
+    },
+    {
+      "H": "Agent territorial spécialisé des écoles maternelles (H/F)",
+      "F": "Agente territoriale spécialisée des écoles maternelles",
+      "S": 0.3
+    },
+    {
+      "H": "Agent thermal (H/F)",
+      "F": "Agente thermale",
+      "S": 0.5
+    },
+    {
+      "H": "Agriculteur (H/F)",
+      "F": "Agricultrice",
+      "S": 0.5
+    },
+    {
+      "H": "Aide à domicile (H/F)",
+      "F": "Aide à domicile",
+      "S": 0.4
+    },
+    {
+      "H": "Aide d'élevage agricole (H/F)",
+      "F": "Aide d'élevage agricole",
+      "S": 0.6
+    },
+    {
+      "H": "Aide horticole (H/F)",
+      "F": "Aide horticole",
+      "S": 0.6
+    },
+    {
+      "H": "Aide-soignant (H/F)",
+      "F": "Aide-soignante",
+      "S": 0.3
+    },
+    {
+      "H": "Aiguilleur du rail (H/F)",
+      "F": "Aiguilleuse du rail",
+      "S": 0.4
+    },
+    {
+      "H": "Ajusteur-monteur (H/F)",
+      "F": "Ajusteuse-monteuse",
+      "S": 0.5
+    },
+    {
+      "H": "Ambulancier (H/F)",
+      "F": "Ambulancière",
+      "S": 0.4
+    },
+    {
+      "H": "Analyste (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Analyste de crédits et risques bancaires (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Analyste de la performance sportive (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Analyste financier (H/F)",
+      "F": "Analyste financière",
+      "S": 0.2
+    },
+    {
+      "H": "Animateur (H/F)",
+      "F": "Animatrice",
+      "S": 0.5
+    },
+    {
+      "H": "Animateur 3D (H/F)",
+      "F": "Animatrice 3D",
+      "S": 0.4
+    },
+    {
+      "H": "Animateur auprès des jeunes (H/F)",
+      "F": "Animatrice auprès des jeunes",
+      "S": 0.5
+    },
+    {
+      "H": "Animateur d'activités culturelles et de loisirs (H/F)",
+      "F": "Animatrice d'activités culturelles et de loisirs",
+      "S": 0.4
+    },
+    {
+      "H": "Animateur de loisirs sportifs (H/F)",
+      "F": "Animatrice de loisirs sportifs",
+      "S": 0.4
+    },
+    {
+      "H": "Animateur des ventes (H/F)",
+      "F": "Animatrice des ventes",
+      "S": 0.5
+    },
+    {
+      "H": "Animateur petite enfance (H/F)",
+      "F": "Animatrice petite enfance",
+      "S": 0.3
+    },
+    {
+      "H": "Animateur Qualité Sécurité Environnement (H/F)",
+      "F": "Animatrice Qualité Sécurité Environnement",
+      "S": 0.4,
+      "short": "QSE"
+    },
+    {
+      "H": "Animateur radio (H/F)",
+      "F": "Animatrice radio",
+      "S": 0.6
+    },
+    {
+      "H": "Animateur socioculturel (H/F)",
+      "F": "Animatrice socioculturelle",
+      "S": 0.5
+    },
+    {
+      "H": "Animateur socio-sportif (H/F)",
+      "F": "Animatrice socio-sportive",
+      "S": 0.5
+    },
+    {
+      "H": "Approvisionneur logistique (H/F)",
+      "F": "Approvisionneuse logistique",
+      "S": 0.4
+    },
+    {
+      "H": "Aquaculteur (H/F)",
+      "F": "Aquacultrice",
+      "S": 0.6
+    },
+    {
+      "H": "Arboriculteur (H/F)",
+      "F": "Arboricultrice",
+      "S": 0.6
+    },
+    {
+      "H": "Architecte (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Architecte d'intérieur (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Armaturier de l'industrie du béton (H/F)",
+      "F": "Armaturière de l'industrie du béton",
+      "S": 0.5
+    },
+    {
+      "H": "Artiste de cirque (H/F)",
+      "F": null,
+      "S": 0.7
+    },
+    {
+      "H": "Artiste plasticien (H/F)",
+      "F": "Artiste plasticienne",
+      "S": 0.6
+    },
+    {
+      "H": "Ascensoriste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Assembleur d'ouvrages en bois (H/F)",
+      "F": "Assembleuse d'ouvrages en bois",
+      "S": 0.5
+    },
+    {
+      "H": "Assembleur en produits électriques et électroniques (H/F)",
+      "F": "Assembleuse en produits électriques et électroniques",
+      "S": 0.5
+    },
+    {
+      "H": "Assembleur monteur (H/F)",
+      "F": "Assembleuse monteuse",
+      "S": 0.5
+    },
+    {
+      "H": "Assistant administration des ventes (H/F)",
+      "F": "Assistante administration des ventes",
+      "S": 0.4
+    },
+    {
+      "H": "Assistant de direction (H/F)",
+      "F": "Assistante de direction",
+      "S": 0.3
+    },
+    {
+      "H": "Assistant de vie dépendance (H/F)",
+      "F": "Assistante de vie dépendance",
+      "S": 0.3
+    },
+    {
+      "H": "Assistant géomètre (H/F)",
+      "F": "Assistante géomètre",
+      "S": 0.4
+    },
+    {
+      "H": "Assistant manager en hôtellerie-restauration (H/F)",
+      "F": "Assistante manager en hôtellerie-restauration",
+      "S": 0.4
+    },
+    {
+      "H": "Ressources humaines (H/F)",
+      "F": "Ressources humaines",
+      "S": 0.3
+    },
+    {
+      "H": "Assistant ressources humaines (H/F)",
+      "F": "Assistante ressources humaines",
+      "S": 0.3
+    },
+    {
+      "H": "Assistant commercial (H/F)",
+      "F": "Assistante commerciale",
+      "S": 0.4
+    },
+    {
+      "H": "Assistant maternel agréé (H/F)",
+      "F": "Assistante maternelle agréée",
+      "S": 0.4
+    },
+    {
+      "H": "Assistant médical (H/F)",
+      "F": "Assistante médicale",
+      "S": 0.4
+    },
+    {
+      "H": "Assistant social (H/F)",
+      "F": "Assistante sociale",
+      "S": 0.3
+    },
+    {
+      "H": "Attaché de recherche clinique (H/F)",
+      "F": "Attachée de recherche clinique",
+      "S": 0.2,
+      "short": "ARC"
+    },
+    {
+      "H": "Attaché commercial (H/F)",
+      "F": "Attachée commerciale",
+      "S": 0.4
+    },
+    {
+      "H": "Audioprothésiste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Automaticien (H/F)",
+      "F": "Automaticienne",
+      "S": 0.4
+    },
+    {
+      "H": "Automaticien en bureau d'études (H/F)",
+      "F": "Automaticienne en bureau d'études",
+      "S": 0.4
+    },
+    {
+      "H": "Auxiliaire de puériculture (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Auxiliaire de Vie Sociale (H/F)",
+      "F": null,
+      "S": 0.3,
+      "short": "AVS"
+    },
+    {
+      "H": "Aviculteur (H/F)",
+      "F": "Avicultrice",
+      "S": 0.6
+    },
+    {
+      "H": "Bagagiste en établissement hôtelier (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Barman (H/F)",
+      "F": "Barmaid",
+      "S": 0.5
+    },
+    {
+      "H": "Bijoutier (H/F)",
+      "F": "Bijoutière",
+      "S": 0.4
+    },
+    {
+      "H": "Biologiste médical (H/F)",
+      "F": "Biologiste médicale",
+      "S": 0.3
+    },
+    {
+      "H": "Biostatisticien (H/F)",
+      "F": "Biostatisticienne",
+      "S": 0.4
+    },
+    {
+      "H": "Blanchisseur industriel (H/F)",
+      "F": "Blanchisseuse industrielle",
+      "S": 0.6
+    },
+    {
+      "H": "Bobinier (H/F)",
+      "F": "Bobinière",
+      "S": 0.5
+    },
+    {
+      "H": "Boucher (H/F)",
+      "F": "Bouchère",
+      "S": 0.3
+    },
+    {
+      "H": "Boulanger (H/F)",
+      "F": "Boulangère",
+      "S": 0.3
+    },
+    {
+      "H": "Brancardier (H/F)",
+      "F": "Brancardière",
+      "S": 0.4
+    },
+    {
+      "H": "Brasseur de bière (H/F)",
+      "F": "Brasseuse de bière",
+      "S": 0.5
+    },
+    {
+      "H": "Brocanteur (H/F)",
+      "F": "Brocanteuse",
+      "S": 0.7
+    },
+    {
+      "H": "Brodeur (H/F)",
+      "F": "Brodeuse",
+      "S": 0.6
+    },
+    {
+      "H": "Câbleur d'armoires (H/F)",
+      "F": "Câbleuse d'armoires",
+      "S": 0.5
+    },
+    {
+      "H": "Cadre de santé (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Cadre dirigeant d'administration centrale (H/F)",
+      "F": "Cadre dirigeante d'administration centrale",
+      "S": 0.3
+    },
+    {
+      "H": "Cadreur (H/F)",
+      "F": "Cadreuse",
+      "S": 0.5
+    },
+    {
+      "H": "Caissier (H/F)",
+      "F": "Caissière",
+      "S": 0.4
+    },
+    {
+      "H": "Canalisateur (H/F)",
+      "F": "Canalisatrice",
+      "S": 0.4
+    },
+    {
+      "H": "Cardeur en industrie textile (H/F)",
+      "F": "Cardeuse en industrie textile",
+      "S": 0.6
+    },
+    {
+      "H": "Cariste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Carreleur (H/F)",
+      "F": "Carreleuse",
+      "S": 0.5
+    },
+    {
+      "H": "Carrossier (H/F)",
+      "F": "Carrossière",
+      "S": 0.4
+    },
+    {
+      "H": "Cartographe (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Céramiste d'art (H/F)",
+      "F": null,
+      "S": 0.6
+    },
+    {
+      "H": "Chapelier (H/F)",
+      "F": "Chapelière",
+      "S": 0.6
+    },
+    {
+      "H": "Charcutier-traiteur (H/F)",
+      "F": "Charcutière-traiteuse",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé d'accueil en banque (H/F)",
+      "F": "Chargée d'accueil en banque",
+      "S": 0.3
+    },
+    {
+      "H": "Chargé d'affaires bancaires entreprise (H/F)",
+      "F": "Chargée d'affaires bancaires entreprise",
+      "S": 0.3
+    },
+    {
+      "H": "Chargé d'affaires en industrie (H/F)",
+      "F": "Chargée d'affaires en industrie",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé d'affaires en rénovation énergétique (H/F)",
+      "F": "Chargée d'affaires en rénovation énergétique",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé de communication (H/F)",
+      "F": "Chargée de communication",
+      "S": 0.3
+    },
+    {
+      "H": "Chargé de développement d'activités sportives (H/F)",
+      "F": "Chargée de développement d'activités sportives",
+      "S": 0.5
+    },
+    {
+      "H": "Chargé de développement local (H/F)",
+      "F": "Chargée de développement local",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé de gestion locative en immobilier (H/F)",
+      "F": "Chargée de gestion locative en immobilier",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé de mission développement territorial (H/F)",
+      "F": "Chargée de mission développement territorial",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé de mission tourisme (H/F)",
+      "F": "Chargée de mission tourisme",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé de produit en assurances (H/F)",
+      "F": "Chargée de produit en assurances",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé de recrutement (H/F)",
+      "F": "Chargée de recrutement",
+      "S": 0.3
+    },
+    {
+      "H": "Chargé des affaires réglementaires (H/F)",
+      "F": "Chargée des affaires réglementaires",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé d'études socio-économiques (H/F)",
+      "F": "Chargée d'études socio-économiques",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé d'indemnisations en assurances (H/F)",
+      "F": "Chargée d'indemnisations en assurances",
+      "S": 0.4
+    },
+    {
+      "H": "Chargé d'opérations immobilières (H/F)",
+      "F": "Chargée d'opérations immobilières",
+      "S": 0.4
+    },
+    {
+      "H": "Charpentier bois poseur (H/F)",
+      "F": "Charpentière bois poseuse",
+      "S": 0.4
+    },
+    {
+      "H": "Charpentier (H/F)",
+      "F": "Charpentière",
+      "S": 0.4
+    },
+    {
+      "H": "Chaudronnier (H/F)",
+      "F": "Chaudronnière",
+      "S": 0.3
+    },
+    {
+      "H": "Chauffeur (H/F)",
+      "F": "Chauffeuse",
+      "S": 0.4
+    },
+    {
+      "H": "Chauffeur-livreur (H/F)",
+      "F": "Chauffeuse-livreuse",
+      "S": 0.4
+    },
+    {
+      "H": "Chef d'atelier production électricité-électronique (H/F)",
+      "F": "Cheffe d'atelier production électricité-électronique",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de chantier (H/F)",
+      "F": "Cheffe de chantier",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de cuisine (H/F)",
+      "F": "Cheffe de cuisine",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de culture responsable d'unité de production agricole (H/F)",
+      "F": "Cheffe de culture responsable d'unité de production agricole",
+      "S": 0.4
+    },
+    {
+      "H": "Chef de produit touristique (H/F)",
+      "F": "Cheffe de produit touristique",
+      "S": 0.4
+    },
+    {
+      "H": "Chef de projet événementiel (H/F)",
+      "F": "Cheffe de projet événementiel",
+      "S": 0.4
+    },
+    {
+      "H": "Chef de publicité (H/F)",
+      "F": "Cheffe de publicité",
+      "S": 0.4
+    },
+    {
+      "H": "Chef d'équipe en industrie (H/F)",
+      "F": "Cheffe d'équipe en industrie",
+      "S": 0.3
+    },
+    {
+      "H": "Chef d'équipe et d'atelier textile (H/F)",
+      "F": "Cheffe d'équipe et d'atelier textile",
+      "S": 0.4
+    },
+    {
+      "H": "Chef de rayon alimentaire (H/F)",
+      "F": "Cheffe de rayon alimentaire",
+      "S": 0.4
+    },
+    {
+      "H": "Chef de rayon de produits non alimentaires (H/F)",
+      "F": "Cheffe de rayon de produits non alimentaires",
+      "S": 0.4
+    },
+    {
+      "H": "Chef d'escale (H/F)",
+      "F": "Cheffe d'escale",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de secteur commercial (H/F)",
+      "F": "Cheffe de secteur commercial",
+      "S": 0.3
+    },
+    {
+      "H": "Chef des ventes (H/F)",
+      "F": "Cheffe des ventes",
+      "S": 0.3
+    },
+    {
+      "H": "Chef comptable (H/F)",
+      "F": "Cheffe comptable",
+      "S": 0.3
+    },
+    {
+      "H": "Chef d'atelier automobile (H/F)",
+      "F": "Cheffe d'atelier automobile",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de produit (H/F)",
+      "F": "Cheffe de produit",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de promotion des ventes (H/F)",
+      "F": "Cheffe de promotion des ventes",
+      "S": 0.3
+    },
+    {
+      "H": "Chef d'établissement (H/F)",
+      "F": "Cheffe d'établissement",
+      "S": 0.3
+    },
+    {
+      "H": "Cheminot (H/F)",
+      "F": "Cheminote",
+      "S": 0.4
+    },
+    {
+      "H": "Chercheur en sciences humaines et sociales (H/F)",
+      "F": "Chercheuse en sciences humaines et sociales",
+      "S": 0.4
+    },
+    {
+      "H": "Cisailleur en métallurgie (H/F)",
+      "F": "Cisailleuse en métallurgie",
+      "S": 0.5
+    },
+    {
+      "H": "Clerc de notaire (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Coach (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Coach en développement personnel (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Coffreur (H/F)",
+      "F": "Coffreuse",
+      "S": 0.4
+    },
+    {
+      "H": "Coiffeur (H/F)",
+      "F": "Coiffeuse",
+      "S": 0.3
+    },
+    {
+      "H": "Coloriste en industrie (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Comédien (H/F)",
+      "F": "Comédienne",
+      "S": 0.6
+    },
+    {
+      "H": "Commercial (H/F)",
+      "F": "Commerciale",
+      "S": 0.3
+    },
+    {
+      "H": "Commercial auprès des particuliers (H/F)",
+      "F": "Commerciale auprès des particuliers",
+      "S": 0.3
+    },
+    {
+      "H": "Commercial en automobiles (H/F)",
+      "F": "Commerciale en automobiles",
+      "S": 0.3
+    },
+    {
+      "H": "Commercial grands comptes et entreprises (H/F)",
+      "F": "Commerciale grands comptes et entreprises",
+      "S": 0.3
+    },
+    {
+      "H": "Commis de cuisine (H/F)",
+      "F": "Commise de cuisine",
+      "S": 0.4
+    },
+    {
+      "H": "Community manager (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Comptable (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Concepteur de contenus multimedia (H/F)",
+      "F": "Conceptrice de contenus multimedia",
+      "S": 0.4
+    },
+    {
+      "H": "Concepteur numérique en bijouterie joaillerie (H/F)",
+      "F": "Conceptrice numérique en bijouterie joaillerie",
+      "S": 0.5
+    },
+    {
+      "H": "Concierge d'hôtel (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de bus (H/F)",
+      "F": "Conductrice de bus",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de ligne de conditionnement (H/F)",
+      "F": "Conductrice de ligne de conditionnement",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de ligne en industrie alimentaire (H/F)",
+      "F": "Conductrice de ligne en industrie alimentaire",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de ligne en industrie chimique (H/F)",
+      "F": "Conductrice de ligne en industrie chimique",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de machines à bois (H/F)",
+      "F": "Conductrice de machines à bois",
+      "S": 0.5
+    },
+    {
+      "H": "Conducteur de machines à papier ou carton (H/F)",
+      "F": "Conductrice de machines à papier ou carton",
+      "S": 0.5
+    },
+    {
+      "H": "Conducteur de machines à tisser (H/F)",
+      "F": "Conductrice de machines à tisser",
+      "S": 0.5
+    },
+    {
+      "H": "Conducteur de machines de façonnage routage (H/F)",
+      "F": "Conductrice de machines de façonnage routage",
+      "S": 0.5
+    },
+    {
+      "H": "Conducteur de machines de traitement textile (H/F)",
+      "F": "Conductrice de machines de traitement textile",
+      "S": 0.5
+    },
+    {
+      "H": "Conducteur de machines d'impression (H/F)",
+      "F": "Conductrice de machines d'impression",
+      "S": 0.5
+    },
+    {
+      "H": "Conducteur d'engins agricoles (H/F)",
+      "F": "Conductrice d'engins agricoles",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur d'engins de chantier (H/F)",
+      "F": "Conductrice d'engins de chantier",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur d'engins d'exploitation forestière (H/F)",
+      "F": "Conductrice d'engins d'exploitation forestière",
+      "S": 0.5
+    },
+    {
+      "H": "Conducteur de poids lourd (H/F)",
+      "F": "Conductrice de poids lourd",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de train (H/F)",
+      "F": "Conductrice de train",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de travaux (H/F)",
+      "F": "Conductrice de travaux",
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur d'installation de pâte à papier (H/F)",
+      "F": "Conductrice d'installation de pâte à papier",
+      "S": 0.5
+    },
+    {
+      "H": "Conseiller de clientèle bancaire (H/F)",
+      "F": "Conseillère de clientèle bancaire",
+      "S": 0.3
+    },
+    {
+      "H": "Conseiller d'orientation (H/F)",
+      "F": "Conseillère d'orientation",
+      "S": 0.3
+    },
+    {
+      "H": "Conseiller en assurances (H/F)",
+      "F": "Conseillère en assurances",
+      "S": 0.3
+    },
+    {
+      "H": "Conseiller en formation (H/F)",
+      "F": "Conseillère en formation",
+      "S": 0.3
+    },
+    {
+      "H": "Conseiller en gestion de patrimoine (H/F)",
+      "F": "Conseillère en gestion de patrimoine",
+      "S": 0.3
+    },
+    {
+      "H": "Conseiller en insertion professionnelle (H/F)",
+      "F": "Conseillère en insertion professionnelle",
+      "S": 0.4
+    },
+    {
+      "H": "Conseiller en rénovation énergétique (H/F)",
+      "F": "Conseillère en rénovation énergétique",
+      "S": 0.4
+    },
+    {
+      "H": "Conseiller funéraire (H/F)",
+      "F": "Conseillère funéraire",
+      "S": 0.5
+    },
+    {
+      "H": "Conseiller immobilier (H/F)",
+      "F": "Conseillère immobilier",
+      "S": 0.3
+    },
+    {
+      "H": "Conseiller technique agricole (H/F)",
+      "F": "Conseillère technique agricole",
+      "S": 0.4
+    },
+    {
+      "H": "Conservateur du patrimoine (H/F)",
+      "F": "Conservatrice du patrimoine",
+      "S": 0.5
+    },
+    {
+      "H": "Consultant en organisation et management (H/F)",
+      "F": "Consultante en organisation et management",
+      "S": 0.3
+    },
+    {
+      "H": "Contremaître en menuiserie (H/F)",
+      "F": "Contremaîtresse en menuiserie",
+      "S": 0.5
+    },
+    {
+      "H": "Contrôleur aérien (H/F)",
+      "F": "Contrôleuse aérienne",
+      "S": 0.3
+    },
+    {
+      "H": "Contrôleur de gestion (H/F)",
+      "F": "Contrôleuse de gestion",
+      "S": 0.3
+    },
+    {
+      "H": "Contrôleur des impôts (H/F)",
+      "F": "Contrôleuse des impôts",
+      "S": 0.4
+    },
+    {
+      "H": "Contrôleur en industrie textile (H/F)",
+      "F": "Contrôleuse en industrie textile",
+      "S": 0.5
+    },
+    {
+      "H": "Contrôleur technique en électricité-électronique (H/F)",
+      "F": "Contrôleuse technique en électricité-électronique",
+      "S": 0.5
+    },
+    {
+      "H": "Contrôleur technique en métallurgie (H/F)",
+      "F": "Contrôleuse technique en métallurgie",
+      "S": 0.5
+    },
+    {
+      "H": "Cordiste (H/F)",
+      "F": null,
+      "S": 0.6
+    },
+    {
+      "H": "Cordonnier (H/F)",
+      "F": "Cordonnière",
+      "S": 0.5
+    },
+    {
+      "H": "Correcteur (H/F)",
+      "F": "Correctrice",
+      "S": 0.5
+    },
+    {
+      "H": "Costumier (H/F)",
+      "F": "Costumière",
+      "S": 0.6
+    },
+    {
+      "H": "Coupeur textile (H/F)",
+      "F": "Coupeuse textile",
+      "S": 0.5
+    },
+    {
+      "H": "Coursier (H/F)",
+      "F": "Coursière",
+      "S": 0.4
+    },
+    {
+      "H": "Courtier en assurance (H/F)",
+      "F": "Courtière en assurance",
+      "S": 0.3
+    },
+    {
+      "H": "Courtier en banque (H/F)",
+      "F": "Courtière en banque",
+      "S": 0.3
+    },
+    {
+      "H": "Couturier (H/F)",
+      "F": "Couturière",
+      "S": 0.5
+    },
+    {
+      "H": "Couturier industriel de l'habillement (H/F)",
+      "F": "Couturière industrielle de l'habillement",
+      "S": 0.5
+    },
+    {
+      "H": "Couvreur (H/F)",
+      "F": "Couvreuse",
+      "S": 0.4
+    },
+    {
+      "H": "Croupier (H/F)",
+      "F": "Croupière",
+      "S": 0.6
+    },
+    {
+      "H": "Cuisinier de collectivité (H/F)",
+      "F": "Cuisinière de collectivité",
+      "S": 0.4
+    },
+    {
+      "H": "Cuisinier en industrie chimique (H/F)",
+      "F": "Cuisinière en industrie chimique",
+      "S": 0.5
+    },
+    {
+      "H": "Danseur (H/F)",
+      "F": "Danseuse",
+      "S": 0.6
+    },
+    {
+      "H": "Data engineer (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Data scientist (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Décorateur d'objets d'art (H/F)",
+      "F": "Décoratrice d'objets d'art",
+      "S": 0.5
+    },
+    {
+      "H": "Délégué médical (H/F)",
+      "F": "Déléguée médicale",
+      "S": 0.4
+    },
+    {
+      "H": "Déménageur (H/F)",
+      "F": "Déménageuse",
+      "S": 0.5
+    },
+    {
+      "H": "Démolisseur (H/F)",
+      "F": "Démolisseuse",
+      "S": 0.5
+    },
+    {
+      "H": "Dentiste (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Designer industriel (H/F)",
+      "F": "Designeuse industrielle",
+      "S": 0.4
+    },
+    {
+      "H": "Dessinateur de structures en bois (H/F)",
+      "F": "Dessinatrice de structures en bois",
+      "S": 0.5
+    },
+    {
+      "H": "Dessinateur du BTP (H/F)",
+      "F": "Dessinatrice du BTP",
+      "S": 0.4
+    },
+    {
+      "H": "Dessinateur en électricité-électronique (H/F)",
+      "F": "Dessinatrice en électricité-électronique",
+      "S": 0.4
+    },
+    {
+      "H": "Dessinateur enveloppe du bâtiment (H/F)",
+      "F": "Dessinatrice enveloppe du bâtiment",
+      "S": 0.5
+    },
+    {
+      "H": "Dessinateur-projeteur en mécanique (H/F)",
+      "F": "Dessinatrice-projeteuse en mécanique",
+      "S": 0.4
+    },
+    {
+      "H": "Dévops (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Développeur web (H/F)",
+      "F": "Développeuse web",
+      "S": 0.3
+    },
+    {
+      "H": "Développeur de photographies (H/F)",
+      "F": "Développeuse de photographies",
+      "S": 0.5
+    },
+    {
+      "H": "Diagnostiqueur immobilier (H/F)",
+      "F": "Diagnostiqueuse immobilier",
+      "S": 0.4
+    },
+    {
+      "H": "Diététicien (H/F)",
+      "F": "Diététicienne",
+      "S": 0.3
+    },
+    {
+      "H": "Directeur administratif et financier (H/F)",
+      "F": "Directrice administrative et financière",
+      "S": 0.2
+    },
+    {
+      "H": "Directeur collecte des déchets (H/F)",
+      "F": "Directrice collecte des déchets",
+      "S": 0.4
+    },
+    {
+      "H": "Directeur d'agence bancaire (H/F)",
+      "F": "Directrice d'agence bancaire",
+      "S": 0.2
+    },
+    {
+      "H": "Directeur de la communication (H/F)",
+      "F": "Directrice de la communication",
+      "S": 0.2
+    },
+    {
+      "H": "Directeur de magasin (H/F)",
+      "F": "Directrice de magasin",
+      "S": 0.2
+    },
+    {
+      "H": "Directeur des Ressources Humaines (H/F)",
+      "F": "Directrice des Ressources Humaines",
+      "S": 0.2
+    },
+    {
+      "H": "Directeur des services informatiques (H/F)",
+      "F": "Directrice des services informatiques",
+      "S": 0.2
+    },
+    {
+      "H": "Directeur des travaux bâtiment (H/F)",
+      "F": "Directrice des travaux bâtiment",
+      "S": 0.2
+    },
+    {
+      "H": "Directeur de structure de santé, sociale ou pénitentiaire (H/F)",
+      "F": "Directrice de structure de santé, sociale ou pénitentiaire",
+      "S": 0.3
+    },
+    {
+      "H": "Directeur de structure sportive (H/F)",
+      "F": "Directrice de structure sportive",
+      "S": 0.3
+    },
+    {
+      "H": "Directeur de structure touristique (H/F)",
+      "F": "Directrice de structure touristique",
+      "S": 0.3
+    },
+    {
+      "H": "Directeur en hôtellerie-restauration (H/F)",
+      "F": "Directrice en hôtellerie-restauration",
+      "S": 0.3
+    },
+    {
+      "H": "Directeur sportif (H/F)",
+      "F": "Directrice sportive",
+      "S": 0.3
+    },
+    {
+      "H": "Disc-jockey (H/F)",
+      "F": null,
+      "S": 0.6
+    },
+    {
+      "H": "Docker (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Documentaliste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Ébéniste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Ecailler (H/F)",
+      "F": "Ecaillère",
+      "S": 0.5
+    },
+    {
+      "H": "Échafaudeur (H/F)",
+      "F": "Échafaudeuse",
+      "S": 0.4
+    },
+    {
+      "H": "Éclairagiste (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Écrivain (H/F)",
+      "F": "Écrivaine",
+      "S": 0.6
+    },
+    {
+      "H": "Éditeur (H/F)",
+      "F": "Éditrice",
+      "S": 0.4
+    },
+    {
+      "H": "Éducateur de jeunes enfants (H/F)",
+      "F": "Éducatrice de jeunes enfants",
+      "S": 0.3
+    },
+    {
+      "H": "Éducateur spécialisé (H/F)",
+      "F": "Éducatrice spécialisée",
+      "S": 0.3
+    },
+    {
+      "H": "Éducateur sportif (H/F)",
+      "F": "Éducatrice sportive",
+      "S": 0.3
+    },
+    {
+      "H": "Éducateur sportif Santé (H/F)",
+      "F": "Éducatrice sportive Santé",
+      "S": 0.3
+    },
+    {
+      "H": "Éducateur technique spécialisé (H/F)",
+      "F": "Éducatrice technique spécialisée",
+      "S": 0.4
+    },
+    {
+      "H": "Élagueur (H/F)",
+      "F": "Élagueuse",
+      "S": 0.4
+    },
+    {
+      "H": "Électricien de maintenance (H/F)",
+      "F": "Électricienne de maintenance",
+      "S": 0.3
+    },
+    {
+      "H": "Électricien du bâtiment (H/F)",
+      "F": "Électricienne du bâtiment",
+      "S": 0.3
+    },
+    {
+      "H": "Électricien réseaux (H/F)",
+      "F": "Électricienne réseaux",
+      "S": 0.3
+    },
+    {
+      "H": "Électronicien de maintenance (H/F)",
+      "F": "Électronicienne de maintenance",
+      "S": 0.3
+    },
+    {
+      "H": "Éleveur d'animaux (H/F)",
+      "F": "Éleveuse d'animaux",
+      "S": 0.4
+    },
+    {
+      "H": "Éleveur de bovins (H/F)",
+      "F": "Éleveuse de bovins",
+      "S": 0.4
+    },
+    {
+      "H": "Éleveur de porcins (H/F)",
+      "F": "Éleveuse de porcins",
+      "S": 0.4
+    },
+    {
+      "H": "Éleveur d'ovins (H/F)",
+      "F": "Éleveuse d'ovins",
+      "S": 0.4
+    },
+    {
+      "H": "Employé de laboratoire cinématographique (H/F)",
+      "F": "Employée de laboratoire cinématographique",
+      "S": 0.5
+    },
+    {
+      "H": "Employé de libre-service (H/F)",
+      "F": "Employée de libre-service",
+      "S": 0.4
+    },
+    {
+      "H": "Employé de pressing (H/F)",
+      "F": "Employée de pressing",
+      "S": 0.4
+    },
+    {
+      "H": "Employé de restauration collective (H/F)",
+      "F": "Employée de restauration collective",
+      "S": 0.4
+    },
+    {
+      "H": "Employé d'hôtel (H/F)",
+      "F": "Employée d'hôtel",
+      "S": 0.4
+    },
+    {
+      "H": "Enquêteur sondage (H/F)",
+      "F": "Enquêtrice sondage",
+      "S": 0.5
+    },
+    {
+      "H": "Enseignant d'équitation (H/F)",
+      "F": "Enseignante d'équitation",
+      "S": 0.4
+    },
+    {
+      "H": "Entraîneur de sport professionnel et de haut niveau (H/F)",
+      "F": "Entraîneure de sport professionnel et de haut niveau",
+      "S": 0.3
+    },
+    {
+      "H": "Épicier (H/F)",
+      "F": "Épicière",
+      "S": 0.5
+    },
+    {
+      "H": "Équipier polyvalent de restauration rapide (H/F)",
+      "F": "Équipière polyvalente de restauration rapide",
+      "S": 0.4
+    },
+    {
+      "H": "Ergothérapeute (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Esthéticien (H/F)",
+      "F": "Esthéticienne",
+      "S": 0.4
+    },
+    {
+      "H": "Étalagiste (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Étancheur (H/F)",
+      "F": "Étancheuse",
+      "S": 0.4
+    },
+    {
+      "H": "Expert-comptable (H/F)",
+      "F": "Experte-comptable",
+      "S": 0.2
+    },
+    {
+      "H": "Expert risques en assurances (H/F)",
+      "F": "Experte risques en assurances",
+      "S": 0.3
+    },
+    {
+      "H": "Exploitant transport routier de marchandises (H/F)",
+      "F": "Exploitante transport routier de marchandises",
+      "S": 0.4
+    },
+    {
+      "H": "Extracteur de roches (H/F)",
+      "F": "Extractrice de roches",
+      "S": 0.5
+    },
+    {
+      "H": "Façadier (H/F)",
+      "F": "Façadière",
+      "S": 0.4
+    },
+    {
+      "H": "Facteur (H/F)",
+      "F": "Factrice",
+      "S": 0.4
+    },
+    {
+      "H": "Facteur d'instruments de musique (H/F)",
+      "F": "Factrice d'instruments de musique",
+      "S": 0.5
+    },
+    {
+      "H": "Fleuriste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Fondeur en métallurgie (H/F)",
+      "F": "Fondeuse en métallurgie",
+      "S": 0.5
+    },
+    {
+      "H": "Forestier (H/F)",
+      "F": "Forestière",
+      "S": 0.5
+    },
+    {
+      "H": "Foreur (H/F)",
+      "F": "Foreuse",
+      "S": 0.5
+    },
+    {
+      "H": "Forgeron industriel (H/F)",
+      "F": "Forgeronne industrielle",
+      "S": 0.5
+    },
+    {
+      "H": "Formateur (H/F)",
+      "F": "Formatrice",
+      "S": 0.3
+    },
+    {
+      "H": "Frigoriste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Fromager (H/F)",
+      "F": "Fromagère",
+      "S": 0.5
+    },
+    {
+      "H": "Garde d'enfant à domicile (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Garde forestier (H/F)",
+      "F": "Garde forestière",
+      "S": 0.5
+    },
+    {
+      "H": "Gardien (H/F)",
+      "F": "Gardienne",
+      "S": 0.4
+    },
+    {
+      "H": "Gendarme (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Géologue (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Géomètre-topographe (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Gérant de portefeuille financier (H/F)",
+      "F": "Gérante de portefeuille financier",
+      "S": 0.3
+    },
+    {
+      "H": "Gestionnaire de copropriété (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Gestionnaire de flux de production (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Gestionnaire de produits bancaires (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Gestionnaire des opérations sur les marchés financiers (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Gestionnaire en assurances (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Gouvernant d'hôtel (H/F)",
+      "F": "Gouvernante d'hôtel",
+      "S": 0.4
+    },
+    {
+      "H": "Graphiste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Graveur d'art (H/F)",
+      "F": "Graveuse d'art",
+      "S": 0.5
+    },
+    {
+      "H": "Grossiste en produits frais (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Grutier (H/F)",
+      "F": "Grutière",
+      "S": 0.5
+    },
+    {
+      "H": "Guide touristique (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Homme sage-femme (H/F)",
+      "F": "Sage-femme",
+      "S": 0.3
+    },
+    {
+      "H": "Horloger (H/F)",
+      "F": "Horlogère",
+      "S": 0.4
+    },
+    {
+      "H": "Horticulteur (H/F)",
+      "F": "Horticultrice",
+      "S": 0.4
+    },
+    {
+      "H": "Hôte d'accueil tourisme (H/F)",
+      "F": "Hôtesse d'accueil tourisme",
+      "S": 0.4
+    },
+    {
+      "H": "Imprimeur textile (H/F)",
+      "F": "Imprimeuse textile",
+      "S": 0.5
+    },
+    {
+      "H": "Infirmier anesthésiste (H/F)",
+      "F": "Infirmière anesthésiste",
+      "S": 0.3
+    },
+    {
+      "H": "Infirmier de bloc opératoire (H/F)",
+      "F": "Infirmière de bloc opératoire",
+      "S": 0.3
+    },
+    {
+      "H": "Infirmier de santé au travail (H/F)",
+      "F": "Infirmière de santé au travail",
+      "S": 0.3
+    },
+    {
+      "H": "Infirmier en puériculture (H/F)",
+      "F": "Infirmière en puériculture",
+      "S": 0.3
+    },
+    {
+      "H": "Infirmier en soins généraux (H/F)",
+      "F": "Infirmière en soins généraux",
+      "S": 0.3
+    },
+    {
+      "H": "Ingénieur agronome (H/F)",
+      "F": "Ingénieure agronome",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur calcul et structure (H/F)",
+      "F": "Ingénieure calcul et structure",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur de maintenance industrielle (H/F)",
+      "F": "Ingénieure de maintenance industrielle",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur de recherche scientifique (H/F)",
+      "F": "Ingénieure de recherche scientifique",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur d'études BTP (H/F)",
+      "F": "Ingénieure d'études BTP",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur génie civil (H/F)",
+      "F": "Ingénieure génie civil",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur méthodes et process (H/F)",
+      "F": "Ingénieure méthodes et process",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur R&D en industrie (H/F)",
+      "F": "Ingénieure R&D en industrie",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur système informatique (H/F)",
+      "F": "Ingénieure système informatique",
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur télécoms (H/F)",
+      "F": "Ingénieure télécoms",
+      "S": 0.4
+    },
+    {
+      "H": "Inspecteur de conformité (H/F)",
+      "F": "Inspectrice de conformité",
+      "S": 0.4
+    },
+    {
+      "H": "Inspecteur des douanes (H/F)",
+      "F": "Inspectrice des douanes",
+      "S": 0.4
+    },
+    {
+      "H": "Inspecteur du travail (H/F)",
+      "F": "Inspectrice du travail",
+      "S": 0.4
+    },
+    {
+      "H": "Installateur chauffage et climatisation (H/F)",
+      "F": "Installatrice chauffage et climatisation",
+      "S": 0.4
+    },
+    {
+      "H": "Installateur fibre optique (H/F)",
+      "F": "Installatrice fibre optique",
+      "S": 0.4
+    },
+    {
+      "H": "Installateur-poseur de piscines préfabriquées (H/F)",
+      "F": "Installatrice-poseuse de piscines préfabriquées",
+      "S": 0.4
+    },
+    {
+      "H": "Intégrateur logiciels métiers (H/F)",
+      "F": "Intégratrice logiciels métiers",
+      "S": 0.4
+    },
+    {
+      "H": "Jardinier (H/F)",
+      "F": "Jardinière",
+      "S": 0.4
+    },
+    {
+      "H": "Joaillier (H/F)",
+      "F": "Joaillière",
+      "S": 0.4
+    },
+    {
+      "H": "Journaliste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Juge (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Juriste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Kinésithérapeute (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Lapidaire (H/F)",
+      "F": "Diamantaire",
+      "S": 0.5
+    },
+    {
+      "H": "Laveur de vitres (H/F)",
+      "F": "Laveuse de vitres",
+      "S": 0.5
+    },
+    {
+      "H": "Loueur de véhicules (H/F)",
+      "F": "Loueuse de véhicules",
+      "S": 0.4
+    },
+    {
+      "H": "Maçon du paysage (H/F)",
+      "F": "Maçonne du paysage",
+      "S": 0.4
+    },
+    {
+      "H": "Maître d'hôtel (H/F)",
+      "F": "Maîtresse d'hôtel",
+      "S": 0.4
+    },
+    {
+      "H": "Mandataire (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Manipulateur en radiologie (H/F)",
+      "F": "Manipulatrice en radiologie",
+      "S": 0.3
+    },
+    {
+      "H": "Mannequin (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Manœuvre bâtiment (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Maquilleur (H/F)",
+      "F": "Maquilleuse",
+      "S": 0.4
+    },
+    {
+      "H": "Marin (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Maroquinier (H/F)",
+      "F": "Maroquinière",
+      "S": 0.4
+    },
+    {
+      "H": "Mécanicien (H/F)",
+      "F": "Mécanicienne",
+      "S": 0.3
+    },
+    {
+      "H": "Mécanicien agricole (H/F)",
+      "F": "Mécanicienne agricole",
+      "S": 0.4
+    },
+    {
+      "H": "Mécanicien automobile (H/F)",
+      "F": "Mécanicienne automobile",
+      "S": 0.3
+    },
+    {
+      "H": "Mécanicien avion (H/F)",
+      "F": "Mécanicienne avion",
+      "S": 0.3
+    },
+    {
+      "H": "Mécanicien de bateaux (H/F)",
+      "F": "Mécanicienne de bateaux",
+      "S": 0.4
+    },
+    {
+      "H": "Mécanicien de maintenance industrielle (H/F)",
+      "F": "Mécanicienne de maintenance industrielle",
+      "S": 0.3
+    },
+    {
+      "H": "Mécanicien modèle (H/F)",
+      "F": "Mécanicienne modèle",
+      "S": 0.5
+    },
+    {
+      "H": "Mécanicien motocycles (H/F)",
+      "F": "Mécanicienne motocycles",
+      "S": 0.3
+    },
+    {
+      "H": "Médecin (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Médecin conseil (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Médecin coordonnateur (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Médecin du travail (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Médecin généraliste (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Média planneur (H/F)",
+      "F": "Média planneuse",
+      "S": 0.4
+    },
+    {
+      "H": "Médiateur familial (H/F)",
+      "F": "Médiatrice familiale",
+      "S": 0.4
+    },
+    {
+      "H": "Médiateur social (H/F)",
+      "F": "Médiatrice sociale",
+      "S": 0.4
+    },
+    {
+      "H": "Menuisier (H/F)",
+      "F": "Menuisière",
+      "S": 0.4
+    },
+    {
+      "H": "Menuisier aluminium (H/F)",
+      "F": "Menuisière aluminium",
+      "S": 0.4
+    },
+    {
+      "H": "Métallier (H/F)",
+      "F": "Métallière",
+      "S": 0.4
+    },
+    {
+      "H": "Métallier d'art (H/F)",
+      "F": "Métallière d'art",
+      "S": 0.4
+    },
+    {
+      "H": "Météorologue (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Métreur (H/F)",
+      "F": "Métreuse",
+      "S": 0.4
+    },
+    {
+      "H": "Metteur en scène (H/F)",
+      "F": "Metteuse en scène",
+      "S": 0.3
+    },
+    {
+      "H": "Modeleur (H/F)",
+      "F": "Modeleuse",
+      "S": 0.4
+    },
+    {
+      "H": "Moniteur d'auto-école (H/F)",
+      "F": "Monitrice d'auto-école",
+      "S": 0.4
+    },
+    {
+      "H": "Moniteur de sport nature (H/F)",
+      "F": "Monitrice de sport nature",
+      "S": 0.4
+    },
+    {
+      "H": "Moniteur en salle de sport (H/F)",
+      "F": "Monitrice en salle de sport",
+      "S": 0.4
+    },
+    {
+      "H": "Monteur-câbleur en électronique (H/F)",
+      "F": "Monteuse-câbleuse en électronique",
+      "S": 0.3
+    },
+    {
+      "H": "Monteur de panneaux photovoltaïques (H/F)",
+      "F": "Monteuse de panneaux photovoltaïques",
+      "S": 0.3
+    },
+    {
+      "H": "Monteur vidéo (H/F)",
+      "F": "Monteuse vidéo",
+      "S": 0.3
+    },
+    {
+      "H": "Monteur régleur en plasturgie (H/F)",
+      "F": "Monteuse régleuse en plasturgie",
+      "S": 0.3
+    },
+    {
+      "H": "Mouleur noyauteur (H/F)",
+      "F": "Mouleuse noyauteuse",
+      "S": 0.4
+    },
+    {
+      "H": "Mouleur-stratifieur (H/F)",
+      "F": "Mouleuse-stratifieuse",
+      "S": 0.4
+    },
+    {
+      "H": "Musicien (H/F)",
+      "F": "Musicienne",
+      "S": 0.3
+    },
+    {
+      "H": "Nappeur en industrie textile (H/F)",
+      "F": "Nappeuse en industrie textile",
+      "S": 0.5
+    },
+    {
+      "H": "Officier de police (H/F)",
+      "F": "Officière de police",
+      "S": 0.2
+    },
+    {
+      "H": "Opérateur d'attraction (H/F)",
+      "F": "Opératrice d'attraction",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur (H/F)",
+      "F": "Opératrice",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de fabrication en matériaux de construction (H/F)",
+      "F": "Opératrice de fabrication en matériaux de construction",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de finition en industrie textile (H/F)",
+      "F": "Opératrice de finition en industrie textile",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de préparation en industrie textile (H/F)",
+      "F": "Opératrice de préparation en industrie textile",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de prépresse (H/F)",
+      "F": "Opératrice de prépresse",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de production (H/F)",
+      "F": "Opératrice de production",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de saisie (H/F)",
+      "F": "Opératrice de saisie",
+      "S": 0.4
+    },
+    {
+      "H": "Opérateur de traitement d'abrasion de surface (H/F)",
+      "F": "Opératrice de traitement d'abrasion de surface",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de traitement thermique (H/F)",
+      "F": "Opératrice de traitement thermique",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur de transformation (H/F)",
+      "F": "Opératrice de transformation",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur en bijouterie (H/F)",
+      "F": "Opératrice en bijouterie",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur en fabrication mécanique (H/F)",
+      "F": "Opératrice en fabrication mécanique",
+      "S": 0.4
+    },
+    {
+      "H": "Opérateur en maroquinerie industrielle (H/F)",
+      "F": "Opératrice en maroquinerie industrielle",
+      "S": 0.4
+    },
+    {
+      "H": "Opérateur en orfèvrerie et bijouterie (H/F)",
+      "F": "Opératrice en orfèvrerie et bijouterie",
+      "S": 0.4
+    },
+    {
+      "H": "Opérateur en polissage de bijouterie (H/F)",
+      "F": "Opératrice en polissage de bijouterie",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur en tannerie (H/F)",
+      "F": "Opératrice en tannerie",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur sur machines automatisées (H/F)",
+      "F": "Opératrice sur machines automatisées",
+      "S": 0.4
+    },
+    {
+      "H": "Opérateur télécom aux armées (H/F)",
+      "F": "Opératrice télécom aux armées",
+      "S": 0.4
+    },
+    {
+      "H": "Opticien (H/F)",
+      "F": "Opticienne",
+      "S": 0.3
+    },
+    {
+      "H": "Orthophoniste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Orthoprothésiste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Orthoptiste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Ostéopathe (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Ouvrier agricole polyvalent (H/F)",
+      "F": "Ouvrière agricole polyvalente",
+      "S": 0.4
+    },
+    {
+      "H": "Ouvrier (H/F)",
+      "F": "Ouvrière",
+      "S": 0.4
+    },
+    {
+      "H": "Ouvrier d'abattoir (H/F)",
+      "F": "Ouvrière d'abattoir",
+      "S": 0.5
+    },
+    {
+      "H": "Ouvrier de scierie (H/F)",
+      "F": "Ouvrière de scierie",
+      "S": 0.5
+    },
+    {
+      "H": "Ouvrier en voiries (H/F)",
+      "F": "Ouvrière en voiries",
+      "S": 0.5
+    },
+    {
+      "H": "Palefrenier soigneur (H/F)",
+      "F": "Palefrenière soigneuse",
+      "S": 0.4
+    },
+    {
+      "H": "Pâtissier (H/F)",
+      "F": "Pâtissière",
+      "S": 0.3
+    },
+    {
+      "H": "Patronnier (H/F)",
+      "F": "Patronnière",
+      "S": 0.4
+    },
+    {
+      "H": "Peintre (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Peintre en bâtiment (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Peintre industriel (H/F)",
+      "F": "Peintre industrielle",
+      "S": 0.4
+    },
+    {
+      "H": "Pharmacien (H/F)",
+      "F": "Pharmacienne",
+      "S": 0.4
+    },
+    {
+      "H": "Photographe (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Pilote de ligne (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Pizzaïolo (H/F)",
+      "F": "Pizzaïola",
+      "S": 0.6
+    },
+    {
+      "H": "Planneur stratégique (H/F)",
+      "F": "Planneuse stratégique",
+      "S": 0.3
+    },
+    {
+      "H": "Plaquiste (H/F)",
+      "F": null,
+      "S": 0.7
+    },
+    {
+      "H": "Plasturgiste (H/F)",
+      "F": null,
+      "S": 0.6
+    },
+    {
+      "H": "Plâtrier (H/F)",
+      "F": "Plâtrière",
+      "S": 0.7
+    },
+    {
+      "H": "Plombier (H/F)",
+      "F": "Plombière",
+      "S": 0.5
+    },
+    {
+      "H": "Plongeur (H/F)",
+      "F": "Plongeuse",
+      "S": 0.8
+    },
+    {
+      "H": "Podologue (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Poissonnier (H/F)",
+      "F": "Poissonnière",
+      "S": 0.7
+    },
+    {
+      "H": "Policier (H/F)",
+      "F": "Policière",
+      "S": 0.3
+    },
+    {
+      "H": "Policier municipal (H/F)",
+      "F": "Policière municipale",
+      "S": 0.4
+    },
+    {
+      "H": "Polisseur en bijouterie ou joaillerie (H/F)",
+      "F": "Polisseuse en bijouterie ou joaillerie",
+      "S": 0.7
+    },
+    {
+      "H": "Pontier (H/F)",
+      "F": "Pontière",
+      "S": 0.6
+    },
+    {
+      "H": "Porteur funéraire (H/F)",
+      "F": "Porteuse funéraire",
+      "S": 0.8
+    },
+    {
+      "H": "Poseur de cloisons démontables et mobiles (H/F)",
+      "F": "Poseuse de cloisons démontables et mobiles",
+      "S": 0.7
+    },
+    {
+      "H": "Poseur de façade vitrée (H/F)",
+      "F": "Poseuse de façade vitrée",
+      "S": 0.6
+    },
+    {
+      "H": "Poseur de menuiseries extérieures (H/F)",
+      "F": "Poseuse de menuiseries extérieures",
+      "S": 0.6
+    },
+    {
+      "H": "Poseur de véranda (H/F)",
+      "F": "Poseuse de véranda",
+      "S": 0.5
+    },
+    {
+      "H": "Poseur en fermetures de bâtiment (H/F)",
+      "F": "Poseuse en fermetures de bâtiment",
+      "S": 0.6
+    },
+    {
+      "H": "Préfet (H/F)",
+      "F": "Préfète",
+      "S": 0.3
+    },
+    {
+      "H": "Préparateur (H/F)",
+      "F": "Préparatrice",
+      "S": 0.5
+    },
+    {
+      "H": "Préparateur de bateau (H/F)",
+      "F": "Préparatrice de bateau",
+      "S": 0.6
+    },
+    {
+      "H": "Préparateur de commandes (H/F)",
+      "F": "Préparatrice de commandes",
+      "S": 0.7
+    },
+    {
+      "H": "Préparateur en pharmacie (H/F)",
+      "F": "Préparatrice en pharmacie",
+      "S": 0.4
+    },
+    {
+      "H": "Préparateur physique (H/F)",
+      "F": "Préparatrice physique",
+      "S": 0.5
+    },
+    {
+      "H": "Président Directeur Général (H/F)",
+      "F": "Présidente Directrice Générale",
+      "S": 0.2
+    },
+    {
+      "H": "Producteur (H/F)",
+      "F": "Productrice",
+      "S": 0.3
+    },
+    {
+      "H": "Producteur de film (H/F)",
+      "F": "Productrice de film",
+      "S": 0.4
+    },
+    {
+      "H": "Product Owner (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Professeur (H/F)",
+      "F": "Professeure",
+      "S": 0.2
+    },
+    {
+      "H": "Professeur de musique (H/F)",
+      "F": "Professeure de musique",
+      "S": 0.3
+    },
+    {
+      "H": "Professeur d'enseignement professionnel (H/F)",
+      "F": "Professeure d'enseignement professionnel",
+      "S": 0.4
+    },
+    {
+      "H": "Professeur des écoles (H/F)",
+      "F": "Professeure des écoles",
+      "S": 0.2
+    },
+    {
+      "H": "Professeur des universités (H/F)",
+      "F": "Professeure des universités",
+      "S": 0.1
+    },
+    {
+      "H": "Psychologue (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Psychomotricien (H/F)",
+      "F": "Psychomotricienne",
+      "S": 0.4
+    },
+    {
+      "H": "Réalisateur (H/F)",
+      "F": "Réalisatrice",
+      "S": 0.2
+    },
+    {
+      "H": "Réceptionniste en hôtellerie (H/F)",
+      "F": null,
+      "S": 0.6
+    },
+    {
+      "H": "Rédacteur technique (H/F)",
+      "F": "Rédactrice technique",
+      "S": 0.5
+    },
+    {
+      "H": "Régisseur (H/F)",
+      "F": "Régisseuse",
+      "S": 0.3
+    },
+    {
+      "H": "Régisseur général (H/F)",
+      "F": "Régisseuse générale",
+      "S": 0.2
+    },
+    {
+      "H": "Régisseur de recettes (H/F)",
+      "F": "Régisseuse de recettes",
+      "S": 0.4
+    },
+    {
+      "H": "Régisseur du son (H/F)",
+      "F": "Régisseuse du son",
+      "S": 0.3
+    },
+    {
+      "H": "Régleur d'équipements industriels (H/F)",
+      "F": "Régleuse d'équipements industriels",
+      "S": 0.5
+    },
+    {
+      "H": "Relieur (H/F)",
+      "F": "Relieuse",
+      "S": 0.6
+    },
+    {
+      "H": "Repasseur-presseur (H/F)",
+      "F": "Repasseuse-presseuse",
+      "S": 0.7
+    },
+    {
+      "H": "Responsable administratif (H/F)",
+      "F": "Responsable administrative",
+      "S": 0.3
+    },
+    {
+      "H": "Responsable commercial (H/F)",
+      "F": "Responsable commerciale",
+      "S": 0.3
+    },
+    {
+      "H": "Responsable d'agence en assurances (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable d'agence immobilière (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable d'agence transport routier de marchandises (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable d'atelier d'impression (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable d'atelier en bijouterie ou joaillerie (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable de caisses (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable de département en assurances (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable de département en grande distribution (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable de laboratoire d'analyse industrielle (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable de l'administration des ventes (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable de la Sécurité des Systèmes d'Information (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Responsable de magasin (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable d'enquêtes (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable de Petite ou Moyenne Entreprise (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable des achats (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable de sécurité civile et de secours (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable de site éco-industriel (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable de site nettoyage de locaux (H/F)",
+      "F": null,
+      "S": 0.6
+    },
+    {
+      "H": "Responsable d'établissement de restauration collective (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable de travaux BTP (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable d'exploitation de gisements et de carrières (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable d'exploitation transport fluvial (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable d'exploitation transport routier de personnes (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable d'îlot de production (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable d'unité de production industrielle (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable entrepôt logistique (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Responsable Hygiène Sécurité Environnement en industrie (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable logistique (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable marketing (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable opérationnel de la défense (H/F)",
+      "F": "Responsable opérationnelle de la défense",
+      "S": 0.3
+    },
+    {
+      "H": "Responsable pédagogique (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable qualité en industrie (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable relation client (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable sécurité (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Retoucheur en habillement (H/F)",
+      "F": "Retoucheuse en habillement",
+      "S": 0.5
+    },
+    {
+      "H": "Ripeur (H/F)",
+      "F": "Ripeuse",
+      "S": 0.7
+    },
+    {
+      "H": "Saliculteur (H/F)",
+      "F": "Salicultrice",
+      "S": 0.6
+    },
+    {
+      "H": "Scaphandrier (H/F)",
+      "F": "Scaphandrière",
+      "S": 0.5
+    },
+    {
+      "H": "Sculpteur sur bois (H/F)",
+      "F": "Sculptrice sur bois",
+      "S": 0.6
+    },
+    {
+      "H": "Secouriste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Secrétaire (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Secrétaire comptable (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Secrétaire de mairie (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Secrétaire médical (H/F)",
+      "F": "Secrétaire médicale",
+      "S": 0.3
+    },
+    {
+      "H": "Secrétaire technique (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Sertisseur en bijouterie ou joaillerie (H/F)",
+      "F": "Sertisseuse en bijouterie ou joaillerie",
+      "S": 0.6
+    },
+    {
+      "H": "Serveur (H/F)",
+      "F": "Serveuse",
+      "S": 0.3
+    },
+    {
+      "H": "Soigneur animalier (H/F)",
+      "F": "Soigneuse animalière",
+      "S": 0.5
+    },
+    {
+      "H": "Soldat (H/F)",
+      "F": "Soldate",
+      "S": 0.4
+    },
+    {
+      "H": "Solier-moquettiste (H/F)",
+      "F": "Solière-moquettiste",
+      "S": 0.5
+    },
+    {
+      "H": "Sommelier (H/F)",
+      "F": "Sommelière",
+      "S": 0.4
+    },
+    {
+      "H": "Soudeur (H/F)",
+      "F": "Soudeuse",
+      "S": 0.5
+    },
+    {
+      "H": "Souffleur de verre (H/F)",
+      "F": "Souffleuse de verre",
+      "S": 0.6
+    },
+    {
+      "H": "Souscripteur en assurances (H/F)",
+      "F": "Souscriptrice en assurances",
+      "S": 0.4
+    },
+    {
+      "H": "Sportif professionnel (H/F)",
+      "F": "Sportive professionnelle",
+      "S": 0.2
+    },
+    {
+      "H": "Steward (H/F)",
+      "F": "Hôtesse de l'air",
+      "S": 0.3
+    },
+    {
+      "H": "Styliste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Surveillant de baignade (H/F)",
+      "F": "Surveillante de baignade",
+      "S": 0.5
+    },
+    {
+      "H": "Surveillant en milieu scolaire (H/F)",
+      "F": "Surveillante en milieu scolaire",
+      "S": 0.3
+    },
+    {
+      "H": "Tailleur de pierre (H/F)",
+      "F": "Tailleuse de pierre",
+      "S": 0.6
+    },
+    {
+      "H": "Tapissier d'ameublement (H/F)",
+      "F": "Tapissière d'ameublement",
+      "S": 0.5
+    },
+    {
+      "H": "Tapissier d'ameublement (H/F)",
+      "F": "Tapissière d'ameublement",
+      "S": 0.5
+    },
+    {
+      "H": "Taxidermiste (H/F)",
+      "F": null,
+      "S": 0.6
+    },
+    {
+      "H": "Technicien agricole (H/F)",
+      "F": "Technicienne agricole",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien chauffagiste (H/F)",
+      "F": "Technicienne chauffagiste",
+      "S": 0.5
+    },
+    {
+      "H": "Technicien de culture maraîchère (H/F)",
+      "F": "Technicienne de culture maraîchère",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien de laboratoire en industrie (H/F)",
+      "F": "Technicienne de laboratoire en industrie",
+      "S": 0.5
+    },
+    {
+      "H": "Technicien de laboratoires d'analyses médicales (H/F)",
+      "F": "Technicienne de laboratoires d'analyses médicales",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien de l'industrie du verre (H/F)",
+      "F": "Technicienne de l'industrie du verre",
+      "S": 0.5
+    },
+    {
+      "H": "Technicien de maintenance de distributeurs automatiques (H/F)",
+      "F": "Technicienne de maintenance de distributeurs automatiques",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien de maintenance en informatique (H/F)",
+      "F": "Technicienne de maintenance en informatique",
+      "S": 0.3
+    },
+    {
+      "H": "Technicien de maintenance industrielle (H/F)",
+      "F": "Technicienne de maintenance industrielle",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien des industries graphiques (H/F)",
+      "F": "Technicienne des industries graphiques",
+      "S": 0.5
+    },
+    {
+      "H": "Technicien énergie (H/F)",
+      "F": "Technicienne énergie",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien en Hygiène, Sécurité, Environnement industriel (H/F)",
+      "F": "Technicienne en Hygiène, Sécurité, Environnement industriel",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien en risques technologiques (H/F)",
+      "F": "Technicienne en risques technologiques",
+      "S": 0.5
+    },
+    {
+      "H": "Technicien études électroniques (H/F)",
+      "F": "Technicienne études électroniques",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien informatique (H/F)",
+      "F": "Technicienne informatique",
+      "S": 0.3
+    },
+    {
+      "H": "Technicien Intervention Sociale et Familiale (H/F)",
+      "F": "Technicienne Intervention Sociale et Familiale",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien méthodes (H/F)",
+      "F": "Technicienne méthodes",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien R&D (H/F)",
+      "F": "Technicienne R&D",
+      "S": 0.3
+    },
+    {
+      "H": "Technicien SAV (H/F)",
+      "F": "Technicienne SAV",
+      "S": 0.4
+    },
+    {
+      "H": "Technicien support technique (H/F)",
+      "F": "Technicienne support technique",
+      "S": 0.4
+    },
+    {
+      "H": "Technico-commercial (H/F)",
+      "F": "Technico-commerciale",
+      "S": 0.3
+    },
+    {
+      "H": "Téléconseiller (H/F)",
+      "F": "Téléconseillère",
+      "S": 0.5
+    },
+    {
+      "H": "Thanatopracteur (H/F)",
+      "F": "Thanatopractrice",
+      "S": 0.6
+    },
+    {
+      "H": "Toiletteur d'animaux (H/F)",
+      "F": "Toiletteuse d'animaux",
+      "S": 0.5
+    },
+    {
+      "H": "Tourneur-fraiseur (H/F)",
+      "F": "Tourneuse-fraiseuse",
+      "S": 0.5
+    },
+    {
+      "H": "Trader (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Traducteur (H/F)",
+      "F": "Traductrice",
+      "S": 0.3
+    },
+    {
+      "H": "Trésorier (H/F)",
+      "F": "Trésorière",
+      "S": 0.3
+    },
+    {
+      "H": "Trieur de pierres et perles (H/F)",
+      "F": "Trieuse de pierres et perles",
+      "S": 0.6
+    },
+    {
+      "H": "Tuyauteur (H/F)",
+      "F": "Tuyauteuse",
+      "S": 0.5
+    },
+    {
+      "H": "UX - UI Designer (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Valet de chambre (H/F)",
+      "F": "Femme de chambre",
+      "S": 0.4
+    },
+    {
+      "H": "Vannier (H/F)",
+      "F": "Vannière",
+      "S": 0.6
+    },
+    {
+      "H": "Vendangeur (H/F)",
+      "F": "Vendangeuse",
+      "S": 0.7
+    },
+    {
+      "H": "Vendeur d'articles de sport et loisirs (H/F)",
+      "F": "Vendeuse d'articles de sport et loisirs",
+      "S": 0.4
+    },
+    {
+      "H": "Vendeur en animalerie (H/F)",
+      "F": "Vendeuse en animalerie",
+      "S": 0.5
+    },
+    {
+      "H": "Vendeur en équipement de la maison (H/F)",
+      "F": "Vendeuse en équipement de la maison",
+      "S": 0.4
+    },
+    {
+      "H": "Vendeur en prêt-à-porter (H/F)",
+      "F": "Vendeuse en prêt-à-porter",
+      "S": 0.4
+    },
+    {
+      "H": "Vendeur grossiste de matériels et équipements (H/F)",
+      "F": "Vendeuse grossiste de matériels et équipements",
+      "S": 0.4
+    },
+    {
+      "H": "Vétérinaire (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Viticulteur (H/F)",
+      "F": "Viticultrice",
+      "S": 0.5
+    },
+    {
+      "H": "Yield manager (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Agent de médiation et de gestion urbaine (H/F)",
+      "F": null,
+      "S": 0.5
+    },
+    {
+      "H": "Agent de service funéraire (H/F)",
+      "F": "Agente de service funéraire",
+      "S": 0.6
+    },
+    {
+      "H": "Agent d'exploitation transport multimodal (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Analyste d'exploitation (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Assistant en psychologie (H/F)",
+      "F": "Assistante en psychologie",
+      "S": 0.4
+    },
+    {
+      "H": "Assistant parlementaire (H/F)",
+      "F": "Assistante parlementaire",
+      "S": 0.3
+    },
+    {
+      "H": "Assistante maternelle (H/F)",
+      "F": "Assistant maternel",
+      "S": 0.4
+    },
+    {
+      "H": "Attaché de presse (H/F)",
+      "F": "Attachée de presse",
+      "S": 0.3
+    },
+    {
+      "H": "Auxiliaire ambulancier (H/F)",
+      "F": "Auxiliaire ambulancière",
+      "S": 0.5
+    },
+    {
+      "H": "Batteur d'or (H/F)",
+      "F": "Batteuse d'or",
+      "S": 0.7
+    },
+    {
+      "H": "Bijoutier-joaillier (H/F)",
+      "F": "Bijoutière-joaillière",
+      "S": 0.4
+    },
+    {
+      "H": "Biologiste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Bio-informaticien (H/F)",
+      "F": "Bio-informaticienne",
+      "S": 0.4
+    },
+    {
+      "H": "Biotechnologiste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Blanchisseur industriel (H/F)",
+      "F": "Blanchisseuse industrielle",
+      "S": 0.6
+    },
+    {
+      "H": "Bottier (H/F)",
+      "F": "Bottière",
+      "S": 0.5
+    },
+    {
+      "H": "Canneur (H/F)",
+      "F": "Canneuse",
+      "S": 0.6
+    },
+    {
+      "H": "Cartographe (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Chef de produit (H/F)",
+      "F": "Cheffe de produit",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de projet (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Chef de projet en informatique (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Chimiste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Comptable unique (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Conducteur de travaux BTP (H/F)",
+      "F": "Conductrice de travaux BTP",
+      "S": 0.3
+    },
+    {
+      "H": "Consultant en stratégie (H/F)",
+      "F": "Consultante en stratégie",
+      "S": 0.2
+    },
+    {
+      "H": "Courtier en crédits (H/F)",
+      "F": "Courtière en crédits",
+      "S": 0.4
+    },
+    {
+      "H": "Data analyst (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Développeur (H/F)",
+      "F": "Développeuse",
+      "S": 0.3
+    },
+    {
+      "H": "Éducateur de jeunes enfants (H/F)",
+      "F": "Éducatrice de jeunes enfants",
+      "S": 0.5
+    },
+    {
+      "H": "Électrotechnicien (H/F)",
+      "F": "Électrotechnicienne",
+      "S": 0.4
+    },
+    {
+      "H": "Enseignant-chercheur (H/F)",
+      "F": "Enseignante-chercheuse",
+      "S": 0.2
+    },
+    {
+      "H": "Géophysicien (H/F)",
+      "F": "Géophysicienne",
+      "S": 0.3
+    },
+    {
+      "H": "Graphiste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Graphiste multimédia (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Hydrogéologue (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Ingénieur (H/F)",
+      "F": "Ingénieure",
+      "S": 0.2
+    },
+    {
+      "H": "Ingénieur environnement (H/F)",
+      "F": "Ingénieure environnement",
+      "S": 0.3
+    },
+    {
+      "H": "Magasinier (H/F)",
+      "F": "Magasinière",
+      "S": 0.5
+    },
+    {
+      "H": "Maraîcher (H/F)",
+      "F": "Maraîchère",
+      "S": 0.5
+    },
+    {
+      "H": "Microbiologiste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Moniteur éducateur (H/F)",
+      "F": "Monitrice éducatrice",
+      "S": 0.5
+    },
+    {
+      "H": "Opérateur en transformation laitière (H/F)",
+      "F": "Opératrice en transformation laitière",
+      "S": 0.6
+    },
+    {
+      "H": "Orthésiste-prothésiste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Responsable administratif (H/F)",
+      "F": "Responsable administrative",
+      "S": 0.3
+    },
+    {
+      "H": "Technicien de maintenance en équipements industriels (H/F)",
+      "F": "Technicienne de maintenance en équipements industriels",
+      "S": 0.4
+    },
+    {
+      "H": "Traducteur interprète (H/F)",
+      "F": "Traductrice interprète",
+      "S": 0.4
+    },
+    {
+      "H": "Webdesigner (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Cybersécurité (H/F)",
+      "F": null,
+      "S": 0.1
+    },
+    {
+      "H": "Analyste (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Analyste de données (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Analyste de réseau informatique (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Chef de projet informatique (H/F)",
+      "F": "Cheffe de projet informatique",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de projet marketing (H/F)",
+      "F": "Cheffe de projet marketing",
+      "S": 0.3
+    },
+    {
+      "H": "Chef de secteur en grande distribution (H/F)",
+      "F": "Cheffe de secteur en grande distribution",
+      "S": 0.3
+    },
+    {
+      "H": "Chef pâtissier (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Chef de projet web (H/F)",
+      "F": "Cheffe de projet web",
+      "S": 0.3
+    },
+    {
+      "H": "Développeur d'applications mobiles (H/F)",
+      "F": "Développeuse d'applications mobiles",
+      "S": 0.3
+    },
+    {
+      "H": "Employé de commerce (H/F)",
+      "F": "Employée de commerce",
+      "S": 0.5
+    },
+    {
+      "H": "Géomaticien (H/F)",
+      "F": "Géomaticienne",
+      "S": 0.4
+    },
+    {
+      "H": "Infographiste (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Ingénieur biomédical (H/F)",
+      "F": "Ingénieure biomédicale",
+      "S": 0.3
+    },
+    {
+      "H": "Journaliste reporter d'images (H/F)",
+      "F": null,
+      "S": 0.4
+    },
+    {
+      "H": "Kinésiologue (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Logisticien (H/F)",
+      "F": "Logisticienne",
+      "S": 0.4
+    },
+    {
+      "H": "Pompier (H/F)",
+      "F": null,
+      "S": 0.3
+    },
+    {
+      "H": "Responsable des ressources humaines (H/F)",
+      "F": null,
+      "S": 0.2
+    },
+    {
+      "H": "Technicien de maintenance (H/F)",
+      "F": "Technicienne de maintenance",
+      "S": 0.3
+    },
+    {
+      "H": "Technicien en informatique (H/F)",
+      "F": "Technicienne en informatique",
+      "S": 0.3
+    },
+    {
+      "H": "Webmaster (H/F)",
+      "F": null,
+      "S": 0.4
+    }
+  ],
+  "sector": [
+    "Activités juridiques",
+    "Comptables",
+    "Agriculture",
+    "Élevage",
+    "Architecture",
+    "Études",
+    "Normes",
+    "Artisanat d'art",
+    "Audiovisuel",
+    "Spectacle",
+    "Automobile",
+    "Bâtiment",
+    "Travaux publics (BTP)",
+    "Commerce",
+    "Distribution",
+    "Communication",
+    "Marketing",
+    "Culture",
+    "Patrimoine",
+    "Édition",
+    "Énergie",
+    "Enseignement",
+    "Formation",
+    "Environnement",
+    "Finance",
+    "Banque",
+    "Assurance",
+    "Gestion administrative",
+    "Ressources humaines",
+    "Hôtellerie",
+    "Restauration",
+    "Immobilier",
+    "Industrie alimentaire",
+    "Industrie bois",
+    "Industrie chimie",
+    "Industrie électronique",
+    "Industrie métallurgie",
+    "Industrie papier",
+    "Imprimerie",
+    "Industrie textile",
+    "Mode",
+    "Industries",
+    "Informatique",
+    "Télécommunication",
+    "Logistique",
+    "Transport",
+    "Maintenance",
+    "Entretien",
+    "Nettoyage",
+    "Recherche",
+    "Santé",
+    "Service à la personne",
+    "Service public",
+    "Défense",
+    "Sécurité",
+    "Social",
+    "Sport",
+    "Animation",
+    "Loisir",
+    "Tourisme",
+    "Assurances",
+    "Biotechnologie",
+    "Cosmétique",
+    "Parfumerie",
+    "Développement durable",
+    "E-commerce",
+    "Numérique",
+    "Énergies renouvelables",
+    "Entreposage",
+    "Stockage",
+    "Jeux vidéo",
+    "Juridique",
+    "Média",
+    "Presse",
+    "Mode",
+    "Accessoires",
+    "Pharmaceutique",
+    "Robotique",
+    "Sécurité informatique",
+    "Technologie médicale",
+    "Travail temporaire",
+    "Intérim",
+    "Aéronautique",
+    "Aérospatial",
+    "Agroalimentaire",
+    "Assistance sociale",
+    "Équipement industriel",
+    "Événementiel",
+    "Gestion de projet",
+    "Graphisme",
+    "Ingénierie",
+    "Intelligence artificielle",
+    "Luxe",
+    "Matériaux de construction",
+    "Multimédia",
+    "Pétrole",
+    "Gaz",
+    "Plasturgie",
+    "Production audiovisuelle",
+    "Réalité augmentée",
+    "Réalité virtuelle",
+    "Ressources naturelles",
+    "Sciences de la vie",
+    "Services aux entreprises",
+    "Sport électronique",
+    "Technologies de l'information",
+    "Vente en ligne"
+  ]
+}

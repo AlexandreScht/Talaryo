@@ -1,112 +1,73 @@
-import { InvalidArgumentError, InvalidSessionError, ServicesError } from '@/exceptions';
-import { returnUpdateCode } from '@/interfaces/service';
-import { FindUserProps, UserDocument } from '@/interfaces/users';
-import { UserModel } from '@/models/users';
-import type { DeleteResult } from 'mongodb';
-import { FilterQuery } from 'mongoose';
-import randomatic from 'randomatic';
-import { Service } from 'typedi';
-import { v7 as uuid } from 'uuid';
-
-@Service()
-export class UserServiceFile {
-  public async getUser(userData: FindUserProps, fields?: (keyof Partial<UserDocument>)[]): Promise<UserDocument | null> {
+import { getErrorMessage } from '@/exceptions/errorMessage';
+import type { ResponseType } from '@/interfaces/services';
+import { UserSchema, role } from '@/interfaces/users';
+import { DistantUserUpdateSchemaValidator, UserUpdateSchemaValidator, getAllUsersSchemaValidator } from '@/libs/valideModules';
+import validator from '@/middlewares/validator';
+import routes from '@/routes';
+import type { AxiosInstance } from 'axios';
+const {
+  api: { users: router },
+} = routes;
+export const UpdateUserService =
+  ({ axios }: { axios: AxiosInstance }) =>
+  async (props: {
+    user: Omit<
+      UserSchema,
+      'password' | 'accessToken' | 'accessCode' | 'passwordReset' | 'stripeCustomer' | 'subscribe_start' | 'subscribe_end' | 'email'
+    >;
+    selector?: { id: number } | { email: string };
+  }): Promise<ResponseType<{ role: role; firstName: string; lastName: string; society?: string }>> => {
     try {
-      let query = null;
-      const selectedFields = fields.length ? fields.join(' ') : '-password';
-      if ('email' in userData) {
-        const { email, oAuthAccount } = userData;
+      const distantUpdate = 'selector' in props;
+      distantUpdate ? validator(DistantUserUpdateSchemaValidator, props) : validator(UserUpdateSchemaValidator, props);
 
-        query = UserModel.findOne({
-          email,
-          ...(oAuthAccount ? { $or: [{ password: { $exists: false } }, { password: null }] } : { password: { $exists: true, $ne: null } }),
-        }).select(selectedFields);
-      }
-      if ('id' in userData) {
-        const { id } = userData;
-        query = UserModel.findById(id).select(selectedFields);
-      }
-      if (!query) {
-        throw new InvalidArgumentError('Search criteria must be either email or id');
-      }
-      return await query.exec();
-    } catch (error) {
-      throw new ServicesError(error);
+      const { selector, user } = props as unknown as any;
+
+      const { data } = await axios.patch(router.updateUser([selector?.id ?? selector?.email]), user);
+
+      return { res: data };
+    } catch (err: unknown) {
+      return getErrorMessage(err);
     }
-  }
+  };
 
-  public async updateUsers(
-    criteria: FilterQuery<Omit<UserDocument, 'password'>>,
-    values: Partial<Omit<UserDocument, '_id' | 'email' | 'password'>>,
-  ): Promise<boolean> {
+// export const UpdateCurrentUsersService =
+//   ({ axios }: { axios: AxiosInstance }) =>
+//   async (values: unknown): Promise<ResponseType> => {
+//     try {
+//       validator(UserUpdateSchemaValidator, values as UsersType);
+//       const {
+//         data: { res },
+//       } = await axios.put(routes.api.updateUsers(), values);
+
+//       return { res: data };
+//     } catch (err: unknown) {
+//       return getErrorMessage(err);
+//     }
+//   };
+
+export const getAllUsersService =
+  ({ axios }: { axios: AxiosInstance }) =>
+  async (
+    props?: Partial<{
+      limit: number;
+      page: number;
+      firstName: string;
+      email: string;
+      lastName: string;
+      role: role;
+    }>,
+  ): Promise<ResponseType<Partial<UserSchema>[]>> => {
     try {
-      const { modifiedCount } = await UserModel.updateMany(criteria, { $set: values }).exec();
-
-      return modifiedCount > 0;
-    } catch (error) {
-      throw new ServicesError(error);
-    }
-  }
-
-  public async findUsers(userData: FilterQuery<UserDocument>, fields?: (keyof Omit<Partial<UserDocument>, 'password'>)[]): Promise<UserDocument[]> {
-    try {
-      const selectedFields = fields && fields.length ? fields.join(' ') : '-password';
-      return await UserModel.find(userData).select(selectedFields).exec();
-    } catch (error) {
-      throw new ServicesError(error);
-    }
-  }
-
-  public async deleteUser(userData: FindUserProps): Promise<DeleteResult> {
-    try {
-      if ('email' in userData) {
-        const { email, oAuthAccount } = userData;
-        return await UserModel.deleteOne({
-          email,
-          password: oAuthAccount ? null : { $ne: null },
-        });
-      }
-      if ('id' in userData) {
-        const { id } = userData;
-        return await UserModel.findByIdAndDelete(id);
-      }
-
-      throw new InvalidArgumentError('Search criteria must be either email or id');
-    } catch (error) {
-      throw new ServicesError(error);
-    }
-  }
-
-  public async generateTokenAccess(id: string): Promise<returnUpdateCode> {
-    try {
-      const updatedUser: returnUpdateCode = await UserModel.findByIdAndUpdate(
-        id,
-        {
-          accessToken: uuid(),
+      validator(getAllUsersSchemaValidator, props || {});
+      const {
+        data: {
+          meta: { results },
         },
-        { new: true },
-      ).select('accessToken');
-      if (updatedUser) return updatedUser;
-      throw new InvalidSessionError('Unable to update the refreshToken');
-    } catch (error) {
-      throw new ServicesError(error);
-    }
-  }
+      } = await axios.get(router.allUsers(props));
 
-  public async generateCodeAccess(id: string, digit = 4, secure = false): Promise<returnUpdateCode> {
-    try {
-      const updatedUser: returnUpdateCode = await UserModel.findByIdAndUpdate(
-        id,
-        {
-          ...(!secure ? { accessToken: uuid() } : {}),
-          accessCode: Number.parseInt(randomatic('0', digit), 10),
-        },
-        { new: true },
-      ).select('accessCode accessToken email firstName');
-      if (updatedUser) return updatedUser;
-      throw new InvalidSessionError('Unable to update the refreshToken');
-    } catch (error) {
-      throw new ServicesError(error);
+      return { res: results };
+    } catch (err: unknown) {
+      return getErrorMessage(err);
     }
-  }
-}
+  };
