@@ -4,11 +4,13 @@ import UserServiceFile from '@/services/users';
 import request from 'supertest';
 import Container from 'typedi';
 import { getSignedCookieValue } from '../jest-helpers/cookie';
+import captchaMiddleWareMocked from '../jest-helpers/middlewares/captcha';
 import apiMockedService from '../jest-helpers/spy-services/api';
 import authMockedService from '../jest-helpers/spy-services/auth';
 import mailerMockedService from '../jest-helpers/spy-services/mailer';
 import userMockedService from '../jest-helpers/spy-services/users';
 
+captchaMiddleWareMocked();
 describe('POST auth/register', () => {
   const registerRequest = () => request(global.app).post('/api/auth/register');
 
@@ -21,6 +23,7 @@ describe('POST auth/register', () => {
   let createBrevoUser: APIServicesJest['createBrevoUser'];
 
   beforeEach(() => {
+    captchaMiddleWareMocked();
     register = authMockedService().register;
     getUser = userMockedService().getUser;
     generateCodeAccess = userMockedService().generateCodeAccess;

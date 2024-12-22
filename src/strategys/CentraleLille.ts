@@ -1,14 +1,14 @@
 import { candidateStrategiesResult } from '@/interfaces/scrapping';
-import { GetElements, GetGoogleInfos, GetProfileGenders } from '@/libs/scrapping';
+import { GetGoogleData, GetProfileGenders } from '@/libs/scrapping';
 import { dateMatcher, profileMatcher } from '@/utils/regrex';
 import { load } from 'cheerio';
 
 export default function CentraleLille(html: string): candidateStrategiesResult[] {
   const data = load(html);
-  const elements = GetElements(data);
+  const elements = GetGoogleData(data, 'https://www.centraliens-lille.org/');
 
-  return elements.reduce((acc: candidateStrategiesResult[], element: cheerio.Element) => {
-    const { link, title, desc } = GetGoogleInfos(data, element);
+  return elements.reduce((acc: candidateStrategiesResult[], element) => {
+    const { link, title, desc } = element;
     const extractInfos = (text: string) => {
       const parts = text.replace(dateMatcher, '').split(' - ');
       if (parts.length === 2) {

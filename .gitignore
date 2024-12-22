@@ -142,3 +142,4 @@ database.js
 .yarn/install-state.gz
 .pnp.*
 
+Dockerfile

@@ -1,13 +1,13 @@
 import { candidateStrategiesResult } from '@/interfaces/scrapping';
-import { GetElements, GetGoogleInfos, GetProfileGenders } from '@/libs/scrapping';
+import { GetGoogleData, GetProfileGenders } from '@/libs/scrapping';
 import { load } from 'cheerio';
 
 export default function Ferrandi(html: string): candidateStrategiesResult[] {
   const data = load(html);
-  const elements = GetElements(data);
+  const elements = GetGoogleData(data, 'https://www.ferrandialumni.fr/');
 
-  return elements.reduce((acc: candidateStrategiesResult[], element: cheerio.Element) => {
-    const { link, title, desc } = GetGoogleInfos(data, element);
+  return elements.reduce((acc: candidateStrategiesResult[], element) => {
+    const { link, title, desc } = element;
     const extractInfos = (text: string) => {
       const [fullName, diplome, currentJob] = text.split(' - ').filter(part => !/CV\s*/g.test(part));
       return { fullName, diplome, currentJob };

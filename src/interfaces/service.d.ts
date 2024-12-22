@@ -10,8 +10,8 @@ interface returnUpdateCode {
 //* auth
 interface registerOauth {
   email: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
 }
 interface registerCredentials extends registerOauth {
   password: string;
@@ -26,6 +26,8 @@ interface registerServiceCredentials {
 interface registerServiceOAuth {
   id: number;
   role: role;
+  email: string;
+  createdAt: Date;
 }
 
 export type RegisterServiceReturnType<T> = T extends { password?: string }

@@ -54,6 +54,7 @@ const config = {
       USERNAME: process.env.PROXY_V2_USERNAME,
       PASSWORD: process.env.PROXY_V2_PASSWORD,
     },
+    IP: process.env.IP,
   },
   apiKey: {
     EMAILKEY: process.env.EMAIL_KEY,

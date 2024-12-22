@@ -17,7 +17,7 @@ export interface UserSchema {
   subscribe_status: 'active' | 'pending' | 'disable' | 'waiting';
   subscribe_start?: Date;
   subscribe_end?: Date;
-  passwordReset?: string;
+  passwordAccess?: string;
 }
 
 export interface Favoris {

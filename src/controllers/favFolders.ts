@@ -2,7 +2,7 @@ import { ServerException } from '@/exceptions';
 import FavorisFolderServiceFile from '@/services/favFolders';
 import FavorisServiceFile from '@/services/favoris';
 import { logger } from '@/utils/logger';
-import { ControllerMethods, ControllerWithPagination, ControllerWithParams, ExpressHandler, FoldersControllerCreate } from '@interfaces/controller';
+import { ControllerMethods, ControllerWithParams, ExpressHandler, FoldersControllerCreate, FoldersControllerGet } from '@interfaces/controller';
 import Container from 'typedi';
 
 export default class FavFoldersControllerFile implements ControllerMethods<FavFoldersControllerFile> {
@@ -57,10 +57,9 @@ export default class FavFoldersControllerFile implements ControllerMethods<FavFo
     }
   };
 
-  protected getFavFolders: ExpressHandler<ControllerWithPagination<'name'>> = async ({
+  protected getFavFolders: ExpressHandler<FoldersControllerGet> = async ({
     locals: {
-      params: { name },
-      query: { page, limit },
+      query: { page, limit, name },
     },
     session: { sessionId },
     res,

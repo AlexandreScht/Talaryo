@@ -1,13 +1,13 @@
 import { candidateStrategiesResult } from '@/interfaces/scrapping';
-import { GetElements, GetGoogleInfos, GetProfileGenders } from '@/libs/scrapping';
+import { GetGoogleData, GetProfileGenders } from '@/libs/scrapping';
 import { load } from 'cheerio';
 
 export default function Symfony(html: string): candidateStrategiesResult[] {
   const data = load(html);
-  const elements = GetElements(data);
+  const elements = GetGoogleData(data, 'https://connect.symfony.com/');
 
-  return elements.reduce((acc: candidateStrategiesResult[], element: cheerio.Element) => {
-    const { link, title, desc } = GetGoogleInfos(data, element);
+  return elements.reduce((acc: candidateStrategiesResult[], element) => {
+    const { link, title, desc } = element;
     const matchTitle = title.match(/^(.*)\s+a\.k\.a\./);
     const fullName = matchTitle && matchTitle[1] ? matchTitle[1]?.trim() : title?.trim() || undefined;
     const img = GetProfileGenders(fullName);

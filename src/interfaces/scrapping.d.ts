@@ -16,6 +16,24 @@ export type platforms =
   | 'Essec'
   | 'Neoma';
 
+type platformLinkSearch =
+  | 'https://fr.linkedin.com/'
+  | 'https://viadeo.journaldunet.com/'
+  | 'https://www.xing.com/'
+  | 'https://reseau.batiactu.com/'
+  | 'https://dribbble.com/'
+  | 'https://culinaryagents.com/'
+  | 'https://connect.symfony.com/'
+  | 'https://www.hecalumni.fr/'
+  | 'https://ax.polytechnique.org/'
+  | 'https://www.ferrandialumni.fr/'
+  | 'https://www.alumni.utc.fr/'
+  | 'https://association.centralesupelec-alumni.com/cv/'
+  | 'https://www.centraliens-lille.org/'
+  | 'https://www.essecalumni.com/'
+  | 'https://www.neoma-alumni.com/'
+  | 'https://www.behance.net/';
+
 interface candidateScrapingForm {
   platform: platforms;
   fn?: string[];
@@ -86,14 +104,14 @@ interface puppeteerCVProps {
 
 interface puppeteerResult {
   data?: candidateStrategiesResult[] | string[];
-  total?: number;
+  pages?: number;
 }
 
 interface puppeteerCandidateResult {
   scrapeResult?: candidateStrategiesResult[];
-  total?: number;
+  pages?: number;
 }
 interface puppeteerCVResult {
   cvLinks?: string[];
-  total?: number;
+  pages?: number;
 }

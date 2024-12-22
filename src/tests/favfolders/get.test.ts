@@ -5,8 +5,8 @@ import { authCookie } from '../jest-helpers/cookie';
 import favFoldersMockedService from '../jest-helpers/spy-services/favFolders';
 
 describe('GET favFolders/get-folder/:name', () => {
-  const getFavFolderRequest = (params: string, auth?: TokenUser) => {
-    const agent = request(global.app).get(`/api/favFolders/get-folder/${params}`);
+  const getFavFolderRequest = (auth?: TokenUser) => {
+    const agent = request(global.app).get('/api/favFolders/get');
     if (auth) {
       const authCookieValue = authCookie(auth);
       return agent.set('Cookie', authCookieValue);
@@ -23,7 +23,7 @@ describe('GET favFolders/get-folder/:name', () => {
 
   //; without auth cookie
   it('without auth cookie => 999 error (Auth required)', async () => {
-    const response = await getFavFolderRequest('1');
+    const response = await getFavFolderRequest();
 
     expect(response.status).toBe(999);
     expect(getContent).not.toHaveBeenCalled();
@@ -32,10 +32,12 @@ describe('GET favFolders/get-folder/:name', () => {
 
   //; With incorrect values
   it('With incorrect values => status 200', async () => {
-    const response = await getFavFolderRequest('select * from users', { refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'free' });
+    const response = await getFavFolderRequest({ refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'free' }).query({
+      name: 'SELECT * FROM users',
+    });
 
     expect(response.status).toBe(200);
-    expect(getContent).toHaveBeenNthCalledWith(1, 1, { limit: 10, name: 'select * from users', page: 1 });
+    expect(getContent).toHaveBeenNthCalledWith(1, 1, { limit: 10, name: 'SELECT * FROM users', page: 1 });
 
     expect(response.body).toHaveProperty('results');
     expect(response.body).toHaveProperty('total');
@@ -45,24 +47,39 @@ describe('GET favFolders/get-folder/:name', () => {
 
   //; With specials values
   it('With specials values => status 200', async () => {
-    const response = await getFavFolderRequest('maçillteuré', { refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'free' });
+    const response = await getFavFolderRequest({ refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'free' }).query({
+      name: 'maçillteuré',
+    });
 
     expect(response.status).toBe(200);
     expect(getContent).toHaveBeenNthCalledWith(1, 1, { limit: 10, name: 'maçillteuré', page: 1 });
     expect(response.body).toHaveProperty('results');
     expect(response.body).toHaveProperty('total');
-    expect(response.body.results[0]).toHaveProperty('id');
-    expect(response.body.results[0]).toHaveProperty('name');
-    expect(response.body.results[0]).toHaveProperty('itemsCount');
-    expect(response.body.results[0].id).toBe('2');
-    expect(response.body.results[0].name).toBe('maçillteuré');
-    expect(response.body.results[0].itemsCount).toBe('0');
+    expect(response.body.results).toEqual([{ id: '2', name: 'maçillteuré', itemsCount: '0' }]);
     expect(response.body.total).toBe(1);
+  });
+
+  //; get All folders
+  it('get All folders => status 200', async () => {
+    const response = await getFavFolderRequest({ refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'free' });
+
+    expect(response.status).toBe(200);
+    expect(getContent).toHaveBeenNthCalledWith(1, 1, { limit: 10, name: undefined, page: 1 });
+    expect(response.body).toHaveProperty('results');
+    expect(response.body).toHaveProperty('total');
+    expect(response.body.results).toEqual([
+      { id: '2', name: 'maçillteuré', itemsCount: '0' },
+      { id: '3', name: 'folderC', itemsCount: '1' },
+      { id: '4', name: 'folderD', itemsCount: '0' },
+    ]);
+    expect(response.body.total).toBe(3);
   });
 
   //; To Get a deleted folders
   it('To Get a deleted folders => status 200', async () => {
-    const response = await getFavFolderRequest('folderB', { refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'free' });
+    const response = await getFavFolderRequest({ refreshToken: 'refreshToken', sessionId: 1, sessionRole: 'free' }).query({
+      name: 'folderB',
+    });
 
     expect(response.status).toBe(200);
     expect(getContent).toHaveBeenNthCalledWith(1, 1, { limit: 10, name: 'folderB', page: 1 });

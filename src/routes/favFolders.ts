@@ -17,7 +17,7 @@ export class FavFoldersRouter extends FavFoldersControllerFile {
   initializeRoutes() {
     this.router.post('/new', mw([auth(), Validator({ body: z.object({ name: stringValidator }) }), this.createFavFolder]));
     this.router.delete('/remove/:id', mw([auth(), Validator({ params: z.object({ id: numberValidator.min(1) }) }), this.deleteFavFolder]));
-    this.router.get('/get-folder/:name', mw([auth(), Validator(getFoldersSchema), this.getFavFolders]));
+    this.router.get('/get', mw([auth(), Validator(getFoldersSchema), this.getFavFolders]));
   }
 
   getRouter() {

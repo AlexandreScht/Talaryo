@@ -51,6 +51,16 @@ export async function down(knex: Knex): Promise<void> {
     }
   }
 
+  // Supprimer les doublons avant d'ajouter la contrainte unique
+  await knex.raw(`
+    DELETE FROM favoris
+    WHERE ctid NOT IN (
+      SELECT min(ctid)
+      FROM favoris
+      GROUP BY "userId", "link", "favFolderId"
+    )
+  `);
+
   await knex.raw(`
     DO $$
     BEGIN
@@ -63,21 +73,22 @@ export async function down(knex: Knex): Promise<void> {
     END IF;
     END
     $$;
-    `);
+  `);
 
   await knex.raw(`
-      DO $$
-      BEGIN
-      IF NOT EXISTS (
-      SELECT 1 
-      FROM pg_constraint 
-      WHERE conname = 'favoris_userid_link_favfolderid_unique'
-      ) THEN
-      ALTER TABLE "favoris" ADD CONSTRAINT "favoris_userid_link_favfolderid_unique" UNIQUE ("userId", "link", "favFolderId");
-      END IF;
-      END
-      $$;
-      `);
+    DO $$
+    BEGIN
+    IF NOT EXISTS (
+    SELECT 1 
+    FROM pg_constraint 
+    WHERE conname = 'favoris_userid_link_favfolderid_unique'
+    ) THEN
+    ALTER TABLE "favoris" ADD CONSTRAINT "favoris_userid_link_favfolderid_unique" UNIQUE ("userId", "link", "favFolderId");
+    END IF;
+    END
+    $$;
+  `);
+
   const hasResumeColumn = await knex.schema.hasColumn('favoris', 'resume');
   await knex.schema.alterTable('favoris', table => {
     table.string('link').notNullable().alter();

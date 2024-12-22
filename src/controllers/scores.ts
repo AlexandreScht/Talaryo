@@ -56,16 +56,18 @@ export default class ScoresControllerFile implements ControllerMethods<ScoresCon
 
       const isCurrentDate = startDateValue.getTime() === lastDateValue.getTime() && startDateValue.getTime() === currentDateValue.getTime();
 
-      const result = isCurrentDate
-        ? await this.ScoreService.getUserCurrentScores(sessionId)
-        : await this.ScoreService.getUserRangeScores(startDateValue, lastDateValue, sessionId);
-
-      if ('currentScore' in result) {
-        res.send({ isCurrentData: true, score: result.currentScore, meta: { ...result.prevScores } });
+      if (isCurrentDate) {
+        const { lastScores, currentScore, totalCurrentSearches, totalCurrentProfiles } = await this.ScoreService.getUserCurrentScores(sessionId);
+        res.send({
+          lastScores,
+          fetchedScore: { scores: currentScore, meta: { totalProfiles: totalCurrentSearches, totalSearches: totalCurrentProfiles } },
+        });
         return;
       }
+      const { scores, totalProfiles, totalSearches } = await this.ScoreService.getUserRangeScores(startDateValue, lastDateValue, sessionId);
 
-      res.send({ isCurrentData: false, score: result });
+      res.status(201).send({ fetchedScore: { scores, meta: { totalProfiles, totalSearches } } });
+      return;
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('ScoresControllerFile.getUserScore => ', error);
@@ -112,12 +114,12 @@ export default class ScoresControllerFile implements ControllerMethods<ScoresCon
             const totalValue = await totalService.service();
             acc[totalName] = {
               score: totalValue[totalName] ?? 0,
-              total: totalService.totalLimit,
+              total: totalService.totalLimit === Infinity ? 'Infinity' : totalService.totalLimit,
             };
           } catch (error) {
             acc[totalName] = {
               score: 0,
-              total: totalService.totalLimit,
+              total: totalService.totalLimit === Infinity ? 'Infinity' : totalService.totalLimit,
             };
           }
         }

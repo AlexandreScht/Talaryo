@@ -90,10 +90,8 @@ export const updateUserSchema = z.object({
 //> FoldersSchema
 
 export const getFoldersSchema = {
-  params: z.object({
-    name: stringValidator,
-  }),
   query: z.object({
+    name: stringValidator.optional(),
     limit: numberValidator.min(10).optional().default(10),
     page: numberValidator.min(1).optional().default(1),
   }),
@@ -170,7 +168,7 @@ export const scrapingCandidateSchemaSchema = {
     fn: z.array(stringValidator).optional(),
     industry: z.array(stringValidator).optional(),
     sector: z.array(stringValidator).optional(),
-    time: z.boolean().optional().default(true),
+    time: z.boolean().optional().default(false),
     key: z.array(stringValidator).optional(),
     skill: z.array(stringValidator).optional(),
     Nindustry: z.array(stringValidator).optional(),
@@ -197,7 +195,7 @@ export const scrapingCvSchemaSchema = {
     Nindustry: z.array(stringValidator).optional(),
     Nskill: z.array(stringValidator).optional(),
     Nkey: z.array(stringValidator).optional(),
-    time: z.boolean().optional().default(true),
+    time: z.boolean().optional().default(false),
     zone: z.boolean().optional().default(false),
     start: numberValidator.default(0),
     index: numberValidator.default(50),

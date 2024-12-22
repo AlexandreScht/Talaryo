@@ -1,13 +1,13 @@
 import { candidateStrategiesResult } from '@/interfaces/scrapping';
-import { GetElements, GetGoogleInfos, GetProfileGenders } from '@/libs/scrapping';
+import { GetGoogleData, GetProfileGenders } from '@/libs/scrapping';
 import { load } from 'cheerio';
 
 export default function CulinaryAgents(html: string): candidateStrategiesResult[] {
   const data = load(html);
-  const elements = GetElements(data);
+  const elements = GetGoogleData(data, 'https://culinaryagents.com/');
 
-  return elements.reduce((acc: candidateStrategiesResult[], element: cheerio.Element) => {
-    const { link, title, desc } = GetGoogleInfos(data, element);
+  return elements.reduce((acc: candidateStrategiesResult[], element) => {
+    const { link, title, desc } = element;
     const splitTitle = title.split("'s professional profile");
     const fullName = splitTitle[0]?.trim() || undefined;
     const img = GetProfileGenders(fullName);

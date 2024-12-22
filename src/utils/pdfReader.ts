@@ -17,7 +17,7 @@ export default async function pdfReader(url: string): Promise<{ pdf: false | Buf
         return { pdf: undefined, text: undefined };
       }
 
-      const response = await SkipInTest(
+      const { text, numpages } = await SkipInTest(
         async () => {
           return await pdf(data);
         },
@@ -30,9 +30,7 @@ export default async function pdfReader(url: string): Promise<{ pdf: false | Buf
           }
           return { text: 'dataPage', numpages: 2 };
         },
-      )();
-
-      const { text, numpages } = response();
+      )()();
 
       if (![1, 2].includes(numpages)) {
         return { pdf: undefined, text: undefined };

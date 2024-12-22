@@ -2,7 +2,7 @@ import { ServerException } from '@/exceptions';
 import SearchesServiceFile from '@/services/searches';
 import SearchFolderServiceFile from '@/services/searchFolders';
 import { logger } from '@/utils/logger';
-import { ControllerMethods, ControllerWithPagination, ControllerWithParams, ExpressHandler, FoldersControllerCreate } from '@interfaces/controller';
+import { ControllerMethods, ControllerWithParams, ExpressHandler, FoldersControllerCreate, FoldersControllerGet } from '@interfaces/controller';
 import Container from 'typedi';
 
 export default class SearchesFolderControllerFile implements ControllerMethods<SearchesFolderControllerFile> {
@@ -57,10 +57,9 @@ export default class SearchesFolderControllerFile implements ControllerMethods<S
     }
   };
 
-  protected getSearchFolders: ExpressHandler<ControllerWithPagination<'name'>> = async ({
+  protected getSearchFolders: ExpressHandler<FoldersControllerGet> = async ({
     locals: {
-      params: { name },
-      query: { page, limit },
+      query: { page, limit, name },
     },
     session: { sessionId },
     res,

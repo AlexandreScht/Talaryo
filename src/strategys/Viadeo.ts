@@ -1,13 +1,13 @@
 import { candidateStrategiesResult } from '@/interfaces/scrapping';
-import { GetElements, GetGoogleInfos, GetProfileGenders } from '@/libs/scrapping';
+import { GetGoogleData, GetProfileGenders } from '@/libs/scrapping';
 import { load } from 'cheerio';
 
 export default function Viadeo(html: string): candidateStrategiesResult[] {
   const data = load(html);
-  const elements = GetElements(data);
+  const elements = GetGoogleData(data, 'https://viadeo.journaldunet.com/');
 
-  return elements.reduce((acc: candidateStrategiesResult[], element: cheerio.Element) => {
-    const { link, title, desc } = GetGoogleInfos(data, element);
+  return elements.reduce((acc: candidateStrategiesResult[], element) => {
+    const { link, title, desc } = element;
     //* name
     const nameMatch = title.match(/^(.*?)(?=\s\(|\s\-)/);
     const fullName = nameMatch[0] || undefined;

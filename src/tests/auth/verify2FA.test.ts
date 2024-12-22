@@ -71,9 +71,10 @@ describe('GET auth/verify2FA', () => {
         id: 10,
         password: { not: null },
         accessToken: 'tuperwayeMail',
+
         accessCode: '809812',
       },
-      returning: ['accessCode', 'email', 'role'],
+      returning: ['accessCode', 'email', 'role', 'createdAt'],
     });
     expect(updateUsers).not.toHaveBeenCalled();
     expect(response.body.error).toBe('Échec de la vérification à deux facteurs. Le code que vous avez saisi est incorrect.');
@@ -91,7 +92,7 @@ describe('GET auth/verify2FA', () => {
         accessToken: 'wrongToken',
         accessCode: '875680',
       },
-      returning: ['accessCode', 'email', 'role'],
+      returning: ['accessCode', 'email', 'role', 'createdAt'],
     });
     expect(updateUsers).not.toHaveBeenCalled();
     expect(response.body.error).toBe('Échec de la vérification à deux facteurs. Le code que vous avez saisi est incorrect.');
@@ -109,7 +110,7 @@ describe('GET auth/verify2FA', () => {
         accessToken: 'wrongToken',
         accessCode: { not: null },
       },
-      returning: ['accessCode', 'email', 'role'],
+      returning: ['accessCode', 'email', 'role', 'createdAt'],
     });
     expect(updateUsers).not.toHaveBeenCalled();
     expect(response.body.error).toBe('Échec de la vérification à deux facteurs. Le code que vous avez saisi est incorrect.');
@@ -128,7 +129,7 @@ describe('GET auth/verify2FA', () => {
         accessToken: 'tuperwayeAuth',
         accessCode: { not: null },
       },
-      returning: ['accessCode', 'email', 'role'],
+      returning: ['accessCode', 'email', 'role', 'createdAt'],
     });
     expect(updateUsers).not.toHaveBeenCalled();
     expect(response.body.error).toBe('Échec de la vérification à deux facteurs. Le code que vous avez saisi est incorrect.');
@@ -157,7 +158,7 @@ describe('GET auth/verify2FA', () => {
         accessToken: 'tuperwayeMail',
         accessCode: '875680',
       },
-      returning: ['accessCode', 'email', 'role'],
+      returning: ['accessCode', 'email', 'role', 'createdAt'],
     });
     expect(updateUsers).toHaveBeenNthCalledWith(
       1,
@@ -166,8 +167,7 @@ describe('GET auth/verify2FA', () => {
       },
       { accessCode: null, accessToken: null },
     );
-    expect(response.body.email).toBe('log2FAmail@gmail.com');
-    expect(response.body.role).toBe('free');
+    expect(response.body).toEqual({ email: 'log2FAmail@gmail.com', role: 'free', createdAt: expect.any(String) });
   });
 
   //; with correct values (2FA authenticator)
@@ -194,7 +194,7 @@ describe('GET auth/verify2FA', () => {
         accessToken: 'tuperwayeAuth',
         accessCode: { not: null },
       },
-      returning: ['accessCode', 'email', 'role'],
+      returning: ['accessCode', 'email', 'role', 'createdAt'],
     });
     expect(updateUsers).toHaveBeenNthCalledWith(
       1,
@@ -203,7 +203,6 @@ describe('GET auth/verify2FA', () => {
       },
       { accessToken: null },
     );
-    expect(response.body.email).toBe('log2FAauthenticator@gmail.com');
-    expect(response.body.role).toBe('free');
+    expect(response.body).toEqual({ email: 'log2FAauthenticator@gmail.com', role: 'free', createdAt: expect.any(String) });
   });
 });

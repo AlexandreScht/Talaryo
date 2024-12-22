@@ -5,7 +5,7 @@ import { ServerException } from '@/exceptions';
 import { TokenUser } from '@/interfaces/token';
 import { SocketIo, socketPropsList } from '@/interfaces/webSocket';
 import { logger } from '@/utils/logger';
-import { decryptSessionToken } from '@/utils/token';
+import { getSignedCookieValue } from '@/utils/token';
 import { parse } from 'cookie';
 
 const socketMiddleware = (socketList: Map<string, socketPropsList>) => async (socket: SocketIo, next: (err?: Error) => void) => {
@@ -22,8 +22,9 @@ const socketMiddleware = (socketList: Map<string, socketPropsList>) => async (so
       throw new ServerException(500, 'Io props incorrect');
     }
 
-    const [error, user] = decryptSessionToken<TokenUser>(cookieAuth);
-    if (error) {
+    const user = getSignedCookieValue<TokenUser>(cookieAuth);
+
+    if (!user) {
       throw new ServerException(500, 'Cookie incorrect');
     }
 

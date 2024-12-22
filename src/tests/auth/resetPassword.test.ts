@@ -84,8 +84,8 @@ describe('GET auth/reset-password', () => {
     expect(response.status).toBe(505);
     expect(updateUsers).toHaveBeenNthCalledWith(
       1,
-      { id: 48, accessToken: 'MyFakeAccessToken', password: { not: null }, passwordReset: 'resetToken' },
-      { password: 'newPassword08!', passwordReset: null },
+      { id: 48, accessToken: 'MyFakeAccessToken', password: { not: null }, passwordAccess: 'resetToken' },
+      { password: 'newPassword08!', passwordAccess: null },
     );
     expect(response.body.error).toBe('Impossible de mettre à jour votre mot de passe. Veuillez contacter le support.');
   });
@@ -101,8 +101,8 @@ describe('GET auth/reset-password', () => {
     expect(response.status).toBe(204);
     expect(updateUsers).toHaveBeenNthCalledWith(
       1,
-      { id: 1, accessToken: 'MyFakeAccessToken', password: { not: null }, passwordReset: 'resetToken' },
-      { password: 'newPassword08!', passwordReset: null },
+      { id: 1, accessToken: 'MyFakeAccessToken', password: { not: null }, passwordAccess: 'resetToken' },
+      { password: 'newPassword08!', passwordAccess: null },
     );
     expect(response.body).toEqual({});
   });

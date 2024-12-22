@@ -109,7 +109,7 @@ export default class ScrappingController implements ControllerMethods<ScrappingC
   //; protected methods
   protected candidate: ExpressHandler<ScrappingControllerCandidate> = async ({
     locals: {
-      query: { platform, fn, industry, sector, skill, key, loc, Nindustry, Nskill, Nkey, zone, start = 0, index = 50, time: current = true },
+      query: { platform, fn, industry, sector, skill, key, loc, Nindustry, Nskill, Nkey, zone, start = 0, index = 50, time: current = false },
     },
     session: { sessionId, sessionRole },
     res,
@@ -124,19 +124,19 @@ export default class ScrappingController implements ControllerMethods<ScrappingC
 
       const url = `https://www.google.com/search?client=opera&q=${encodeURIComponent(searchUrl)}&start=${start}&num=${index}`;
 
-      const { scrapeResult, total } =
+      const { scrapeResult, pages } =
         (await this.ScrapperService.scrapeCandidate({
           url,
           platform,
           current,
         })) || {};
 
-      if (!scrapeResult || total < 1) {
+      if (!scrapeResult) {
         res.status(204).send();
         return;
       }
 
-      const favMap = await this.FavorisService.userCandidateFavoris(sessionId);
+      const favMap = (await this.FavorisService.userCandidateFavoris(sessionId)) || new Map();
 
       const links = scrapeResult.map(obj => ({
         ...obj,
@@ -145,7 +145,10 @@ export default class ScrappingController implements ControllerMethods<ScrappingC
 
       await this.ScoreService.improveScore(['searches'], 1, sessionId);
 
-      res.send({ links, data: { start, index, total } });
+      console.log(pages);
+      console.log((start || 0) / index + 6);
+
+      res.send({ links, data: { start, index, end: pages <= (start || 0) / index + 6 } });
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('ScrappingController.candidate =>' + error);
@@ -173,7 +176,7 @@ export default class ScrappingController implements ControllerMethods<ScrappingC
         zone,
         start = 0,
         index = 50,
-        time: current = true,
+        time: current = false,
       },
     },
     session: { sessionId, sessionRole },
@@ -225,12 +228,12 @@ export default class ScrappingController implements ControllerMethods<ScrappingC
         return;
       }
 
-      const { links: streamValues, total } = result;
+      const { links: streamValues, pages } = result;
 
       const favMap = await this.FavorisService.userCandidateFavoris(sessionId, true);
 
       const Stream: StreamManager = new StreamManager(sessionId);
-      const { firstResult, ignored } =
+      const { firstResult } =
         (await Stream.newStream<string, cvScrapingForm, cvStrategiesResult>({
           streamValues,
           streamOption,
@@ -245,7 +248,7 @@ export default class ScrappingController implements ControllerMethods<ScrappingC
       }
 
       await this.ScoreService.improveScore(['cv'], 1, sessionId);
-      res.send({ firstResult, data: { start, index, total: total - ignored } });
+      res.send({ firstResult, data: { start, index, end: pages <= (start || 0) / index + 6 } });
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('ScrappingController.cv =>' + error);

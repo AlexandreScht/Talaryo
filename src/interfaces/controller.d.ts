@@ -60,7 +60,7 @@ interface AuthControllerAskResetPassword {
 }
 interface AuthControllerValidAccount {
   cookie: { access_cookie: cookiesValues<codeToken> };
-  body: { code: number };
+  params: { code: number };
 }
 
 interface AuthControllerLogin {
@@ -123,6 +123,14 @@ interface UsersControllerUpdateUser {
 interface FoldersControllerCreate {
   body: {
     name: string;
+  };
+}
+
+interface FoldersControllerGet {
+  query: {
+    limit: number;
+    page: number;
+    name?: string;
   };
 }
 

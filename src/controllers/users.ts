@@ -62,7 +62,7 @@ export default class UserControllerFile implements ControllerMethods<UserControl
       });
 
       createSessionCookie<TokenUser>(res, { refreshToken, sessionId, sessionRole: updateUser.role, cookieName: config.COOKIE_NAME }, '31d');
-      res.send({ role: updateUser.role });
+      res.send({ role: updateUser.role, firstName: updateUser.firstName, lastName: updateUser.lastName, society: updateUser?.society });
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('UserControllerFile.updateCurrentUser => ', error);

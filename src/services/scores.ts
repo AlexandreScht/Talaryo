@@ -104,15 +104,21 @@ class ScoreServiceFile {
     }
   }
 
-  public async getUserCurrentScores(userId: number): Promise<{ currentScore: ScoreModel[]; prevScores: { searches: number; profiles: number } }> {
+  public async getUserCurrentScores(userId: number): Promise<{
+    currentScore: ScoreModel[];
+    lastScores: { totalSearches: number; totalProfiles: number };
+    totalCurrentSearches: number;
+    totalCurrentProfiles: number;
+  }> {
     try {
-      const date = this.currentDate;
-      const { year, month } = this.extractDate(date);
+      const date = new Date();
+      const currentDate = {
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+      };
       date.setMonth(date.getMonth() - 1);
-      if (date.getMonth() === this.currentDate.getMonth()) {
-        date.setDate(0);
-      }
-      const { year: prevYear, month: prevMonth } = this.extractDate(date);
+      const prevYear = date.getFullYear();
+      const prevMonth = date.getMonth() + 1;
 
       return await ScoreModel.query()
         .select('searches', 'profils', 'year', 'month', 'day')
@@ -120,7 +126,7 @@ class ScoreServiceFile {
         .andWhere(builder => {
           builder
             .where(qb => {
-              qb.where({ year, month });
+              qb.where({ year: currentDate.year, month: currentDate.month });
             })
             .orWhere(qb => {
               qb.where({ year: prevYear, month: prevMonth });
@@ -128,17 +134,21 @@ class ScoreServiceFile {
         })
         .orderBy('id', 'asc')
         .then(data => {
-          const currentScore = data.filter(item => item.year === year && item.month === month);
+          const currentScore = data.filter(item => item.year === currentDate.year && item.month === currentDate.month);
           const lastMonthData = data.filter(item => item.year === prevYear && item.month === prevMonth);
-          const searches = lastMonthData.reduce((sum, item) => sum + item.searches, 0) || 0;
-          const profiles = lastMonthData.reduce((sum, item) => sum + item.profils, 0) || 0;
-
+          const totalSearches = lastMonthData.reduce((sum, item) => sum + item.searches, 0) || 0;
+          const totalProfiles = lastMonthData.reduce((sum, item) => sum + item.profils, 0) || 0;
+          const totalCurrentSearches = currentScore.reduce((sum, item) => sum + item.searches, 0) || 0;
+          const totalCurrentProfiles = currentScore.reduce((sum, item) => sum + item.profils, 0) || 0;
+          const lastScores = {
+            totalSearches,
+            totalProfiles,
+          };
           return {
+            totalCurrentSearches,
+            totalCurrentProfiles,
             currentScore,
-            prevScores: {
-              searches,
-              profiles,
-            },
+            lastScores,
           };
         });
     } catch (error) {
@@ -147,7 +157,11 @@ class ScoreServiceFile {
     }
   }
 
-  public async getUserRangeScores(startDateProps: Date, endDateProps: Date, userId: number): Promise<ScoreModel[]> {
+  public async getUserRangeScores(
+    startDateProps: Date,
+    endDateProps: Date,
+    userId: number,
+  ): Promise<{ scores: ScoreModel[]; totalSearches: number; totalProfiles: number }> {
     try {
       const { year: startYear, month: startMonth, day: startDay } = this.extractDate(startDateProps);
       const { year: endYear, month: endMonth, day: endDay } = this.extractDate(endDateProps);
@@ -160,7 +174,16 @@ class ScoreServiceFile {
         .whereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') >= ?`, [startDate])
         .andWhereRaw(`TO_DATE(CONCAT(year, '-', month, '-', day), 'YYYY-MM-DD') <= ?`, [endDate])
         .select('searches', 'profils', 'year', 'month', 'day')
-        .orderBy('id', 'asc');
+        .orderBy('id', 'asc')
+        .then(data => {
+          const totalSearches = data.reduce((sum, item) => sum + item.searches, 0) || 0;
+          const totalProfiles = data.reduce((sum, item) => sum + item.profils, 0) || 0;
+          return {
+            scores: data,
+            totalSearches,
+            totalProfiles,
+          };
+        });
     } catch (error) {
       logger.error('ScoreService.getUserRangeScores => ', error);
       throw new ServicesError();

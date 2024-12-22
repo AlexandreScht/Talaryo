@@ -55,6 +55,7 @@ const mw =
             }
             return nextExpress(err);
           }
+
           const handler = middlewaresHandler[handlerIndex];
           handlerIndex += 1;
 
@@ -73,16 +74,21 @@ const mw =
     };
     try {
       const Authorization = getAuthorization(req);
+
       if (Authorization) {
         const [err, user] = decryptSessionToken<TokenUser>(Authorization);
 
         if (err || !user) {
           throw new ExpiredSessionError();
         }
+
         ctx.session = user;
       }
+
       await ctx.next();
     } catch (err) {
+      console.log(err);
+
       return nextExpress(err);
     }
   };

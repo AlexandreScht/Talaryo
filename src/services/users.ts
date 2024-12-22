@@ -171,10 +171,10 @@ export default class UserServiceFile implements UserServiceFileType {
     }
   }
 
-  public async presetNewPassword(id: number): Promise<Pick<UserShape, 'accessToken' | 'passwordReset'>> {
+  public async presetNewPassword(id: number): Promise<Pick<UserShape, 'accessToken' | 'passwordAccess'>> {
     try {
       const updatedUser = await UserModel.query()
-        .patchAndFetchById(id, { accessToken: uuid(), passwordReset: uuid() })
+        .patchAndFetchById(id, { accessToken: uuid(), passwordAccess: uuid() })
         .select('accessToken', 'passwordReset');
 
       if (updatedUser) {
@@ -188,11 +188,11 @@ export default class UserServiceFile implements UserServiceFileType {
     }
   }
 
-  public async generateCodeAccess(id: number, digit = 4, secure = false): Promise<returnUpdateCode> {
+  public async generateCodeAccess(id: number, digit?: number, secure?: boolean): Promise<returnUpdateCode> {
     try {
       const updatedUser = await UserModel.query()
         .patchAndFetchById(id, {
-          ...(secure ? {} : { accessToken: uuid() }),
+          ...(!secure ? {} : { accessToken: uuid() }),
           accessCode: randomatic('0', digit),
         })
         .select('accessCode', 'accessToken', 'email', 'firstName');

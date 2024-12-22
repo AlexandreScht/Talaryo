@@ -2,10 +2,12 @@ import config from '@/config';
 import type { AuthServicesJest, MailerServicesJest, UserServicesJest } from '@/interfaces/jest';
 import request from 'supertest';
 import { getSignedCookieValue } from '../jest-helpers/cookie';
+import captchaMiddleWareMocked from '../jest-helpers/middlewares/captcha';
 import authMockedService from '../jest-helpers/spy-services/auth';
 import mailerMockedService from '../jest-helpers/spy-services/mailer';
 import userMockedService from '../jest-helpers/spy-services/users';
 
+captchaMiddleWareMocked();
 describe('POST auth/login', () => {
   const loginRequest = () => request(global.app).post('/api/auth/login');
 
@@ -16,6 +18,7 @@ describe('POST auth/login', () => {
   let login: AuthServicesJest['login'];
 
   beforeEach(() => {
+    captchaMiddleWareMocked();
     login = authMockedService().login;
     getUser = userMockedService().getUser;
     generateCodeAccess = userMockedService().generateCodeAccess;
@@ -56,6 +59,7 @@ describe('POST auth/login', () => {
       'validate',
       'password',
       'role',
+      'createdAt',
       'twoFactorType',
       'firstName',
     ]);
@@ -81,6 +85,7 @@ describe('POST auth/login', () => {
       'validate',
       'password',
       'role',
+      'createdAt',
       'twoFactorType',
       'firstName',
     ]);
@@ -93,6 +98,7 @@ describe('POST auth/login', () => {
         role: 'admin',
         twoFactorType: null,
         firstName: 'Alexandre',
+        createdAt: expect.any(Date),
         checkPassword: expect.any(Function),
       },
       'myPassword',
@@ -118,6 +124,7 @@ describe('POST auth/login', () => {
       'validate',
       'password',
       'role',
+      'createdAt',
       'twoFactorType',
       'firstName',
     ]);
@@ -130,6 +137,7 @@ describe('POST auth/login', () => {
         role: 'free',
         twoFactorType: null,
         firstName: 'user',
+        createdAt: expect.any(Date),
         checkPassword: expect.any(Function),
       },
       'MyPassword08!',
@@ -155,6 +163,7 @@ describe('POST auth/login', () => {
       'validate',
       'password',
       'role',
+      'createdAt',
       'twoFactorType',
       'firstName',
     ]);
@@ -167,6 +176,7 @@ describe('POST auth/login', () => {
         role: 'admin',
         twoFactorType: null,
         firstName: 'Alexandre',
+        createdAt: expect.any(Date),
         checkPassword: expect.any(Function),
       },
       'MyPassword08!',
@@ -188,10 +198,7 @@ describe('POST auth/login', () => {
     expect(generateTokenAccess).not.toHaveBeenCalled();
     expect(TwoFactorAuthenticate).not.toHaveBeenCalled();
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('role');
-    expect(response.body.role).toBe('admin');
-    expect(response.body).toHaveProperty('email');
-    expect(response.body.email).toBe('alexandreschecht@gmail.com');
+    expect(response.body).toEqual({ role: 'admin', email: 'alexandreschecht@gmail.com', createdAt: expect.any(String) });
   });
 
   //; With correct credentials / valid account / 2FA email activated
@@ -207,6 +214,7 @@ describe('POST auth/login', () => {
       'validate',
       'password',
       'role',
+      'createdAt',
       'twoFactorType',
       'firstName',
     ]);
@@ -219,6 +227,7 @@ describe('POST auth/login', () => {
         role: 'admin',
         twoFactorType: 'email',
         firstName: 'Alexandre',
+        createdAt: expect.any(Date),
         checkPassword: expect.any(Function),
       },
       'MyPassword08!',
@@ -258,6 +267,7 @@ describe('POST auth/login', () => {
       'validate',
       'password',
       'role',
+      'createdAt',
       'twoFactorType',
       'firstName',
     ]);
@@ -270,6 +280,7 @@ describe('POST auth/login', () => {
         role: 'admin',
         twoFactorType: 'authenticator',
         firstName: 'Alexandre',
+        createdAt: expect.any(Date),
         checkPassword: expect.any(Function),
       },
       'MyPassword08!',

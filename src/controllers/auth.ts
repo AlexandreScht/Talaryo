@@ -57,7 +57,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       if (userData) {
         const { id: userId, validate } = userData;
         if (!validate) {
-          const { accessCode, accessToken } = await this.UserService.generateCodeAccess(userId);
+          const { accessCode, accessToken } = await this.UserService.generateCodeAccess(userId, 4, true);
           await this.MailerService.Registration(email, firstName, accessCode as number);
           createSessionCookie<codeToken>(res, { id: userId, accessToken, cookieName: 'access_cookie' }, '15m');
         } else {
@@ -104,8 +104,8 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         return;
       }
       if (!validate) throw new InvalidSessionError('Veuillez valider votre compte par e-mail.');
-      const { accessToken, passwordReset } = await this.UserService.presetNewPassword(userId);
-      await this.MailerService.ResetPassword(email, passwordReset);
+      const { accessToken, passwordAccess } = await this.UserService.presetNewPassword(userId);
+      await this.MailerService.ResetPassword(email, passwordAccess);
 
       createSessionCookie<codeToken>(res, { id: userId, accessToken, cookieName: 'reset_access' }, '15m');
       res.status(204).send(true);
@@ -121,7 +121,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
     locals: {
       cookie: { reset_access },
       body: { password },
-      token: passwordReset,
+      token: passwordAccess,
     },
     res,
     next,
@@ -132,8 +132,8 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         throw new InvalidArgumentError("Votre code d'accès est incorrect. Veuillez refaire votre demande.");
       const { id, accessToken } = reset_access;
       const success = await this.UserService.updateUsers(
-        { id, accessToken, password: { not: null }, passwordReset },
-        { password, passwordReset: null },
+        { id, accessToken, password: { not: null }, passwordAccess },
+        { password, passwordAccess: null },
       );
 
       if (!success) throw new ServicesError('Impossible de mettre à jour votre mot de passe. Veuillez contacter le support.');
@@ -174,7 +174,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         return;
       }
       const { id } = access_cookie;
-      const { accessCode, accessToken, email, firstName } = await this.UserService.generateCodeAccess(id);
+      const { accessCode, accessToken, email, firstName } = await this.UserService.generateCodeAccess(id, 4, true);
       await this.MailerService.Registration(email, firstName, accessCode as number);
 
       createSessionCookie<codeToken>(res, { id, accessToken, cookieName: 'access_cookie' }, '15m');
@@ -190,7 +190,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
   protected validateAccount: ExpressHandler<AuthControllerValidAccount> = async ({
     locals: {
       cookie: { access_cookie },
-      body: { code },
+      params: { code },
     },
     res,
     next,
@@ -245,14 +245,16 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         'validate',
         'password',
         'role',
+        'createdAt',
         'twoFactorType',
         'firstName',
+        'lastName',
       ]);
 
       if (!userData) {
         throw new InvalidCredentialsError(`Email ou mot de passe incorrect !`);
       }
-      const { id: userId, validate, role, twoFactorType, firstName } = userData;
+      const { id: userId, validate, role, twoFactorType, firstName, createdAt, lastName } = userData;
 
       await this.AuthService.login(userData, password);
       if (!validate) {
@@ -274,7 +276,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
       }
 
       createSessionCookie<TokenUser>(res, { refreshToken: uuid(), sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
-      res.send({ role, email });
+      res.send({ role, email, createdAt, firstName, lastName });
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('AuthControllerFile.login => ', error);
@@ -291,15 +293,16 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
     next,
   }) => {
     try {
-      const userFound = await this.UserService.getUser({ email, oAuthAccount: true }, ['id', 'role']);
+      const userFound = await this.UserService.getUser({ email, oAuthAccount: true }, ['id', 'role', 'createdAt']);
 
-      const { id: userId, role } = userFound
+      const {
+        id: userId,
+        role,
+        createdAt,
+      } = userFound
         ? userFound
         : await transaction(this.UserService.getModel, async trx => {
-            const user = await this.AuthService.register<registerOauth>(
-              { email, firstName, lastName, ...(accessUsers.includes(email) ? { role: 'admin' } : {}) },
-              trx,
-            );
+            const user = await this.AuthService.register<registerOauth>({ email, ...(accessUsers.includes(email) ? { role: 'admin' } : {}) }, trx);
             if (!user) {
               throw new ServicesError('Une erreur est survenue lors de votre connexion');
             }
@@ -310,7 +313,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
           });
 
       createSessionCookie<TokenUser>(res, { refreshToken: uuid(), sessionId: userId, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
-      res.send({ role });
+      res.send({ role, email, createdAt });
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('AuthControllerFile.oAuthConnect => ', error);
@@ -383,12 +386,12 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
           accessToken,
           ...(twoFA === 'email' ? { accessCode: String(otp) } : { accessCode: { not: null } }),
         },
-        returning: ['accessCode', 'email', 'role'],
+        returning: ['accessCode', 'email', 'role', 'createdAt', 'firstName', 'lastName'],
       });
 
       if (!userFind) throw new InvalidCredentialsError('Échec de la vérification à deux facteurs. Le code que vous avez saisi est incorrect.');
 
-      const { accessCode, email, role } = userFind;
+      const { accessCode, email, role, createdAt, firstName, lastName } = userFind;
 
       if (twoFA === 'authenticator') {
         const success = tokenUtils.verifyAuthenticator2FA(accessCode as string, String(otp));
@@ -409,7 +412,7 @@ export default class AuthControllerFile implements ControllerMethods<AuthControl
         secure: config.ORIGIN.startsWith('https'),
       });
       createSessionCookie<TokenUser>(res, { refreshToken: uuid(), sessionId: id, sessionRole: role, cookieName: config.COOKIE_NAME }, '31d');
-      res.send({ email, role });
+      res.send({ role, email, createdAt, firstName, lastName });
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('AuthControllerFile.verify2FA => ', error);

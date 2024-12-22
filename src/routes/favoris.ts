@@ -17,7 +17,7 @@ export class FavorisRouter extends FavorisControllerFile {
   initializeRoutes() {
     this.router.post('/new', mw([auth(), Validator({ body: FavorisShapeSchema({ required: ['favFolderId', 'img'] }) }), this.createFavoris]));
     this.router.delete('/remove/:id', mw([auth(), Validator({ params: z.object({ id: numberValidator }) }), this.deleteFavoris]));
-    this.router.patch(
+    this.router.put(
       '/update/:id',
       mw([auth(), Validator({ params: z.object({ id: numberValidator }), body: FavorisShapeSchema() }), this.updateFavoris]),
     );

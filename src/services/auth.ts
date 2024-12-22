@@ -21,7 +21,7 @@ export default class AuthServiceFile {
       }
       return (await UserModel.query(trx)
         .insert({ ...userData, validate: true })
-        .returning(['email', 'role', 'id'])) as RegisterServiceReturnType<T>;
+        .returning(['email', 'role', 'id', 'createdAt'])) as RegisterServiceReturnType<T>;
     } catch (error) {
       logger.error('AuthServiceFile.register => ', error);
       throw new ServicesError('Une erreur est survenue lors de votre enregistrement');

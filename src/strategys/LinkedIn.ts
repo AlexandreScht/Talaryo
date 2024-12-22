@@ -1,32 +1,35 @@
 import { candidateStrategiesResult } from '@/interfaces/scrapping';
-import { GetChips, GetElements, GetGoogleInfos, GetProfileGenders } from '@/libs/scrapping';
+import { GetGoogleData, GetProfileGenders } from '@/libs/scrapping';
 import { load } from 'cheerio';
 
 export default function LinkedIn(html: string): candidateStrategiesResult[] {
-  const data = load(html);
-  const elements = GetElements(data);
+  try {
+    const data = load(html);
+    const elements = GetGoogleData(data, 'https://fr.linkedin.com/');
 
-  return elements.reduce((acc: candidateStrategiesResult[], element: cheerio.Element) => {
-    const { link, title, desc } = GetGoogleInfos(data, element);
-    const titleSeparator = title.split(' - ');
-    const chip = GetChips(data, element);
+    return elements.reduce((acc: candidateStrategiesResult[], element) => {
+      const { link, title, desc } = element;
 
-    const fullName = titleSeparator[0]?.toString()?.trim() || undefined;
-    const currentJob = chip?.length > 2 ? chip[1].toString().trim() : titleSeparator?.length > 1 ? titleSeparator[1].toString().trim() : undefined;
-    const currentCompany =
-      titleSeparator?.length > 2 ? titleSeparator[2].toString().trim() : chip?.length > 1 ? chip[chip.length - 1].toString().trim() : undefined;
+      const titleSeparator = title.split(' - ');
 
-    const img = GetProfileGenders(fullName);
+      const fullName = titleSeparator[0]?.toString()?.trim() || undefined;
+      const currentJob = titleSeparator?.length > 1 ? titleSeparator[1].toString().trim() : undefined;
+      const currentCompany = titleSeparator?.length > 2 ? titleSeparator[2].toString().trim() : undefined;
 
-    acc.push({
-      link,
-      img,
-      fullName,
-      currentJob,
-      currentCompany,
-      resume: desc?.trim(),
-    });
+      const img = GetProfileGenders(fullName);
 
-    return acc;
-  }, [] as candidateStrategiesResult[]);
+      acc.push({
+        link,
+        img,
+        fullName,
+        currentJob,
+        currentCompany,
+        resume: desc?.trim(),
+      });
+
+      return acc;
+    }, [] as candidateStrategiesResult[]);
+  } catch (error) {
+    console.log(error);
+  }
 }

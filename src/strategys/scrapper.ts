@@ -6,7 +6,7 @@ import {
   ScrappingSource,
 } from '@/interfaces/scrapping';
 import { ApiPuppeteer } from '@/libs/puppeteer';
-import { GetElements, GetGoogleInfos } from '@/libs/scrapping';
+import { GetCvProps } from '@/libs/scrapping';
 import { load } from 'cheerio';
 import { Service } from 'typedi';
 
@@ -23,35 +23,33 @@ export default class ScrapperServiceFile extends ApiPuppeteer {
     this.check(values);
 
     const result = await this.open(values);
+
     if (!result) {
       return undefined;
     }
-    const { data: scrape, total } = result;
+    const { data: scrape, pages } = result;
+
     return {
       scrapeResult: (scrape as candidateStrategiesResult[])?.filter(v => (current ? !!v?.currentCompany : v)),
-      total,
+      pages,
     };
   }
 
-  public async scrapeCV(url: string): Promise<{ links: string[]; total: number } | undefined> {
+  public async scrapeCV(url: string): Promise<{ links: string[]; pages: number } | undefined> {
     const values: puppeteerCVProps = { url, strategy: this.cvStrategy, type: 'cv' };
     this.check(values);
     const result = await this.open(values);
-
     if (!result) {
       return undefined;
     }
-    const { data: links, total } = result;
-    return { links: (links as string[]).filter(v => v), total };
+    const { data: links, pages } = result;
+    return { links: (links as string[]).filter(v => v), pages };
   }
 
   public cvStrategy(html: string): string[] {
     const data = load(html);
-    const elements = GetElements(data);
-
-    return elements.map(el => {
-      const { link } = GetGoogleInfos(data, el);
-      return link;
+    return GetCvProps(data).map(el => {
+      return el.link;
     });
   }
 }

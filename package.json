@@ -19,8 +19,7 @@
     "rollback": "knex migrate:rollback --knexfile=knexfile.ts --verbose",
     "make:seeder": "knex seed:make --knexfile=knexfile.ts -x ts --env development",
     "make:migration": "knex migrate:make --knexfile=knexfile.ts -x ts --env development",
-    "deploy:dev": "node deploy.js dev",
-    "deploy:prod": "node deploy.js prod"
+    "deploy": "node deploy.js"
   },
   "keywords": [],
   "author": "",
@@ -105,9 +104,12 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "random-js": "^2.1.0",
     "randomatic": "^3.1.1",
+    "readline": "^1.3.0",
     "reflect-metadata": "^0.1.14",
     "socket.io": "^4.7.5",
     "speakeasy": "^2.0.0",
+    "ssh2": "^1.16.0",
+    "ssh2-sftp-client": "^11.0.0",
     "stream-chain": "^3.1.0",
     "stream-json": "^1.8.0",
     "stripe": "^17.0.0",

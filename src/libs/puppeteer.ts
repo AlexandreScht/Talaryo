@@ -5,12 +5,14 @@ import { logger } from '@utils/logger';
 import axios from 'axios';
 import { load } from 'cheerio';
 import { exec } from 'child_process';
+import { promises as fs } from 'fs';
+import path from 'path';
 import type { Browser, LaunchOptions, Page } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import util from 'util';
 import { SkipInTest } from './decorators';
-const { proxy, IP } = config;
+const { proxy } = config;
 export class ApiPuppeteer {
   private proxyServer: string = proxy.SERVER;
   private proxyUsername: string = proxy.USERNAME;
@@ -30,28 +32,24 @@ export class ApiPuppeteer {
       if (!strategy || typeof strategy !== 'function') {
         throw new InvalidArgumentError('Option "strategy" needs to be an array.');
       }
+
       SkipInTest(() =>
         logger.info(`---------------
       puppeteer check successfully
       ---------------`),
-      )();
+      )()();
     } catch (error) {
       logger.error('ApiPuppeteer.check =>', error);
       throw error;
     }
   }
 
-  private getNumber(values: string): number | undefined {
+  private pageLength(values: string): number {
     try {
       const $ = load(values);
-      const nResults = $('#result-stats').text();
+      const lastPage = $('td.NKTSme').last();
 
-      const match = nResults.match(/(\d+(?:[.,]\d{3})*(?:\s+\d{3})*)\s*résultats/);
-
-      if (match) {
-        return Number.parseInt(match[1].replace(/\s/g, ''), 10);
-      }
-      return undefined;
+      return Number(lastPage?.text()?.trim()) || 1;
     } catch (error) {
       logger.error('ApiPuppeteer.getNumber =>', error);
       return undefined;
@@ -71,7 +69,8 @@ export class ApiPuppeteer {
         throw new Error('no data');
       }
       const ip = stdout.trim();
-      if (ip !== IP && !isNaN(Number.parseInt(ip))) {
+
+      if (ip !== proxy.IP && !isNaN(Number.parseInt(ip))) {
         return true;
       }
       return false;
@@ -85,6 +84,7 @@ export class ApiPuppeteer {
     try {
       puppeteer.use(StealthPlugin());
       const proxyIsWorking = await this.testProxy();
+
       if (!proxyIsWorking) {
         logger.info('Proxy test failed');
         const { SERVER, USERNAME, PASSWORD } = proxy.v2;
@@ -144,7 +144,8 @@ export class ApiPuppeteer {
         timeout: 15000,
         ignoreHTTPSErrors: true,
       } as LaunchOptions);
-      SkipInTest(() => logger.info(`Puppeteer launched!`))();
+
+      SkipInTest(() => logger.info(`Puppeteer launched!`))()();
     } catch (error) {
       // Kill Puppeteer
       logger.error('ApiPuppeteer.init =>', error);
@@ -190,35 +191,26 @@ export class ApiPuppeteer {
     } catch (error) {
       logger.error('ApiPuppeteer.configurePage =>', error);
       throw error;
-    } finally {
-      if (page && !page.isClosed()) {
-        try {
-          await page.close();
-        } catch (err) {
-          logger.error('ApiPuppeteer closing page error => ', err);
-        }
-      }
     }
   }
 
-  private async scrapePage<T>({
-    page,
-    url,
-    handler,
-  }: {
-    page: Page;
-    url: string;
-    handler: (responseBody: string) => Promise<T>;
-  }): Promise<T | undefined> {
+  private async scrapePage<T>({ page, url, handler }: { page: Page; url: string; handler: (responseBody: string) => T }): Promise<T | undefined> {
     try {
       const response = await page.goto(url);
+
       if (response && response.status() === 200 && response.url().startsWith('https://www.google.com/search')) {
         const responseBody = await response.text();
 
         if (!responseBody) {
           throw new PuppeteerError();
         }
-        return await handler(responseBody);
+
+        const filePath = path.join(__dirname, 'scraped_pages', 'scrape.html');
+        await fs.mkdir(path.dirname(filePath), { recursive: true });
+
+        // Écrire le contenu HTML dans le fichier
+        await fs.writeFile(filePath, responseBody, 'utf-8');
+        return handler(responseBody);
       }
 
       throw new PuppeteerError();
@@ -246,13 +238,11 @@ export class ApiPuppeteer {
 
   private async scrapperReseaux({ page, data: { strategy, url } }: { page: Page; data: puppeteerCandidateProps }) {
     try {
-      const handler = async (responseBody: string): Promise<puppeteerCandidateResult | undefined> => {
-        const res = strategy(responseBody);
-        const scrapeResult = res instanceof Promise ? await res : res;
-
-        return { scrapeResult, total: this.getNumber(responseBody) };
+      const handler = (responseBody: string): puppeteerCandidateResult | undefined => {
+        const scrapeResult = strategy(responseBody);
+        return { scrapeResult, pages: this.pageLength(responseBody) };
       };
-      return this.scrapePage<puppeteerCandidateResult | undefined>({ page, url, handler });
+      return await this.scrapePage<puppeteerCandidateResult | undefined>({ page, url, handler });
     } catch (error) {
       logger.error('ApiPuppeteer.scrapperReseaux => ', error);
       return undefined;
@@ -261,11 +251,11 @@ export class ApiPuppeteer {
 
   private async scrapperCV({ page, data: { url, strategy } }: { page: Page; data: puppeteerCVProps }) {
     try {
-      const handler = async (responseBody: string): Promise<puppeteerCVResult | undefined> => {
+      const handler = (responseBody: string): puppeteerCVResult | undefined => {
         const cvLinks = strategy(responseBody);
-        return { cvLinks, total: this.getNumber(responseBody) };
+        return { cvLinks, pages: this.pageLength(responseBody) };
       };
-      return this.scrapePage<puppeteerCVResult | undefined>({ page, url, handler });
+      return await this.scrapePage<puppeteerCVResult | undefined>({ page, url, handler });
     } catch (error) {
       logger.error('ApiPuppeteer.scrapperCV => ', error);
       return undefined;
@@ -275,22 +265,23 @@ export class ApiPuppeteer {
   protected async open(data: puppeteerCandidateProps | puppeteerCVProps): Promise<puppeteerResult | undefined> {
     await this.init();
 
-    SkipInTest(() => logger.info(`Puppeteer scrapping!`))();
+    SkipInTest(() => logger.info(`Puppeteer scrapping!`))()();
 
     const page: Page = await this.browser!.newPage();
     const modifiedPage = await this.configurePage(page);
     try {
       switch (data.type) {
         case 'reseaux':
-          const { scrapeResult, total: totalProfile = 0 } = (await this.scrapperReseaux({ page: modifiedPage, data })) || {};
-          if (!scrapeResult || totalProfile < 1) return undefined;
+          const { scrapeResult, pages: totalProfile } = (await this.scrapperReseaux({ page: modifiedPage, data })) || {};
 
-          return { data: scrapeResult, total: totalProfile };
+          if (!scrapeResult || !scrapeResult?.length) return undefined;
+
+          return { data: scrapeResult, pages: totalProfile };
 
         case 'cv':
-          const { cvLinks, total: totalCv = 0 } = (await this.scrapperCV({ page: modifiedPage, data })) || {};
-          if (!cvLinks || totalCv < 1) return undefined;
-          return { data: cvLinks, total: totalCv };
+          const { cvLinks, pages } = (await this.scrapperCV({ page: modifiedPage, data })) || {};
+          if (!cvLinks) return undefined;
+          return { data: cvLinks, pages };
 
         default:
           return undefined;
